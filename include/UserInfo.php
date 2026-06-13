@@ -70,9 +70,8 @@ class UserInfo
 
   function __construct ($userdn)
   {
-    global $config;
     $this->dn         = $userdn;
-    $this->ignoreACL  = ($config->get_cfg_value('ignoreAcl') == $this->dn);
+    $this->ignoreACL  = (config()->get_cfg_value('ignoreAcl') == $this->dn);
 
     $this->loadLDAPInfo();
 
@@ -85,8 +84,7 @@ class UserInfo
   /*! \brief Loads user information from LDAP */
   function loadLDAPInfo ()
   {
-    global $config;
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     $ldap->cat($this->dn, ['*']);
     $attrs = $ldap->fetch(TRUE);
     if (!$ldap->success()) {
@@ -137,16 +135,16 @@ class UserInfo
    */
   function loadACL ()
   {
-    global $config, $plist;
+    global $plist;
 
     $this->ACL          = [];
     $this->groups       = [];
     $this->roles        = [];
     $this->result_cache = [];
     $this->resetAclCache();
-    $ldap = $config->getLdapLink();
-    $ldap->cd($config->current['BASE']);
-    $targetFilterLimit  = $config->get_cfg_value('AclTargetFilterLimit', 100);
+    $ldap = config()->getLdapLink();
+    $ldap->cd(config()->current['BASE']);
+    $targetFilterLimit  = config()->get_cfg_value('AclTargetFilterLimit', 100);
 
     /* Get member groups... */
     $ldap->search('(&(objectClass=groupOfNames)(member='.ldap_escape_f($this->dn).'))', ['dn']);
@@ -509,7 +507,6 @@ class UserInfo
    */
   function getPermissions ($dn, $object, $attribute = '', $skip_write = FALSE)
   {
-    global $config;
     /* If we are forced to skip ACLs checks for the current user
         then return all permissions.
      */
@@ -575,8 +572,8 @@ class UserInfo
           /* Category ACLs (e.g. $object = "user/0") */
           if (strstr($object, '/0')) {
             $ocs = preg_replace("/\/0$/", '', $object);
-            if (isset($config->data['CATEGORIES'][$ocs]) && ($attribute == '')) {
-              foreach ($config->data['CATEGORIES'][$ocs]['classes'] as $oc) {
+            if (isset(config()->data['CATEGORIES'][$ocs]) && ($attribute == '')) {
+              foreach (config()->data['CATEGORIES'][$ocs]['classes'] as $oc) {
                 if (isset($subacl['Acl'][$ocs.'/'.$oc])) {
                   if (($dn != $this->dn) &&
                       isset($subacl['Acl'][$ocs.'/'.$oc][0]) &&
@@ -640,12 +637,11 @@ class UserInfo
    */
   function getModuleDepartments ($module, bool $skip_self_acls = FALSE): array
   {
-    global $config;
     /* If we are forced to skip ACLs checks for the current user
         then return all departments as valid.
      */
     if ($this->ignore_acl_for_current_user()) {
-      return array_values($config->getDepartmentList());
+      return array_values(config()->getDepartmentList());
     }
 
     /* Use cached results if possilbe */
@@ -655,7 +651,7 @@ class UserInfo
       $module = [$module];
     }
 
-    $departmentInfo = $config->getDepartmentInfo();
+    $departmentInfo = config()->getDepartmentInfo();
 
     $res = [];
     foreach ($module as $mod) {
@@ -694,7 +690,7 @@ class UserInfo
       }
 
       /* For all departments */
-      $departments = $config->getDepartmentList();
+      $departments = config()->getDepartmentList();
       foreach ($departments as $dn) {
         if (isset($deps[$dn])) {
           continue;
@@ -735,8 +731,6 @@ class UserInfo
    */
   function getCompleteCategoryAcls ($dn, $category)
   {
-    global $config;
-
     if (!is_string($category)) {
       trigger_error('category must be string');
       return '';
@@ -745,8 +739,8 @@ class UserInfo
         return $this->result_cache['getCompleteCategoryAcls'][$dn][$category];
       }
       $acl = 'rwcdm';
-      if (isset($config->data['CATEGORIES'][$category])) {
-        foreach ($config->data['CATEGORIES'][$category]['classes'] as $oc) {
+      if (isset(config()->data['CATEGORIES'][$category])) {
+        foreach (config()->data['CATEGORIES'][$category]['classes'] as $oc) {
           if ($oc == '0') {
             /* Skip objectClass '0' (e.g. user/0) */
             continue;
@@ -802,8 +796,6 @@ class UserInfo
   */
   function expired_status ()
   {
-    global $config;
-
     if ($this->forcePasswordChange) {
       return POSIX_FORCE_PASSWORD_CHANGE;
     }
@@ -813,7 +805,7 @@ class UserInfo
       return 0;
     }
 
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
 
     if (class_available('ppolicyAccount')) {
       try {
@@ -839,11 +831,11 @@ class UserInfo
       }
     }
 
-    if ($config->get_cfg_value('handleExpiredAccounts') != 'TRUE') {
+    if (config()->get_cfg_value('handleExpiredAccounts') != 'TRUE') {
       return 0;
     }
 
-    $ldap->cd($config->current['BASE']);
+    $ldap->cd(config()->current['BASE']);
     $ldap->cat($this->dn);
     $attrs    = $ldap->fetch();
     $current  = floor(date("U") / 60 / 60 / 24);
@@ -927,19 +919,17 @@ class UserInfo
    */
   function isUserAdmin ()
   {
-    global $config;
     if (empty($this->ACLperPath)) {
       $this->loadACL();
     }
-    return ($this->getPermissions($config->current['BASE'], 'user/user') == 'rwcdm');
+    return ($this->getPermissions(config()->current['BASE'], 'user/user') == 'rwcdm');
   }
 
   /* \brief Test if a plugin is blacklisted for this user (does not show up in the menu)
    */
   function isBlacklisted ($plugin)
   {
-    global $config;
-    $blacklist = $config->get_cfg_value('PluginsMenuBlacklist', []);
+    $blacklist = config()->get_cfg_value('PluginsMenuBlacklist', []);
     foreach ($blacklist as $item) {
       list ($group, $p) = explode('|', $item, 2);
       if (($plugin == $p) && (in_array($group, $this->groups) || in_array($group, $this->roles))) {
@@ -956,8 +946,6 @@ class UserInfo
    */
   function getAttributeCategory ($type, $attribute)
   {
-    global $config;
-
     if (in_array_ics($attribute, ['objectClass', 'dn'])) {
       return TRUE;
     }
@@ -980,7 +968,7 @@ class UserInfo
         return $prefix.$tab['CLASS'];
       }
       if (isset($tab['SUBTABS'])) {
-        $acl = $this->getAttributeCategory($config->data['TABS'][$tab['SUBTABS']], $attribute);
+        $acl = $this->getAttributeCategory(config()->data['TABS'][$tab['SUBTABS']], $attribute);
         if ($acl !== FALSE) {
           return $prefix.$acl;
         }
@@ -1037,17 +1025,15 @@ class UserInfo
    */
   public static function getLdapUser (string $username)
   {
-    global $config;
-
     /* look through the entire ldap */
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     if (!$ldap->success()) {
       throw new FatalError(MsgPool::ldaperror($ldap->getError(FALSE), '', LDAP_AUTH));
     }
 
     $allowed_attributes = ['uid','mail'];
     $verify_attr = [];
-    $tmp = explode(',', $config->get_cfg_value('loginAttribute'));
+    $tmp = explode(',', config()->get_cfg_value('loginAttribute'));
     foreach ($tmp as $attr) {
       if (in_array($attr, $allowed_attributes)) {
         $verify_attr[] = $attr;
@@ -1064,7 +1050,7 @@ class UserInfo
       $filter .= '('.$attr.'='.$username.')';
     }
     $filter = '(&(|'.$filter.')(objectClass=inetOrgPerson))';
-    $ldap->cd($config->current['BASE']);
+    $ldap->cd(config()->current['BASE']);
     $ldap->search($filter, $tmp);
 
     /* get results, only a count of 1 is valid */
@@ -1106,8 +1092,6 @@ class UserInfo
    */
   public static function loginUser (string $username, string $password): userinfo
   {
-    global $config;
-
     $ui = static::getLdapUser($username);
 
     if ($ui === FALSE) {
@@ -1117,9 +1101,9 @@ class UserInfo
     }
 
     /* password check, bind as user with supplied password  */
-    $ldapObj = new LDAP($ui->dn, $password, $config->current['SERVER'],
-      isset($config->current['LDAPFOLLOWREFERRALS']) && ($config->current['LDAPFOLLOWREFERRALS'] == 'TRUE'),
-      isset($config->current['LDAPTLS']) && ($config->current['LDAPTLS'] == 'TRUE')
+    $ldapObj = new LDAP($ui->dn, $password, config()->current['SERVER'],
+      isset(config()->current['LDAPFOLLOWREFERRALS']) && (config()->current['LDAPFOLLOWREFERRALS'] == 'TRUE'),
+      isset(config()->current['LDAPTLS']) && (config()->current['LDAPTLS'] == 'TRUE')
     );
     $ldap = new LdapMultiplexer($ldapObj);
     if (!$ldap->success()) {

@@ -46,10 +46,10 @@ class Objects
    */
   static function ls ($types, $attrs = NULL, ?string $ou = NULL, string $filter = '', bool $checkAcl = FALSE, string $scope = 'subtree', bool $templateSearch = FALSE, bool $sizeLimit = FALSE): array
   {
-    global $ui, $config;
+    global $ui;
 
     if ($ou === NULL) {
-      $ou = $config->current['BASE'];
+      $ou = config()->current['BASE'];
     }
 
     if (!is_array($types)) {
@@ -242,7 +242,7 @@ class Objects
 
   static function search ($types, $search_attrs, ?string $ou = NULL, string $filter = '', bool $checkAcl = FALSE, string $scope = 'subtree', bool $templateSearch = FALSE, &$partialFilterAcls = [], bool $sizeLimit = FALSE): ldapMultiplexer
   {
-    global $config, $ui;
+    global $ui;
 
     $partialFilterAcls = [];
 
@@ -251,7 +251,7 @@ class Objects
     }
 
     if ($ou === NULL) {
-      $ou = $config->current['BASE'];
+      $ou = config()->current['BASE'];
     }
 
     $typeFilters = [];
@@ -274,7 +274,7 @@ class Objects
       throw new EmptyFilterException();
     }
 
-    $ldap = $config->getLdapLink($sizeLimit);
+    $ldap = config()->getLdapLink($sizeLimit);
     if (!$ldap->dnExists($ou)) {
       throw new NonExistingBranchException($ou);
     }
@@ -356,8 +356,6 @@ class Objects
    */
   static function link (string $dn, string $type, string $subaction = '', $text = NULL, bool $icon = TRUE, bool $link = TRUE): string
   {
-    global $config;
-
     $infos = static::infos($type);
     if ($link) {
       if (!isset($infos['Management'])) {
@@ -373,7 +371,7 @@ class Objects
     }
 
     if ($text === NULL) {
-      $ldap = $config->getLdapLink();
+      $ldap = config()->getLdapLink();
       $ldap->cat($dn, [$infos['nameAttr']]);
       if ($attrs = $ldap->fetch()) {
         if (isset($attrs[$infos['nameAttr']][0])) {
@@ -430,13 +428,11 @@ class Objects
 
   static function &infos (string $type): array
   {
-    global $config;
-
-    if (!isset($config->data['OBJECTS'][strtoupper($type)])) {
+    if (!isset(config()->data['OBJECTS'][strtoupper($type)])) {
       throw new NonExistingObjectTypeException($type);
     }
 
-    $infos =& $config->data['OBJECTS'][strtoupper($type)];
+    $infos =& config()->data['OBJECTS'][strtoupper($type)];
 
     if (!isset($infos['filterRDN'])) {
       if (empty($infos['ou'])) {
@@ -471,8 +467,6 @@ class Objects
   /* This method allows to cache parsed filter in filterObject key in objectTypes */
   static function getFilterObject (string $type): ldapFilter
   {
-    global $config;
-
     $infos =& static::infos($type);
 
     if (!isset($infos['filterObject'])) {
@@ -484,8 +478,6 @@ class Objects
   /* This method allows to cache searched attributes list in objectTypes */
   static function getSearchedAttributes (string $type): array
   {
-    global $config;
-
     $infos =& static::infos($type);
 
     if (!isset($infos['searchAttributes'])) {
@@ -496,7 +488,7 @@ class Objects
       if (!empty($infos['nameAttr'])) {
         $searchAttrs[$infos['nameAttr']] = $infos['aclCategory'].'/'.$infos['mainTab'];
       }
-      foreach ($config->data['TABS'][$infos['tabGroup']] as $tab) {
+      foreach (config()->data['TABS'][$infos['tabGroup']] as $tab) {
         if (!plugin_available($tab['CLASS'])) {
           continue;
         }
@@ -515,20 +507,19 @@ class Objects
 
   static function types (): array
   {
-    global $config;
-    return array_keys($config->data['OBJECTS']);
+    return array_keys(config()->data['OBJECTS']);
   }
 
   /* !\brief  This method returns a list of all available templates for the given type
    */
   static function getTemplates (string $type, string $requiredPermissions = 'r', string $filter = ''): array
   {
-    global $config, $ui;
+    global $ui;
 
     $infos = static::infos($type);
 
     $templates    = [];
-    $departments  = $config->getDepartmentList();
+    $departments  = config()->getDepartmentList();
     foreach ($departments as $key => $value) {
       // Search all templates from the current dn.
       try {

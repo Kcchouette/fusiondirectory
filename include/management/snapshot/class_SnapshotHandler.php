@@ -56,13 +56,12 @@ class SnapshotHandler
    */
   function __construct ()
   {
-    global $config;
-    $this->enabled = $config->snapshotEnabled();
+    $this->enabled = config()->snapshotEnabled();
     if ($this->enabled) {
       /* Prepare base */
-      $this->snapshotRDN = $config->get_cfg_value('snapshotBase');
-      $ldap = $config->get_ldap_link();
-      $ldap->cd($config->current['BASE']);
+      $this->snapshotRDN = config()->get_cfg_value('snapshotBase');
+      $ldap = config()->get_ldap_link();
+      $ldap->cd(config()->current['BASE']);
       try {
         $ldap->create_missing_trees($this->snapshotRDN);
       } catch (FusionDirectoryError $error) {
@@ -85,8 +84,7 @@ class SnapshotHandler
    */
   protected function snapshot_dn ($dn)
   {
-    global $config;
-    return preg_replace("/".preg_quote($config->current['BASE'], '/')."$/", "", $dn)
+    return preg_replace("/".preg_quote(config()->current['BASE'], '/')."$/", "", $dn)
             .$this->snapshotRDN;
   }
 
@@ -108,12 +106,11 @@ class SnapshotHandler
    */
   function initSnapshotCache ($base)
   {
-    global $config;
     if (!$this->enabled()) {
       return;
     }
 
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
 
     // Initialize base
     $base = $this->snapshot_dn($base);
@@ -148,12 +145,11 @@ class SnapshotHandler
    */
   function getSnapshots ($dn, $raw = FALSE)
   {
-    global $config;
     if (!$this->enabled()) {
       return [];
     }
 
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
 
     $objectBase = preg_replace("/^[^,]*./", "", $dn);
 
@@ -203,7 +199,6 @@ class SnapshotHandler
    */
   function createSnapshot ($dn, string $description, string $objectType, string $snapshotSource = 'FD')
   {
-    global $config;
     if (!$this->enabled()) {
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot are disabled but tried to create snapshot');
       return;
@@ -216,7 +211,7 @@ class SnapshotHandler
       $dns = [$dn];
     }
 
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
 
     /* check if the dn exists */
     if (!$ldap->dn_exists($dn)) {
@@ -290,17 +285,15 @@ class SnapshotHandler
   // Remove snapshots from the user if retention rules approves.
   public function verifySnapshotRetention (string $dn) : void
   {
-    global $config;
-
     // In case the snap configuration has not set any numbers
-    if (isset($config->current['SNAPSHOTMINRETENTION']) && !empty($config->current['SNAPSHOTMINRETENTION'])) {
-      $snapMinRetention  = $config->current['SNAPSHOTMINRETENTION'];
+    if (isset(config()->current['SNAPSHOTMINRETENTION']) && !empty(config()->current['SNAPSHOTMINRETENTION'])) {
+      $snapMinRetention  = config()->current['SNAPSHOTMINRETENTION'];
     } else {
       $snapMinRetention  = 0;
     }
 
-    if (isset($config->current['SNAPSHOTRETENTIONDAYS']) && !empty($config->current['SNAPSHOTRETENTIONDAYS'])) {
-      $snapRetentionDays = $config->current['SNAPSHOTRETENTIONDAYS'];
+    if (isset(config()->current['SNAPSHOTRETENTIONDAYS']) && !empty(config()->current['SNAPSHOTRETENTIONDAYS'])) {
+      $snapRetentionDays = config()->current['SNAPSHOTRETENTIONDAYS'];
     } else {
       $snapRetentionDays = -1;
     }
@@ -348,9 +341,8 @@ class SnapshotHandler
    */
   function removeSnapshot ($dn)
   {
-    global $config;
-    $ldap = $config->get_ldap_link();
-    $ldap->cd($config->current['BASE']);
+    $ldap = config()->get_ldap_link();
+    $ldap->cd(config()->current['BASE']);
     $ldap->rmdir_recursive($dn);
     if (!$ldap->success()) {
       $error = new FusionDirectoryLdapError($dn, LDAP_DEL, $ldap->get_error(), $ldap->get_errno());
@@ -366,12 +358,11 @@ class SnapshotHandler
    */
   function getAvailableSnapsShots ($dn)
   {
-    global $config;
     if (!$this->enabled()) {
       return [];
     }
 
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
 
     /* Prepare bases and some other infos */
     $base_of_object = preg_replace('/^[^,]+,/i', '', $dn);
@@ -404,12 +395,11 @@ class SnapshotHandler
    */
   function getAllDeletedSnapshots ($base_of_object)
   {
-    global $config;
     if (!$this->enabled()) {
       return [];
     }
 
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
 
     /* Prepare bases */
     $new_base       = $this->snapshot_dn($base_of_object);
@@ -451,13 +441,12 @@ class SnapshotHandler
    */
   function restoreSnapshot ($dn)
   {
-    global $config;
     if (!$this->enabled()) {
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot are disabled but tried to restore snapshot');
       return FALSE;
     }
 
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
 
     /* Get the snapshot */
     $ldap->cat($dn, ['gosaSnapshotData','gosaSnapshotDN'], '(gosaSnapshotData=*)');

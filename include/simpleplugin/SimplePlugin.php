@@ -169,9 +169,7 @@ class SimplePlugin implements SimpleTab
    */
    function __construct (?string $dn = NULL, $object = NULL, $parent = NULL, bool $mainTab = FALSE, ?array $attributesInfo = NULL)
    {
-    global $config;
-
-    /* Initialize facade components */
+     /* Initialize facade components */
     $this->acl       = new AclChecker($this);
     $this->renderer  = new PluginRenderer($this);
     $this->hooks     = new PluginHookManager($this);
@@ -261,7 +259,7 @@ class SimplePlugin implements SimpleTab
         }
       } else {
         /* From LDAP */
-        $ldap = $config->getLdapLink();
+        $ldap = config()->getLdapLink();
         $ldap->cat($this->dn);
         $this->attrs = $ldap->fetch(TRUE);
         if (empty($this->attrs)) {
@@ -291,8 +289,8 @@ class SimplePlugin implements SimpleTab
 
     if (is_array($this->inheritance)) {
       /* Check group membership */
-      $ldap = $config->getLdapLink();
-      $ldap->cd($config->current['BASE']);
+      $ldap = config()->getLdapLink();
+      $ldap->cd(config()->current['BASE']);
       foreach ($this->inheritance as $oc => $at) {
         if ($this->mainTab) {
           $filter = '(&(objectClass=' . $oc . ')(' . $at . '=' . ldap_escape_f($this->dn) . '))';
@@ -428,8 +426,7 @@ class SimplePlugin implements SimpleTab
 
   protected function templateSaveAttrs ()
   {
-    global $config;
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     $ldap->cat($this->dn);
     $template_attrs = $ldap->fetch(TRUE);
     if (!$template_attrs) {
@@ -510,7 +507,6 @@ class SimplePlugin implements SimpleTab
    */
   public function computeDn (): string
   {
-    global $config;
     if (!$this->mainTab) {
       throw new FatalError(htmlescape(_('Only main tab can compute dn')));
     }
@@ -536,7 +532,7 @@ class SimplePlugin implements SimpleTab
     if (isset($this->base)) {
       $base = $this->base;
     } else {
-      $base = $config->current['BASE'];
+      $base = config()->current['BASE'];
     }
     if ($this->is_template) {
       return 'cn=' . ldap_escape_dn($this->_template_cn) . ',ou=templates,' . $ou . $base;
@@ -570,11 +566,10 @@ class SimplePlugin implements SimpleTab
   */
   function getAllowedBases (): array
   {
-    global $config;
     $deps = [];
 
     /* Is this a new object ? Or just an edited existing object */
-    $departmentTree = $config->getDepartmentTree();
+    $departmentTree = config()->getDepartmentTree();
     foreach ($departmentTree as $dn => $name) {
       if (
         (!$this->initially_was_account && $this->aclIsCreateable($dn)) ||
@@ -587,7 +582,7 @@ class SimplePlugin implements SimpleTab
     /* Add current base */
     if (isset($this->base) && isset($departmentTree[$this->base])) {
       $deps[$this->base] = $departmentTree[$this->base];
-    } elseif (strtolower($this->dn) != strtolower($config->current['BASE'])) {
+    } elseif (strtolower($this->dn) != strtolower(config()->current['BASE'])) {
       trigger_error('Cannot return list of departments, no default base found in class ' . get_class($this) . '. (base is "' . $this->base . '")');
     }
     return $deps;
@@ -614,7 +609,7 @@ class SimplePlugin implements SimpleTab
     */
   function move (string $src_dn, string $dst_dn)
   {
-    global $config, $ui;
+    global $ui;
 
     /* Do not move if only case has changed */
     if (strtolower($src_dn) == strtolower($dst_dn)) {
@@ -622,8 +617,8 @@ class SimplePlugin implements SimpleTab
     }
 
     /* Try to move with ldap routines */
-    $ldap = $config->getLdapLink();
-    $ldap->cd($config->current['BASE']);
+    $ldap = config()->getLdapLink();
+    $ldap->cd(config()->current['BASE']);
     try {
       $ldap->createMissingTrees(preg_replace('/^[^,]+,/', '', $dst_dn));
     } catch (FusionDirectoryError $error) {
@@ -645,7 +640,7 @@ class SimplePlugin implements SimpleTab
     $ldap->cd($dst_dn);
     $ldap->search('(objectClass=gosaDepartment)', ['dn']);
     if ($ldap->count()) {
-      $config->resetDepartmentCache();
+      config()->resetDepartmentCache();
       $ui->resetAclCache();
     }
 
@@ -893,8 +888,6 @@ class SimplePlugin implements SimpleTab
    */
   function getAclBase (bool $callParent = TRUE): string
   {
-    global $config;
-
     if (($this->parent instanceof SimpleTabs) && $callParent) {
       return $this->parent->getAclBase();
     }
@@ -905,7 +898,7 @@ class SimplePlugin implements SimpleTab
       return 'new,' . $this->base;
     }
 
-    return $config->current['BASE'];
+    return config()->current['BASE'];
   }
 
   function renderAttributes (bool $readOnly = FALSE)
@@ -1057,9 +1050,7 @@ class SimplePlugin implements SimpleTab
   /*! \brief Test if there are ACLs for this plugin */
   function aclHasPermissions (): bool
   {
-    global $config;
-
-    return in_array(get_class($this), $config->data['CATEGORIES'][rtrim($this->acl_category, '/')]['classes']);
+    return in_array(get_class($this), config()->data['CATEGORIES'][rtrim($this->acl_category, '/')]['classes']);
   }
 
   /*! \brief Get the acl permissions for an attribute or the plugin itself */
@@ -1110,12 +1101,11 @@ class SimplePlugin implements SimpleTab
   /* Remove FusionDirectory attributes */
   protected function prepareRemove ()
   {
-    global $config;
     $this->attrs = [];
 
     if (!$this->mainTab) {
       /* include global link_info */
-      $ldap = $config->getLdapLink();
+      $ldap = config()->getLdapLink();
 
       /* Get current objectClasses in order to add the required ones */
       $ldap->cat($this->dn, ['fdTemplateField', 'objectClass']);
@@ -1155,8 +1145,7 @@ class SimplePlugin implements SimpleTab
 
   protected function ldapRemove (): array
   {
-    global $config;
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     if ($this->mainTab) {
       $ldap->rmdirRecursive($this->dn);
     } else {
@@ -1379,8 +1368,6 @@ class SimplePlugin implements SimpleTab
   /* \!brief Prepare $this->attrs */
   protected function prepareSave (): array
   {
-    global $config;
-
     $this->entryCSN = '';
 
     /* Start with empty array */
@@ -1389,7 +1376,7 @@ class SimplePlugin implements SimpleTab
 
     if (!$this->mainTab || $this->initially_was_account) {
       /* Get current objectClasses in order to add the required ones */
-      $ldap = $config->getLdapLink();
+      $ldap = config()->getLdapLink();
       $ldap->cat($this->dn, ['fdTemplateField', 'objectClass']);
 
       $tmp = $ldap->fetch();
@@ -1440,10 +1427,8 @@ class SimplePlugin implements SimpleTab
   /* Returns an array with the errors or an empty array */
   protected function ldapSave (): array
   {
-    global $config;
-
     /* Check if this is a new entry ... add/modify */
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     if ($this->mainTab && !$this->initially_was_account) {
       if ($ldap->dnExists($this->dn)) {
         return [
@@ -1453,7 +1438,7 @@ class SimplePlugin implements SimpleTab
           )
         ];
       }
-      $ldap->cd($config->current['BASE']);
+      $ldap->cd(config()->current['BASE']);
       try {
         $ldap->createMissingTrees(preg_replace('/^[^,]+,/', '', $this->dn));
       } catch (FusionDirectoryError $error) {
@@ -1532,16 +1517,15 @@ class SimplePlugin implements SimpleTab
    */
   protected function getAuditAttributesListFromConf (): array
   {
-    global $config;
     $result = [];
 
     // If audit plugin is installed only.
     if (class_available('auditConfig')) {
-      if (!empty($config->current['AUDITCONFHIDDENATTRVALUES'])) {
-        if (is_string($config->current['AUDITCONFHIDDENATTRVALUES'])) {
-          $result[] = $config->current['AUDITCONFHIDDENATTRVALUES'];
+      if (!empty(config()->current['AUDITCONFHIDDENATTRVALUES'])) {
+        if (is_string(config()->current['AUDITCONFHIDDENATTRVALUES'])) {
+          $result[] = config()->current['AUDITCONFHIDDENATTRVALUES'];
         } else {
-          $result = $config->current['AUDITCONFHIDDENATTRVALUES'];
+          $result = config()->current['AUDITCONFHIDDENATTRVALUES'];
         }
       }
     }
@@ -1630,12 +1614,10 @@ class SimplePlugin implements SimpleTab
    */
   function handlePreEvents (string $mode, array $addAttrs = []): array
   {
-    global $config;
-
     $this->ldap_error = '';
     if ($this->mainTab && ($mode == 'remove')) {
       /* Store information if there was subobjects before deletion */
-      $ldap = $config->getLdapLink();
+      $ldap = config()->getLdapLink();
       $ldap->cd($this->dn);
       $ldap->search('(objectClass=*)', ['dn'], 'one');
       $this->hadSubobjects = ($ldap->count() > 0);
@@ -1663,9 +1645,8 @@ class SimplePlugin implements SimpleTab
     if ($this->is_template) {
       return [];
     }
-    global $config;
 
-    $commands = $config->searchHooks(get_class($this), $cmd);
+    $commands = config()->searchHooks(get_class($this), $cmd);
     $messages = [];
 
     foreach ($commands as $command) {
@@ -1681,7 +1662,7 @@ class SimplePlugin implements SimpleTab
       $addAttrs['callerMAIL']      = $ui->mail;
 
       $addAttrs['dn']       = $this->dn;
-      $addAttrs['location'] = $config->current['NAME'];
+      $addAttrs['location'] = config()->current['NAME'];
 
       if (isset($this->parent->by_object)) {
         foreach ($this->parent->by_object as $class => $object) {
@@ -1718,7 +1699,7 @@ class SimplePlugin implements SimpleTab
         $str = implode("\n", $arr);
         $str = static::passwordProtect($str);
         Logging::debug(DEBUG_SHELL, __LINE__, __FUNCTION__, __FILE__, $command, 'Output: ' . $str);
-        if (!empty($str) && $config->get_cfg_value('displayHookOutput', 'FALSE') == 'TRUE') {
+        if (!empty($str) && config()->get_cfg_value('displayHookOutput', 'FALSE') == 'TRUE') {
           MsgDialog::display('[' . get_class($this) . ' ' . strtolower($cmd) . 'trigger] ' . $command, htmlescape($str), INFO_DIALOG);
         }
       }
@@ -1795,7 +1776,7 @@ class SimplePlugin implements SimpleTab
 
   function browseForeignKeys (string $mode, $param1 = NULL, $param2 = NULL)
   {
-    global $config, $plist;
+    global $plist;
 
     $subobjects = FALSE;
     if (preg_match('/^handle_/', $mode)) {
@@ -1806,7 +1787,7 @@ class SimplePlugin implements SimpleTab
         if ($newdn === NULL) {
           $subobjects = $this->hadSubobjects;
         } else {
-          $ldap = $config->getLdapLink();
+          $ldap = config()->getLdapLink();
           $ldap->cd($newdn);
           $ldap->search('(objectClass=*)', ['dn'], 'one');
           $subobjects = ($ldap->count() > 0);
@@ -1827,7 +1808,7 @@ class SimplePlugin implements SimpleTab
         $filter    = $ref[2];
         $filtersub = $ref[3];
         if ($filtersub == '*') {
-          if ($config->get_cfg_value('wildcardForeignKeys', 'TRUE') == 'TRUE') {
+          if (config()->get_cfg_value('wildcardForeignKeys', 'TRUE') == 'TRUE') {
             $filtersub = $ofield . '=*';
           } else {
             continue;
@@ -2073,8 +2054,7 @@ class SimplePlugin implements SimpleTab
    */
   function createUniqueDn (string $attribute, string $base): string
   {
-    global $config;
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     $base = preg_replace('/^,*/', '', $base);
 
     /* Try to use plain entry first */
