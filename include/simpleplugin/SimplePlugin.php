@@ -144,9 +144,21 @@ class SimplePlugin implements SimpleTab
    */
   protected string $entryCSN = '';
 
-  private bool $hadSubobjects = false;
+   private bool $hadSubobjects = false;
 
-  /*! \brief constructor
+   /** @var AclChecker ACL check operations */
+    public AclChecker $acl;
+
+   /** @var PluginRenderer Rendering and display */
+    public PluginRenderer $renderer;
+
+   /** @var PluginHookManager Hooks and events */
+    public PluginHookManager $hooks;
+
+   /** @var LdapReader LDAP loading and saving */
+    public LdapReader $ldapReader;
+
+   /*! \brief constructor
    *
    *  \param string $dn The dn of this instance
    *  \param Object $object An object to copy values from
@@ -155,9 +167,15 @@ class SimplePlugin implements SimpleTab
    *  \param array $attributesInfo An attributesInfo array, if NULL, getAttributesInfo will be used.
    *
    */
-  function __construct (?string $dn = NULL, $object = NULL, $parent = NULL, bool $mainTab = FALSE, ?array $attributesInfo = NULL)
-  {
+   function __construct (?string $dn = NULL, $object = NULL, $parent = NULL, bool $mainTab = FALSE, ?array $attributesInfo = NULL)
+   {
     global $config;
+
+    /* Initialize facade components */
+    $this->acl       = new AclChecker($this);
+    $this->renderer  = new PluginRenderer($this);
+    $this->hooks     = new PluginHookManager($this);
+    $this->ldapReader = new LdapReader($this);
 
     $this->dn      = $dn;
     $this->parent  = $parent;
