@@ -8,8 +8,9 @@ declare(strict_types=1);
  * Replaces the global variables pattern ($config, $ui, $smarty, etc.)
  *
  * Usage:
- *   $config = container()->get(Config::class);
- *   $ui = container()->get(UserInfo::class);
+ *   $config = config();
+ *   $ui = user_info();
+ *   Or: $config = container()->get(Config::class);
  */
 function container(): FusionDirectory\Container\Container
 {
@@ -20,4 +21,40 @@ function container(): FusionDirectory\Container\Container
     }
 
     return $container;
+}
+
+/**
+ * Get the Config instance (replaces `global $config`).
+ */
+function config(): Config
+{
+    static $config = null;
+
+    if ($config === null) {
+        global $config;
+        if (is_object($config)) {
+            return $config;
+        }
+        throw new \RuntimeException('Config not initialized');
+    }
+
+    return $config;
+}
+
+/**
+ * Get the UserInfo instance (replaces `global $ui`).
+ */
+function user_info(): ?UserInfo
+{
+    global $ui;
+    return $ui ?? null;
+}
+
+/**
+ * Get the Pluglist instance (replaces `global $plist`).
+ */
+function pluglist(): ?Pluglist
+{
+    global $plist;
+    return $plist ?? null;
 }
