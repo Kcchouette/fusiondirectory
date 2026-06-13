@@ -138,40 +138,38 @@ class PasswordRecovery extends standAlonePage
    */
   protected function readLdapConfig (): bool
   {
-    global $config;
-    $this->salt          = $config->get_cfg_value('passwordRecoverySalt');
-    $this->delay_allowed = $config->get_cfg_value('passwordRecoveryValidity');
+    $this->salt          = config()->get_cfg_value('passwordRecoverySalt');
+    $this->delay_allowed = config()->get_cfg_value('passwordRecoveryValidity');
 
-    $this->mail_subject  = $config->get_cfg_value('passwordRecoveryMailSubject');
-    $this->mail_body     = $config->get_cfg_value('passwordRecoveryMailBody');
-    $this->mail2_subject = $config->get_cfg_value('passwordRecoveryMail2Subject');
-    $this->mail2_body    = $config->get_cfg_value('passwordRecoveryMail2Body');
+    $this->mail_subject  = config()->get_cfg_value('passwordRecoveryMailSubject');
+    $this->mail_body     = config()->get_cfg_value('passwordRecoveryMailBody');
+    $this->mail2_subject = config()->get_cfg_value('passwordRecoveryMail2Subject');
+    $this->mail2_body    = config()->get_cfg_value('passwordRecoveryMail2Body');
 
-    $this->from_mail = $config->get_cfg_value('passwordRecoveryEmail');
+    $this->from_mail = config()->get_cfg_value('passwordRecoveryEmail');
 
-    $this->usealternates = $config->get_cfg_value('passwordRecoveryUseAlternate');
+    $this->usealternates = config()->get_cfg_value('passwordRecoveryUseAlternate');
 
-    $this->loginAttribute = $config->get_cfg_value('passwordRecoveryLoginAttribute', 'uid');
+    $this->loginAttribute = config()->get_cfg_value('passwordRecoveryLoginAttribute', 'uid');
 
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $config->get_cfg_value('passwordRecoveryActivated'), "passwordRecoveryActivated");
-    return ($config->get_cfg_value('passwordRecoveryActivated') == "TRUE");
+    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, config()->get_cfg_value('passwordRecoveryActivated'), "passwordRecoveryActivated");
+    return (config()->get_cfg_value('passwordRecoveryActivated') == "TRUE");
   }
 
   function storeToken ($temp_password)
   {
-    global $config;
     /* Store it in ldap with the salt */
     $salt_temp_password = $this->salt . $temp_password . $this->salt;
     $sha1_temp_password = "{SHA}" . base64_encode(pack("H*", sha1($salt_temp_password)));
 
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
 
     // Check if token branch is here
-    $token = get_ou('RecoveryTokenRDN') . $config->current['BASE'];
+    $token = get_ou('RecoveryTokenRDN') . config()->current['BASE'];
     $ldap->cat($token, ['dn']);
     if (!$ldap->count()) {
       /* It's not, let's create it */
-      $ldap->cd($config->current['BASE']);
+      $ldap->cd(config()->current['BASE']);
       try {
         $ldap->createMissingTrees($token);
       } catch (FusionDirectoryError $error) {
@@ -213,14 +211,13 @@ class PasswordRecovery extends standAlonePage
 
   function checkToken ($token)
   {
-    global $config;
     $salt_token = $this->salt . $token . $this->salt;
     $sha1_token = "{SHA}" . base64_encode(pack("H*", sha1($salt_token)));
 
     /* Retrieve hash from the ldap */
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
 
-    $token = get_ou('RecoveryTokenRDN') . $config->current['BASE'];
+    $token = get_ou('RecoveryTokenRDN') . config()->current['BASE'];
     $dn    = 'ou=' . $this->login . ',' . $token;
     $ldap->cat($dn);
     $attrs = $ldap->fetch();
@@ -235,19 +232,18 @@ class PasswordRecovery extends standAlonePage
 
   function getUserDn ()
   {
-    global $config;
     /* Retrieve dn from the ldap */
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
 
     $objectClasses = ['gosaMailAccount'];
-    if (class_available('personalInfo') && ($config->get_cfg_value('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
+    if (class_available('personalInfo') && (config()->get_cfg_value('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
       $objectClasses[] = 'fdPersonalInfo';
     }
-    if (class_available('supannAccount') && ($config->get_cfg_value('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
+    if (class_available('supannAccount') && (config()->get_cfg_value('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
       $objectClasses[] = 'supannPerson';
     }
     $filter = '(&(|(objectClass=' . join(')(objectClass=', $objectClasses) . '))(' . $this->loginAttribute . '=' . ldap_escape_f($this->login) . '))';
-    $ldap->cd($config->current['BASE']);
+    $ldap->cd(config()->current['BASE']);
     $ldap->search($filter, ['dn']);
 
     if ($ldap->count() < 1) {
@@ -266,8 +262,6 @@ class PasswordRecovery extends standAlonePage
   /* Find the login of for the given email address */
   function step2 ($email = NULL)
   {
-    global $config;
-
     if ($email !== NULL) {
       /* Special case when recovery is called from webservice */
       $this->email_address = $email;
@@ -280,14 +274,14 @@ class PasswordRecovery extends standAlonePage
     } else {
       $filter = '(&(objectClass=gosaMailAccount)(mail=' . $address_escaped . '))';
     }
-    if (class_available('personalInfo') && ($config->get_cfg_value('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
+    if (class_available('personalInfo') && (config()->get_cfg_value('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
       $filter = '(|' . $filter . '(&(objectClass=fdPersonalInfo)(fdPrivateMail=' . $address_escaped . ')))';
     }
-    if (class_available('supannAccount') && ($config->get_cfg_value('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
+    if (class_available('supannAccount') && (config()->get_cfg_value('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
       $filter = '(|' . $filter . '(&(objectClass=supannPerson)(|(supannMailPerso=' . $address_escaped . ')(supannMailPrive={SECOURS}' . $address_escaped . '))))';
     }
-    $ldap = $config->getLdapLink();
-    $ldap->cd($config->current['BASE']);
+    $ldap = config()->getLdapLink();
+    $ldap->cd(config()->current['BASE']);
     $ldap->search($filter, ['dn', 'userPassword', $this->loginAttribute]);
 
     /* Only one ldap node should be found */

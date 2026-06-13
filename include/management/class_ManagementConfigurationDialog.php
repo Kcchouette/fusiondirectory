@@ -114,8 +114,6 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   function __construct (Management $parent)
   {
-    global $config;
-
     parent::__construct(NULL, NULL, $parent);
 
     $this->attributesAccess['saveInLdap']->setInLdap(FALSE);
@@ -129,10 +127,10 @@ class ManagementConfigurationDialog extends ManagementDialog
       $this->attributesAccess['resetInLdap']->setVisible(FALSE);
     }
 
-    if (!$config->hasManagementConfig(get_class($this->parent), TRUE)) {
+    if (!config()->hasManagementConfig(get_class($this->parent), TRUE)) {
       $this->attributesAccess['resetInLdapUser']->setVisible(FALSE);
     }
-    if (!$config->hasManagementConfig(get_class($this->parent), FALSE)) {
+    if (!config()->hasManagementConfig(get_class($this->parent), FALSE)) {
       $this->attributesAccess['resetInLdap']->setVisible(FALSE);
     }
 
@@ -161,7 +159,7 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   function attrIsWriteable ($attr): bool
   {
-    global $config, $ui;
+    global $ui;
 
     $noAclAttrs   = ['managementColumns', 'saveInLdapUser', 'resetInLdapUser'];
     $configAttrs  = ['saveInLdap', 'resetInLdap'];
@@ -169,7 +167,7 @@ class ManagementConfigurationDialog extends ManagementDialog
     if ((is_object($attr) && in_array($attr->getLdapName(), $noAclAttrs)) || in_array($attr, $noAclAttrs)) {
       return TRUE;
     } elseif ((is_object($attr) && in_array($attr->getLdapName(), $configAttrs)) || in_array($attr, $configAttrs)) {
-      $acl = $ui->get_permissions(CONFIGRDN.$config->current['BASE'], 'configuration/configInLdap', 'fdManagementConfig', $this->readOnly());
+      $acl = $ui->get_permissions(CONFIGRDN.config()->current['BASE'], 'configuration/configInLdap', 'fdManagementConfig', $this->readOnly());
       return (strpos($acl, 'w') !== FALSE);
     } else {
       return parent::attrIsWriteable($attr);
@@ -178,8 +176,7 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   function handle_resetInLdapUser ()
   {
-    global $config;
-    $errors = $config->updateManagementConfig(get_class($this->parent), NULL, TRUE);
+    $errors = config()->updateManagementConfig(get_class($this->parent), NULL, TRUE);
     MsgDialog::displayChecks($errors);
     if (empty($errors)) {
       $this->attributesAccess['resetInLdapUser']->setVisible(FALSE);
@@ -188,8 +185,7 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   function handle_resetInLdap ()
   {
-    global $config;
-    $errors = $config->updateManagementConfig(get_class($this->parent), NULL, FALSE);
+    $errors = config()->updateManagementConfig(get_class($this->parent), NULL, FALSE);
     MsgDialog::displayChecks($errors);
     if (empty($errors)) {
       $this->attributesAccess['resetInLdap']->setVisible(FALSE);
@@ -198,17 +194,16 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   public function render (): string
   {
-    global $config, $ui;
+    global $ui;
 
     $smarty = get_smarty();
     $smarty->assign('ManagementConfigurationACL', 'rw');
-    $smarty->assign('fdManagementConfigACL', $ui->get_permissions(CONFIGRDN.$config->current['BASE'], 'configuration/configInLdap', 'fdManagementConfig', $this->readOnly()));
+    $smarty->assign('fdManagementConfigACL', $ui->get_permissions(CONFIGRDN.config()->current['BASE'], 'configuration/configInLdap', 'fdManagementConfig', $this->readOnly()));
     return parent::render();
   }
 
   public function save (): array
   {
-    global $config;
     $columnInfos  = [];
     $values       = $this->managementColumns;
     foreach ($values as $value) {
@@ -229,11 +224,11 @@ class ManagementConfigurationDialog extends ManagementDialog
     $this->parent->setColumnConfiguration($columnInfos);
 
     if ($this->saveInLdapUser) {
-      return $config->updateManagementConfig(get_class($this->parent), $columnInfos, TRUE);
+      return config()->updateManagementConfig(get_class($this->parent), $columnInfos, TRUE);
     }
 
     if ($this->saveInLdap) {
-      return $config->updateManagementConfig(get_class($this->parent), $columnInfos);
+      return config()->updateManagementConfig(get_class($this->parent), $columnInfos);
     }
 
     return [];

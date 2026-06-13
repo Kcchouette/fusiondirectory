@@ -104,7 +104,7 @@ class Management implements FusionDirectoryDialog
     ]
   )
   {
-    global $config, $class_mapping;
+    global $class_mapping;
 
     /* Initialize facade components */
     $this->listingComponent  = new ManagementListingComponent($this);
@@ -142,7 +142,7 @@ class Management implements FusionDirectoryDialog
     if (!$this->skipCpHandler) {
       $this->cpHandler = new CopyPasteHandler();
     }
-    if (!static::$skipSnapshots && ($config->get_cfg_value('enableSnapshots') == 'TRUE')) {
+    if (!static::$skipSnapshots && (config()->get_cfg_value('enableSnapshots') == 'TRUE')) {
       $this->snapHandler = new SnapshotHandler();
     }
 
@@ -170,7 +170,7 @@ class Management implements FusionDirectoryDialog
 
   protected function configureActions ()
   {
-    global $config, $ui, $positionDN;
+    global $ui, $positionDN;
 
     // Register default actions
     $createMenu = [];
@@ -298,7 +298,7 @@ class Management implements FusionDirectoryDialog
       )
     );
 
-    if (!static::$skipSnapshots && ($config->get_cfg_value('enableSnapshots') == 'TRUE')) {
+    if (!static::$skipSnapshots && (config()->get_cfg_value('enableSnapshots') == 'TRUE')) {
       $this->registerAction(
         new Action(
           'snapshot', _('Create snapshot'), 'geticon.php?context=actions&icon=snapshot&size=16',
@@ -355,11 +355,9 @@ class Management implements FusionDirectoryDialog
 
   public function getColumnConfiguration (): array
   {
-    global $config;
-
     if (!isset($this->columnConfiguration)) {
       // LDAP configuration
-      $this->columnConfiguration = $config->getManagementConfig(get_class($this));
+      $this->columnConfiguration = config()->getManagementConfig(get_class($this));
     }
 
     if (!isset($this->columnConfiguration)) {
@@ -542,7 +540,7 @@ class Management implements FusionDirectoryDialog
 
   function renderList (): string
   {
-    global $config, $ui;
+    global $ui;
 
     // Rendering things using smarty themselves first
     $listRender   = $this->listing->render();
@@ -1208,7 +1206,7 @@ class Management implements FusionDirectoryDialog
    */
   function createSnapshotDialog (array $action)
   {
-    global $config, $ui;
+    global $ui;
     Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action['targets'], 'Snapshot creation initiated!');
 
     $this->currentDn = array_pop($action['targets']);
@@ -1235,7 +1233,7 @@ class Management implements FusionDirectoryDialog
    */
   function restoreSnapshotDialog (array $action)
   {
-    global $config, $ui;
+    global $ui;
 
     if (empty($action['targets'])) {
       // No target, open the restore removed object dialog.

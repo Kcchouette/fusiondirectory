@@ -39,15 +39,14 @@ class LoginMethod
   /*! \brief Runs schemaCheck if activated in configuration */
   static function runSchemaCheck (): bool
   {
-    global $config;
-    if ($config->get_cfg_value('schemaCheck') != 'TRUE') {
+    if (config()->get_cfg_value('schemaCheck') != 'TRUE') {
       return TRUE;
     }
     $cfg = [];
-    $cfg['admin']       = $config->current['ADMINDN'];
-    $cfg['password']    = $config->current['ADMINPASSWORD'];
-    $cfg['connection']  = $config->current['SERVER'];
-    $cfg['tls']         = ($config->get_cfg_value('ldapTLS') == 'TRUE');
+    $cfg['admin']       = config()->current['ADMINDN'];
+    $cfg['password']    = config()->current['ADMINPASSWORD'];
+    $cfg['connection']  = config()->current['SERVER'];
+    $cfg['tls']         = (config()->get_cfg_value('ldapTLS') == 'TRUE');
     $str = check_schema($cfg);
     foreach ($str as $tr) {
       if (!$tr['STATUS']) {
@@ -65,14 +64,13 @@ class LoginMethod
   /*! \brief Check if locking LDAP branch is here or create it */
   static function checkForLockingBranch (): bool
   {
-    global $config;
-    $ldap = $config->get_ldap_link();
-    $ldap->cat(get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE'], ['dn']);
+    $ldap = config()->get_ldap_link();
+    $ldap->cat(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE'], ['dn']);
     $attrs = $ldap->fetch();
     if (!is_countable($attrs)) {
-      $ldap->cd($config->current['BASE']);
+      $ldap->cd(config()->current['BASE']);
       try {
-        $ldap->create_missing_trees(get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE']);
+        $ldap->create_missing_trees(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE']);
       } catch (FusionDirectoryError $error) {
         $error->display();
       }
@@ -101,7 +99,7 @@ class LoginMethod
   /*! \brief Performs an LDAP bind with $username and $password */
   static function ldapLoginUser (): bool
   {
-    global $ui, $config, $message, $smarty;
+    global $ui, $message, $smarty;
     /* Login as user, initialize user ACL's */
     try {
       $ui = UserInfo::loginUser(static::$username, static::$password);
@@ -120,7 +118,7 @@ class LoginMethod
   /*! \brief Called after successful login, return FALSE if account is expired */
   static function loginAndCheckExpired (): bool
   {
-    global $ui, $config, $plist, $message, $smarty;
+    global $ui, $plist, $message, $smarty;
 
     /* Remove all locks of this user */
     Lock::deleteByUser($ui->dn);
@@ -138,7 +136,7 @@ class LoginMethod
     Pluglist::load();
 
     /* Check that newly installed plugins have their configuration in the LDAP (will reload plist if needed) */
-    $config->checkLdapConfig();
+    config()->checkLdapConfig();
 
     /* Check account expiration */
     $expired = $ui->expired_status();
@@ -156,7 +154,7 @@ class LoginMethod
   /*! \brief Connect user */
   static function connect ()
   {
-    global $config, $ui;
+    global $ui;
 
     $ui = Session::get('ui');
 
@@ -166,7 +164,7 @@ class LoginMethod
     /* Not account expired or password forced change go to main page */
     Logging::log('security', 'login', $ui->uid, [], 'Logged in successfully');
     Session::set('connected', 1);
-    Session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
+    Session::set('DEBUGLEVEL', config()->get_cfg_value('DEBUGLEVEL'));
   }
 
   /*! \brief Final step of successful login: redirect to main.php */
@@ -201,16 +199,16 @@ class LoginMethod
   /*! \brief All login steps in the right order */
   static function loginProcess ()
   {
-    global $config, $smarty;
+    global $smarty;
 
-    $method = $config->get_cfg_value('LoginMethod', '');
+    $method = config()->get_cfg_value('LoginMethod', '');
     if (empty($method)) {
       // Try to detect configurations from FD<1.4
-      if ($config->get_cfg_value('httpAuthActivated') == 'TRUE') {
+      if (config()->get_cfg_value('httpAuthActivated') == 'TRUE') {
         $method = 'LoginHTTPAuth';
-      } elseif ($config->get_cfg_value('casActivated') == 'TRUE') {
+      } elseif (config()->get_cfg_value('casActivated') == 'TRUE') {
         $method = 'LoginCAS';
-      } elseif ($config->get_cfg_value('httpHeaderAuthActivated') == 'TRUE') {
+      } elseif (config()->get_cfg_value('httpHeaderAuthActivated') == 'TRUE') {
         $method = 'LoginHTTPHeader';
       } else {
         $method = 'LoginPost';

@@ -60,10 +60,8 @@ class SimpleTabs implements FusionDirectoryDialog
    * */
   function __construct (string $type, $dn, $attrs_object = NULL)
   {
-    global $config;
-
     $infos              = Objects::infos($type);
-    $data               = $config->data['TABS'][$infos['tabGroup']];
+    $data               = config()->data['TABS'][$infos['tabGroup']];
     $this->acl_category = $infos['aclCategory'];
     $this->objectType   = $type;
     $this->dn           = $dn;
@@ -146,9 +144,7 @@ class SimpleTabs implements FusionDirectoryDialog
    */
   public static function getPotentialTabList (string $type, array $infos): array
   {
-    global $config;
-
-    return $config->data['TABS'][$infos['tabGroup']];
+    return config()->data['TABS'][$infos['tabGroup']];
   }
 
   /*!
@@ -373,12 +369,11 @@ class SimpleTabs implements FusionDirectoryDialog
    */
   public function check (): array
   {
-    global $config;
     $messages = [];
 
     if ($this->getBaseObject()->is_template) {
-      $ldap = $config->getLdapLink();
-      $ldap->cd($config->current['BASE']);
+      $ldap = config()->getLdapLink();
+      $ldap->cd(config()->current['BASE']);
       $filter = '(&(objectClass=fdTemplate)(cn='.ldap_escape_f($this->getBaseObject()->_template_cn).'))';
       $ldap->search($filter, ['dn']);
       while ($attrs = $ldap->fetch()) {
@@ -527,9 +522,8 @@ class SimpleTabs implements FusionDirectoryDialog
    */
   function addSpecialTabs ()
   {
-    global $config;
     $baseobject = $this->getBaseObject();
-    foreach ($config->data['TABS']['SPECIALTABS'] as $tab) {
+    foreach (config()->data['TABS']['SPECIALTABS'] as $tab) {
       if (!plugin_available($tab['CLASS'])) {
         continue;
       }

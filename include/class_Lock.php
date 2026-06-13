@@ -47,7 +47,7 @@ class Lock
    */
   public static function add ($object, ?string $user = NULL)
   {
-    global $config, $ui;
+    global $ui;
 
     /* Remember which entries were opened as read only, because we
         don't need to remove any locks for them later */
@@ -80,19 +80,19 @@ class Lock
     }
 
     /* Check for existing entries in lock area */
-    $ldap = $config->get_ldap_link();
-    $ldap->cd(get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE']);
+    $ldap = config()->get_ldap_link();
+    $ldap->cd(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE']);
     $ldap->search('(&(objectClass=fdLockEntry)(fdUserDn='.ldap_escape_f($user).')(fdObjectDn='.base64_encode($object).'))',
         ['fdUserDn']);
     if ($ldap->get_errno() == 32) {
       /* No such object, means the locking branch is missing, create it */
-      $ldap->cd($config->current['BASE']);
+      $ldap->cd(config()->current['BASE']);
       try {
-        $ldap->create_missing_trees(get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE']);
+        $ldap->create_missing_trees(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE']);
       } catch (FusionDirectoryError $error) {
         $error->display();
       }
-      $ldap->cd(get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE']);
+      $ldap->cd(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE']);
       $ldap->search('(&(objectClass=fdLockEntry)(fdUserDn='.ldap_escape_f($user).')(fdObjectDn='.base64_encode($object).'))',
         ['fdUserDn']);
     }
@@ -110,7 +110,7 @@ class Lock
     if ($ldap->count() == 0) {
       $attrs  = [];
       $name   = md5($object);
-      $dn     = 'cn='.$name.','.get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE'];
+      $dn     = 'cn='.$name.','.get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE'];
       $ldap->cd($dn);
       $attrs = [
         'objectClass'     => 'fdLockEntry',
@@ -135,8 +135,6 @@ class Lock
    */
   public static function deleteByObject ($object)
   {
-    global $config;
-
     if (is_array($object)) {
       foreach ($object as $obj) {
         static::deleteByObject($obj);
@@ -161,8 +159,8 @@ class Lock
     }
 
     /* Check for existance and remove the entry */
-    $ldap = $config->get_ldap_link();
-    $dn   = get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE'];
+    $ldap = config()->get_ldap_link();
+    $dn   = get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE'];
     $ldap->cd($dn);
     $ldap->search('(&(objectClass=fdLockEntry)(fdObjectDn='.base64_encode($object).'))', ['fdObjectDn']);
     if (!$ldap->success()) {
@@ -185,11 +183,9 @@ class Lock
    */
   public static function deleteByUser (string $userdn)
   {
-    global $config;
-
     /* Get LDAP ressources */
-    $ldap = $config->get_ldap_link();
-    $ldap->cd(get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE']);
+    $ldap = config()->get_ldap_link();
+    $ldap->cd(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE']);
 
     /* Remove all objects of this user, drop errors silently in this case. */
     $ldap->search('(&(objectClass=fdLockEntry)(fdUserDn='.ldap_escape_f($userdn).'))', ['fdUserDn']);
@@ -211,8 +207,6 @@ class Lock
    */
   public static function get ($objects, bool $allow_readonly = FALSE): array
   {
-    global $config;
-
     if (is_array($objects) && (count($objects) == 1)) {
       $objects = reset($objects);
     }
@@ -234,8 +228,8 @@ class Lock
     }
 
     /* Get LDAP link, check for presence of the lock entry */
-    $ldap = $config->get_ldap_link();
-    $dn   = get_ou('lockRDN').get_ou('fusiondirectoryRDN').$config->current['BASE'];
+    $ldap = config()->get_ldap_link();
+    $dn   = get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE'];
     $ldap->cd($dn);
     $ldap->search($filter, ['fdUserDn','fdObjectDn', 'fdLockTimestamp']);
     if (!$ldap->success()) {
@@ -243,7 +237,7 @@ class Lock
     }
 
     $locks = [];
-    $sessionLifetime = $config->get_cfg_value('sessionLifetime', 1800);
+    $sessionLifetime = config()->get_cfg_value('sessionLifetime', 1800);
     if ($sessionLifetime > 0) {
       $expirationDate = (new DateTime())->sub(new DateInterval('PT'.$sessionLifetime.'S'));
     }

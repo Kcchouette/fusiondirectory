@@ -60,8 +60,6 @@ class ManagementListing
    */
   function __construct (Management $parent, bool $baseMode = TRUE, bool $multiSelect = TRUE)
   {
-    global $config;
-
     $this->parent       = $parent;
     $this->baseMode     = $baseMode;
     $this->multiSelect  = $multiSelect;
@@ -72,14 +70,14 @@ class ManagementListing
     $this->setUpBaseSelector();
 
     // Move footer information
-    $this->showFooter = ($config->get_cfg_value('listSummary') == 'TRUE');
+    $this->showFooter = (config()->get_cfg_value('listSummary') == 'TRUE');
 
     $this->reloadColumns();
   }
 
   function setUpBaseSelector ()
   {
-    global $config, $ui;
+    global $ui;
 
     // Set base for filter
     if ($this->baseMode) {
@@ -89,7 +87,7 @@ class ManagementListing
       // Instanciate base selector
       $this->baseSelector = new BaseSelector($this->bases, $this->base);
     } else {
-      $this->base = $config->current['BASE'];
+      $this->base = config()->current['BASE'];
     }
   }
 
@@ -453,8 +451,6 @@ class ManagementListing
    */
   function getAction (): array
   {
-    global $config;
-
     $result = ['targets' => [], 'action' => '', 'subaction' => NULL];
 
     // Do not do anything if this is not our PID, or there's even no PID available...
@@ -545,7 +541,6 @@ class ManagementListing
    */
   function refreshBasesList ()
   {
-    global $config;
     $ui = get_userinfo();
 
     // Fill internal bases list
@@ -558,7 +553,7 @@ class ManagementListing
     }
 
     $deps = $ui->getModuleDepartments(array_values($categories));
-    $departmentTree = $config->getDepartmentTree();
+    $departmentTree = config()->getDepartmentTree();
     foreach ($departmentTree as $key => $dep) {
       if (in_array_ics($key, $deps)) {
         $this->bases[$key] = $dep;

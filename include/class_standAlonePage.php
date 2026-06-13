@@ -31,7 +31,7 @@ abstract class standAlonePage
   /* Constructor */
   function __construct ($interactive = TRUE)
   {
-    global $config, $ssl, $ui;
+    global $ssl, $ui;
 
     $this->interactive = $interactive;
 
@@ -61,14 +61,12 @@ abstract class standAlonePage
 
   function checkDirectoryChooser ()
   {
-    global $config;
-
     $olddirectory = $this->directory;
 
     // Check for location header before proceeding with authentication
     if (isset($_SERVER['HTTP_X_FUSIONDIRECTORY_LOCATION'])) {
       $server = trim($_SERVER['HTTP_X_FUSIONDIRECTORY_LOCATION']);
-      if (isset($config->data['LOCATIONS'][$server])) {
+      if (isset(config()->data['LOCATIONS'][$server])) {
         // Valid location found - switch to it
         $this->directory = validate($server);
         Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__,
@@ -79,7 +77,7 @@ abstract class standAlonePage
     } elseif (isset($_GET['directory']) && isset($this->directories[$_GET['directory']])) {
       $this->directory = validate($_GET['directory']);
     } elseif (empty($this->directory)) {
-      $this->directory = $config->data['MAIN']['DEFAULT'];
+      $this->directory = config()->data['MAIN']['DEFAULT'];
 
       if (!isset($this->directories[$this->directory])) {
         $this->directory = key($this->directories);
@@ -88,7 +86,7 @@ abstract class standAlonePage
 
     if ($this->directory != $olddirectory) {
       /* Set config to selected one */
-      $config->set_current($this->directory);
+      config()->set_current($this->directory);
 
       $this->activated = $this->readLdapConfig();
     }
@@ -96,7 +94,7 @@ abstract class standAlonePage
 
   function init ()
   {
-    global $config, $ssl, $ui;
+    global $ssl, $ui;
 
     if (!$this->interactive) {
       $this->activated = $this->readLdapConfig();
@@ -150,12 +148,10 @@ abstract class standAlonePage
 
   function setupSmarty ()
   {
-    global $config;
-
     $smarty = get_smarty();
 
     /* Set template compile directory */
-    $smarty->compile_dir = $config->get_cfg_value('templateCompileDirectory', SPOOL_DIR);
+    $smarty->compile_dir = config()->get_cfg_value('templateCompileDirectory', SPOOL_DIR);
 
     /* Check for compile directory */
     if (!(is_dir($smarty->compile_dir) && is_writable($smarty->compile_dir))) {
@@ -208,7 +204,6 @@ abstract class standAlonePage
 
   function checkForSSL ()
   {
-    global $config;
     $smarty = get_smarty();
 
     /* Check for SSL connection */
@@ -218,10 +213,10 @@ abstract class standAlonePage
       $ssl = URL::getSslUrl();
 
       /* If SSL is forced, just forward to the SSL enabled site */
-      if ($config->get_cfg_value('forcessl') == 'TRUE') {
+      if (config()->get_cfg_value('forcessl') == 'TRUE') {
         header("Location: $ssl");
         exit;
-      } elseif ($config->get_cfg_value('warnssl') == 'TRUE') {
+      } elseif (config()->get_cfg_value('warnssl') == 'TRUE') {
         /* Display SSL mode warning? */
         $smarty->assign('ssl', sprintf(htmlescape(_('Warning: %sSession is not encrypted!%s')), '<a href="'.$ssl.'">', '</a>'));
       }
