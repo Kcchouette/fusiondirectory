@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
-  Copyright (C) 2011-2018  FusionDirectory
+
+  Copyright (C) 2017-2019  FusionDirectory
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,8 +20,31 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-require_once('../include/php_setup.php');
-require_once('functions.php');
-require_once('variables.php');
+/*!
+ * \brief This class handles an element from the management filter box
+ */
+class FilterElement
+{
+  protected ManagementFilter $parent;
 
-PasswordRecovery::run();
+  public function __construct (ManagementFilter $parent)
+  {
+    $this->parent = $parent;
+  }
+
+  /* Reads POST */
+  public function update ()
+  {
+  }
+
+  public function render (): string
+  {
+    return '';
+  }
+
+  /* Fills LDAP filters for the given type. Returns TRUE if type should be skipped altogether. */
+  public function getFilters (string $type, array &$filters): bool
+  {
+    return FALSE;
+  }
+}

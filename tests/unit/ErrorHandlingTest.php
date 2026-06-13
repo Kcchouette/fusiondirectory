@@ -43,7 +43,7 @@ class ErrorHandlingTest extends TestCase
      */
     public function testAutoloaderNoExit(): void
     {
-        $file = $this->includeDir . '/functions.inc';
+        $file = $this->includeDir . '/functions.php';
         $content = file_get_contents($file);
 
         // Find the autoload function

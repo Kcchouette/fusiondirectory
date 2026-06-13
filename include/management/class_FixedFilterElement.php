@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
-  Copyright (C) 2011-2018  FusionDirectory
+
+  Copyright (C) 2018-2019  FusionDirectory
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,8 +20,34 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-require_once('../include/php_setup.php');
-require_once('functions.php');
-require_once('variables.php');
+class FixedFilterElement extends FilterElement
+{
+  protected string $filter;
 
-PasswordRecovery::run();
+  public function __construct (ManagementFilter $parent, string $filter)
+  {
+    parent::__construct($parent);
+
+    $this->filter = $filter;
+  }
+
+  public function render (): string
+  {
+    $inputs = [
+      [
+        'name'  => $this->filter,
+        'desc'  => $this->filter,
+      ]
+    ];
+    $smarty = get_smarty();
+    $smarty->assign('NAME',   _('Fixed'));
+    $smarty->assign('INPUTS', $inputs);
+    return $smarty->fetch(get_template_path('management/filter-element-fixed.tpl'));
+  }
+
+  public function getFilters (string $type, array &$filters): bool
+  {
+    $filters[] = $this->filter;
+    return FALSE;
+  }
+}

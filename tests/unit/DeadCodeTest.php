@@ -19,7 +19,7 @@ class DeadCodeTest extends TestCase
         $output = [];
         $exitCode = 0;
         exec(
-            'grep -rn "track_vars" ' . escapeshellarg($this->projectDir) . '/include/ --include="*.inc" --include="*.php" 2>/dev/null',
+            'grep -rn "track_vars" ' . escapeshellarg($this->projectDir) . '/include/ --include="*.php" 2>/dev/null',
             $output,
             $exitCode
         );
@@ -63,7 +63,7 @@ class DeadCodeTest extends TestCase
      */
     public function testDeprecatedNormalizeLdapRemoved(): void
     {
-        $file = $this->projectDir . '/include/functions.inc';
+        $file = $this->projectDir . '/include/functions.php';
         $content = file_get_contents($file);
 
         $this->assertDoesNotMatchRegularExpression(

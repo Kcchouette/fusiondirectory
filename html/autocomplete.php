@@ -20,9 +20,9 @@
 */
 
 /* Basic setup, remove eventually registered sessions */
-@require_once("../include/php_setup.inc");
-@require_once("functions.inc");
-@require_once("variables.inc");
+@require_once("../include/php_setup.php");
+@require_once("functions.php");
+@require_once("variables.php");
 
 session_cache_limiter("private");
 Session::start();

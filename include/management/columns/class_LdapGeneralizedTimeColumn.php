@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
-  Copyright (C) 2011-2018  FusionDirectory
+
+  Copyright (C) 2018-2019  FusionDirectory
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,8 +20,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-require_once('../include/php_setup.php');
-require_once('functions.php');
-require_once('variables.php');
+/*!
+ * \brief Column rendering LdapGeneralizedTime attributes
+ */
+class LdapGeneralizedTimeColumn extends LinkColumn
+{
+  protected string $type = 'string';
 
-PasswordRecovery::run();
+  protected function renderSingleValue (ListingEntry $entry, string $value): string
+  {
+    if ($value != '') {
+      $dateObject = LdapGeneralizedTime::fromString($value);
+      if (is_object($dateObject)) {
+        return $this->renderLink($entry, $dateObject->format('Y-m-d, H:i:s'));
+      }
+    }
+    return '&nbsp;';
+  }
+}

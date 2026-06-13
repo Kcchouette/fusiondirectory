@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
-  Copyright (C) 2011-2018  FusionDirectory
+
+  Copyright (C) 2018-2023  FusionDirectory
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,8 +20,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-require_once('../include/php_setup.php');
-require_once('functions.php');
-require_once('variables.php');
+/*!
+* \brief Column rendering EpochDays attributes
+*/
+class EpochDaysColumn extends LinkColumn
+{
+  protected string $type = 'integer';
 
-PasswordRecovery::run();
+  protected function renderSingleValue (ListingEntry $entry, string $value): string
+  {
+    if (!empty($value)) {
+      // Multiply epoch day received as value by numbers of seconds in a day.
+      $epochInSeconds = (int) $value * 86400;
+      // casting is required for DateTime; It expects string.
+      $value = (string) $epochInSeconds;
+      $dateObject = DateTime::createFromFormat('U', $value, new DateTimeZone('UTC'));
+      if (is_object($dateObject)) {
+        return $this->renderLink($entry, $dateObject->format('d.m.Y'));
+      }
+    }
+    return '&nbsp;';
+  }
+}

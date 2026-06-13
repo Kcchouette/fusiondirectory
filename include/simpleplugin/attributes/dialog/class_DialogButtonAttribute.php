@@ -20,16 +20,32 @@ declare(strict_types=1);
 */
 
 /*!
- * \brief System selection
+ * \brief Attribute showing a button which triggers a dialog
  */
-class SystemSelect extends SelectManagement
+class DialogButtonAttribute extends ButtonAttribute
 {
-  /* Default columns */
-  public static array $columns = [
-    ['ObjectTypeColumn',  []],
-    ['LinkColumn',        ['attributes' => 'nameAttr',      'label' => 'Name']],
-    ['IpColumn',          ['attributes' => 'ipHostNumber',  'label' => 'IP']],
-    ['Column',            ['attributes' => 'macAddress',    'label' => 'Mac']],
-    ['LinkColumn',        ['attributes' => 'description',   'label' => 'Description']],
-  ];
+  protected ?string $dialogClass  = NULL;
+
+  function __construct ($label, $description, $ldapName, $buttonText, $dialogClass, $defaultValue = '', $acl = '')
+  {
+    parent::__construct($label, $description, $ldapName, $buttonText, NULL, $defaultValue, $acl);
+    $this->dialogClass  = $dialogClass;
+  }
+
+  function applyPostValue ()
+  {
+    if (!$this->disabled && $this->isVisible() && $this->postValue) {
+      $this->plugin->openDialog(new $this->dialogClass($this->plugin, $this));
+    }
+  }
+
+  function getFilterBlackList ()
+  {
+    return [];
+  }
+
+  function getFilterWhiteList ()
+  {
+    return [];
+  }
 }

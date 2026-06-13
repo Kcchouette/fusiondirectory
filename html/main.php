@@ -28,9 +28,9 @@
  */
 
 /* Basic setup, remove eventually registered sessions */
-require_once("../include/php_setup.inc");
-require_once("functions.inc");
-require_once("variables.inc");
+require_once("../include/php_setup.php");
+require_once("functions.php");
+require_once("variables.php");
 
 /* Set headers */
 header('Content-type: text/html; charset=UTF-8');

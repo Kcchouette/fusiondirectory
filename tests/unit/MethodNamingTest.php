@@ -13,15 +13,23 @@ class MethodNamingTest extends TestCase
 
     /**
      * Verify that most methods use camelCase (not snake_case).
-     * Allows exceptions for plugin API methods (pl*) and magic methods.
+     * Allows exceptions for plugin API methods, magic methods, and standalone functions.
      */
     public function testMethodsAreCamelCase(): void
     {
         $files = $this->getPhpFiles($this->includeDir);
         $violations = [];
         $exceptions = ['pl', '__', 'gosa', 'get_cfg_value', 'is_set', 'set_current', 'un_set', 'expired_status', 'gen_menu', 'get_dialogs', 'ignore_acl_for_current_user'];
+        // Exclude files with standalone functions (public API)
+        $excludedFiles = ['functions.php', 'functions_debug.php', 'accept-to-gettext.php'];
 
         foreach ($files as $file) {
+            // Skip excluded files
+            $relativePath = str_replace($this->includeDir . '/', '', $file);
+            if (in_array($relativePath, $excludedFiles)) {
+                continue;
+            }
+
             $lines = file($file);
             foreach ($lines as $lineNum => $line) {
                 if (preg_match('/^\s*(?:public\s+|protected\s+|private\s+)?function\s+([a-z][a-z0-9_]*)\s*\(/', $line, $matches)) {
@@ -35,15 +43,14 @@ class MethodNamingTest extends TestCase
                         }
                     }
                     if (!$isException && strpos($methodName, '_') !== false) {
-                        $relativePath = str_replace($this->includeDir . '/', '', $file);
                         $violations[] = "{$relativePath}:{$lineNum} — {$methodName}()";
                     }
                 }
             }
         }
 
-        // Allow up to 20 violations (methods with external callers we couldn't rename)
-        $this->assertLessThanOrEqual(20, count($violations),
+        // Allow up to 10 violations (methods with external callers we couldn't rename)
+        $this->assertLessThanOrEqual(10, count($violations),
             "Too many snake_case methods remaining:\n" . implode("\n", array_slice($violations, 0, 30))
         );
     }

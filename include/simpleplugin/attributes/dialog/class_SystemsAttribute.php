@@ -1,7 +1,8 @@
 <?php
+declare(strict_types=1);
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
-  Copyright (C) 2011-2018  FusionDirectory
+  Copyright (C) 2012-2020  FusionDirectory
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,8 +19,15 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-require_once('../include/php_setup.php');
-require_once('functions.php');
-require_once('variables.php');
+/*!
+ * \brief Attribute storing a system list
+ */
+class SystemsAttribute extends ObjectsAttribute
+{
+  protected string $dialogClass  = 'SystemSelectDialog';
 
-PasswordRecovery::run();
+  function __construct (string $label, string $description, string $ldapName, bool $required, array $objectTypes = ['terminal', 'workstation', 'server'], ?array $defaultValue = [], string $store_attr = 'cn', string $display_attr = 'cn', ?array $filterElementDefinitions = NULL, string $acl = '')
+  {
+    parent::__construct($label, $description, $ldapName, $required, $objectTypes, $defaultValue, $store_attr, $display_attr, $filterElementDefinitions, $acl);
+  }
+}
