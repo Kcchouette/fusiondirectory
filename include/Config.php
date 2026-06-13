@@ -32,40 +32,40 @@ declare(strict_types=1);
 class Config
 {
   /* XML parser */
-  public $parser;
-  public $config_found     = FALSE;
-  public $tags             = [];
-  public $level            = 0;
-  public $currentLocation  = '';
+  public mixed $parser = null;
+  public bool $config_found = false;
+  public array $tags = [];
+  public int $level = 0;
+  public string $currentLocation = '';
 
   /*!
    * \brief Store configuration for current location
    */
-  public $current = [];
+  public array $current = [];
 
   /* Link to LDAP-server */
   protected $ldapLink = NULL;
-  public $referrals      = [];
+  public array $referrals = [];
 
   /*
    * \brief Configuration data
    *
    * - $data['SERVERS'] contains server informations.
    */
-  public $data = [
+  public array $data = [
     'LOCATIONS' => [],
     'SERVERS'   => [],
     'MAIN'      => [],
   ];
-  public $basedir        = '';
+  public string $basedir = '';
 
   /* Keep a copy of the current department list */
   protected $departmentList;
   protected $departmentTree;
   protected $departmentInfo;
 
-  public $filename         = '';
-  public $last_modified    = 0;
+  public string $filename = '';
+  public int $last_modified = 0;
 
   /*!
    * \brief Class constructor of the config class
