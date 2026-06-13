@@ -1,0 +1,19 @@
+parameters:
+    level: 5
+    paths:
+        - include
+        - plugins
+        - setup
+        - html
+    excludePaths:
+        - ihtml
+        - locale
+        - contrib
+    treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        - '#Call to an undefined method [a-zA-Z0-9_\\:]+\(\)#'
+        - '#Property [a-zA-Z0-9_\\:]+::\$[a-zA-Z0-9_]+ is not subtype of native type#'
+
+includes:
+    - phpstan-baseline.neon
