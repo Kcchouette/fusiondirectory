@@ -40,33 +40,33 @@ define('POSIX_DISALLOW_PASSWORD_CHANGE',  8);
 
 class UserInfo
 {
-  public $dn;
-  public $cn;
-  public $uid;
-  public $sn           = '';
-  public $givenName    = '';
-  public $gidNumber    = -1;
-  public $language     = "";
-  public $groups       = [];
-  public $roles        = [];
-  public $mail         = '';
+  public string $dn = '';
+  public string $cn = '';
+  public string $uid = '';
+  public string $sn           = '';
+  public string $givenName    = '';
+  public int $gidNumber    = -1;
+  public string $language     = '';
+  public array $groups       = [];
+  public array $roles        = [];
+  public string $mail         = '';
 
   /*! \brief LDAP attributes of this user at login */
-  protected $cachedAttrs  = [];
+  protected array $cachedAttrs  = [];
 
-  protected $result_cache = [];
-  protected $ignoreACL    = FALSE;
-  protected $ACL          = [];
-  protected $ACLperPath   = [];
+  protected array $result_cache = [];
+  protected bool $ignoreACL    = false;
+  protected array $ACL          = [];
+  protected array $ACLperPath   = [];
 
   /*! \brief LDAP size limit handler */
-  protected $sizeLimitHandler;
+  protected mixed $sizeLimitHandler = null;
 
   /*! \brief Current management base */
-  protected $currentBase;
+  protected string $currentBase = '';
 
   /*! \brief Password change should be forced */
-  protected $forcePasswordChange = FALSE;
+  protected bool $forcePasswordChange = false;
 
   function __construct ($userdn)
   {
