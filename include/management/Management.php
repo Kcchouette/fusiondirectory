@@ -26,59 +26,59 @@ declare(strict_types=1);
 class Management implements FusionDirectoryDialog
 {
   /* Object types we are currently managing */
-  public $objectTypes;
+  public array $objectTypes = [];
 
   /* managementListing instance which manages the entries */
-  public $listing;
+  public ?ManagementListing $listing = null;
 
   /* managementFilter instance which manages the filters */
-  public $filter;
+  public ?ManagementFilter $filter = null;
 
   /* Copy&Paste */
-  protected $cpHandler        = NULL;
-  protected $cpPastingStarted = FALSE;
-  protected $skipCpHandler    = FALSE;
+  protected ?CopyPasteHandler $cpHandler = null;
+  protected bool $cpPastingStarted = false;
+  protected bool $skipCpHandler = false;
 
   /* Snapshots */
-  protected $snapHandler       = NULL;
+  protected ?object $snapHandler = null;
   public static $skipSnapshots = FALSE;
 
   // The currently used object(s) (e.g. in edit, removal)
-  protected $currentDn = '';
-  protected $currentDns = [];
+  protected string $currentDn = '';
+  protected array $currentDns = [];
 
   // The last used object(s).
-  protected $previousDn = '';
-  protected $previousDns = [];
+  protected string $previousDn = '';
+  protected array $previousDns = [];
 
   // The opened object.
   /**
    * @var ?simpleTabs
    */
-  protected $tabObject    = NULL;
-  protected $dialogObject = NULL;
+  protected ?object $tabObject = null;
+  protected ?object $dialogObject = null;
 
   // The last opened object.
-  protected $last_tabObject    = NULL;
-  protected $last_dialogObject = NULL;
+  protected ?object $last_tabObject = null;
+  protected ?object $last_dialogObject = null;
 
-  protected $renderCache;
+  protected mixed $renderCache = null;
 
-  public $headline;
-  public $title;
-  public $icon;
+  public string $headline = '';
+  public string $title = '';
+  public string $icon = '';
 
-  protected $actions = [];
-  protected $actionHandlers = [];
+  protected array $actions = [];
+  protected array $actionHandlers = [];
 
-  public $neededAttrs = [];
+  public array $neededAttrs = [];
 
   public static $skipTemplates = TRUE;
 
   /* Disable and hide configuration system */
-  protected $skipConfiguration = FALSE;
+  protected bool $skipConfiguration = false;
 
-  protected $columnConfiguration;
+  protected mixed $columnConfiguration = null;
 
   /* Default columns */
   public static $columns = [
