@@ -32,17 +32,17 @@ declare(strict_types=1);
 class SimplePlugin implements SimpleTab
 {
   /*! \brief This attribute store all information about attributes */
-  public $attributesInfo;
+  public array $attributesInfo = [];
 
   /*! \brief This attribute store references toward attributes
    *
    * associative array that stores attributeLdapName => reference on object
    */
-  public $attributesAccess = [];
+  public array $attributesAccess = [];
   // Thisb bolean allows children class to get readOnly automatically via static state or class-level state.
   private static $user_locked = FALSE;
 
-  private $displayPlugin;
+  private mixed $displayPlugin = null;
 
   /*!
     \brief Mark plugin as account
@@ -55,17 +55,17 @@ class SimplePlugin implements SimpleTab
 
     \sa SimplePlugin::is_this_account()
    */
-  public $is_account            = FALSE;
-  public $initially_was_account = FALSE;
-  protected $ignore_account     = FALSE;
+  public bool $is_account            = false;
+  public bool $initially_was_account = false;
+  protected bool $ignore_account     = false;
 
-  public $acl_category = '';
+  public string $acl_category = '';
 
   /*! \brief dn of the opened object */
-  public $dn = '';
+  public string $dn = '';
 
   /*! \brief original dn of the opened object */
-  public $orig_dn = '';
+  public string $orig_dn = '';
 
   /*!
    * \brief Reference to parent object
@@ -77,7 +77,7 @@ class SimplePlugin implements SimpleTab
    *
    * \sa simpleTabs
    */
-  public $parent = NULL;
+  public ?object $parent = null;
 
   /*!
     \brief Mark plugin as template
@@ -86,54 +86,54 @@ class SimplePlugin implements SimpleTab
     Has consequences on the way execute() shows the formular and how
     save() puts the data to LDAP.
    */
-  public $is_template = FALSE;
+  public bool $is_template = false;
 
   /*!
     \brief Represent temporary LDAP data
 
     This should only be used internally.
    */
-  public $attrs = [];
+  public array $attrs = [];
 
   /*! \brief The objectClasses set by this tab */
-  protected $objectclasses = [];
+  protected array $objectclasses = [];
 
   /*! \brief The state of the attributes when we opened the object */
-  protected $saved_attributes = []; // Note : This is overwritten during post_save logic
+  protected array $saved_attributes = []; // Note : This is overwritten during post_save logic
   // Requiring therefore a save to threat this during logging mechanism.
-  protected $beforeLdapChangeAttributes = [];
+  protected array $beforeLdapChangeAttributes = [];
 
   /*! \brief Do we want a header allowing to able/disable this plugin */
-  protected $displayHeader = FALSE;
+  protected bool $displayHeader = false;
 
   /*! \brief Is this plugin the main tab, the one that handle the object itself */
-  protected $mainTab = FALSE;
+  protected bool $mainTab = false;
 
-  protected $header = "";
+  protected string $header = "";
 
-  protected $templatePath;
+  protected ?string $templatePath = null;
 
-  protected $dialog = FALSE;
+  protected bool $dialog = false;
 
   /*! \brief Are we executed in a edit-mode environment? (this is FALSE if we're called from management, TRUE if we're called from a main.inc)
    */
-  protected $needEditMode = FALSE;
+  protected bool $needEditMode = false;
 
   /*! \brief Attributes that needs to be initialized before the others */
-  protected $preInitAttributes = [];
+  protected array $preInitAttributes = [];
 
   /*! \brief FALSE to disable inheritance. Array like array ('objectClass' => 'attribute') to specify oc of the groups it might be inherited from
    */
-  protected $inheritance     = FALSE;
-  protected $member_of_group = FALSE;
-  protected $editing_group   = NULL;
-  protected $group_attrs     = [];
+  protected string $inheritance     = '';
+  protected bool $member_of_group = false;
+  protected ?string $editing_group   = null;
+  protected array $group_attrs     = [];
 
   /*! \brief Used when the entry is opened as "readonly" due to locks */
-  protected $read_only = FALSE;
+  protected bool $read_only = false;
 
   /*! \brief Last LDAP error (used by logging calls from post_* methods) */
-  protected $ldap_error;
+  protected ?string $ldap_error = null;
 
   /*!
    * \brief Object entry CSN
@@ -142,9 +142,9 @@ class SimplePlugin implements SimpleTab
    * an error message will be shown.
    * To configure this check correctly read the FAQ.
    */
-  protected $entryCSN = '';
+  protected string $entryCSN = '';
 
-  private $hadSubobjects = FALSE;
+  private bool $hadSubobjects = false;
 
   /*! \brief constructor
    *
