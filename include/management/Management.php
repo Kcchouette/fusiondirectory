@@ -80,15 +80,24 @@ class Management implements FusionDirectoryDialog
 
   protected mixed $columnConfiguration = null;
 
-  /* Default columns */
-  public static $columns = [
+   /* Default columns */
+   public static $columns = [
     ['ObjectTypeColumn', []],
     ['LinkColumn', ['attributes' => 'nameAttr', 'label' => 'Name']],
     ['LinkColumn', ['attributes' => 'description', 'label' => 'Description']],
     ['ActionsColumn', ['label' => 'Actions']],
-  ];
+   ];
 
-  function __construct (
+   /** @var ManagementListingComponent Listing display and filtering */
+    public ManagementListingComponent $listingComponent;
+
+   /** @var ManagementActionsComponent CRUD actions */
+    public ManagementActionsComponent $actionsComponent;
+
+   /** @var ManagementSnapshotComponent Snapshot operations */
+    public ManagementSnapshotComponent $snapshotComponent;
+
+   function __construct (
     $objectTypes = FALSE,
     array $filterElementDefinitions = [
       ['TabFilterElement', []],
@@ -96,6 +105,11 @@ class Management implements FusionDirectoryDialog
   )
   {
     global $config, $class_mapping;
+
+    /* Initialize facade components */
+    $this->listingComponent  = new ManagementListingComponent($this);
+    $this->actionsComponent  = new ManagementActionsComponent($this);
+    $this->snapshotComponent = new ManagementSnapshotComponent($this);
 
     if ($objectTypes === FALSE) {
       $plInfos     = Pluglist::pluginInfos(get_class($this));
