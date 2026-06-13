@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2011-2016  FusionDirectory

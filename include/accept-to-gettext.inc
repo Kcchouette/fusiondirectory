@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * accept-to-gettext.inc -- convert information in 'Accept-*' headers to
  * gettext language identifiers.
