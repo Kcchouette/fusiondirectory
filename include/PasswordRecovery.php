@@ -22,32 +22,32 @@ declare(strict_types=1);
 
 class PasswordRecovery extends standAlonePage
 {
-  protected $loginAttribute;
-  protected $login;
-  protected $email_address;
+  protected string $loginAttribute;
+  protected string $login;
+  protected string $email_address;
 
-  protected $message;
-  protected $step;
+  protected array $message;
+  protected int $step;
 
   /* Salt needed to mask the uniq id in the ldap */
-  protected $salt;
+  protected string $salt;
 
   /* Uniq ID recovered from email */
-  protected $uniq;
+  protected string $uniq;
 
   /* Delay allowed for the user to change his password (minutes) */
-  protected $delay_allowed;
+  protected int $delay_allowed;
 
   /* Sender */
-  protected $from_mail;
+  protected string $from_mail;
 
-  protected $mail_body;
-  protected $mail_subject;
+  protected string $mail_body;
+  protected string $mail_subject;
 
-  protected $mail2_body;
-  protected $mail2_subject;
+  protected string $mail2_body;
+  protected string $mail2_subject;
 
-  protected $usealternates;
+  protected bool $usealternates;
 
   function init ()
   {

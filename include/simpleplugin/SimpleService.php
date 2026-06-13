@@ -25,12 +25,12 @@ declare(strict_types=1);
  */
 class SimpleService extends SimplePlugin
 {
-  protected static $showActions = TRUE;
+  protected static bool $showActions = TRUE;
 
-  protected $status = '';
+  protected string $status = '';
 
-  public $conflicts   = [];
-  public $DisplayName = '';
+  public array $conflicts   = [];
+  public string $DisplayName = '';
 
   /*! \brief constructor
    *

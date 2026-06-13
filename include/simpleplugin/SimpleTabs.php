@@ -30,30 +30,30 @@ declare(strict_types=1);
  */
 class SimpleTabs implements FusionDirectoryDialog
 {
-  public $dn;
-  public $acl;
-  public $is_template;
+  public ?string $dn;
+  public mixed $acl;
+  public ?bool $is_template;
 
-  public $objectType      = FALSE;
-  protected $specialTabs  = TRUE;
-  protected $plNotify     = [];
+  public string|false $objectType      = FALSE;
+  protected bool $specialTabs  = TRUE;
+  protected array $plNotify     = [];
 
-  public $last       = "";
-  public $current    = "";
-  public $disabled   = "";
-  public $by_name    = [];
+  public string $last       = "";
+  public string $current    = "";
+  public string $disabled   = "";
+  public array $by_name    = [];
   /**
    * @var array<string,SimpleTab>
    */
-  public $by_object  = [];
-  public $acl_category;
+  public array $by_object  = [];
+  public string $acl_category;
 
   /* A parent object if available, e.g. a management class. */
-  public $parent = NULL;
+  public mixed $parent = NULL;
 
-  public $baseclass = "";
+  public string $baseclass = "";
 
-  public $ignoreAcls = FALSE;
+  public bool $ignoreAcls = FALSE;
 
   /*!
    * \brief Tabs classes constructor
@@ -603,5 +603,5 @@ class SimpleTabs implements FusionDirectoryDialog
  */
 class SimpleTabsNoSpecial extends SimpleTabs
 {
-  protected $specialTabs = FALSE;
+  protected bool $specialTabs = FALSE;
 }

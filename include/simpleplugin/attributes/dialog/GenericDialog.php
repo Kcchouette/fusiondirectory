@@ -24,12 +24,12 @@ declare(strict_types=1);
  */
 abstract class GenericDialog implements FusionDirectoryDialog
 {
-  protected $dialogClass = '';
-  protected $dialog;
-  protected $attribute;
+  protected string $dialogClass = '';
+  protected ?FusionDirectoryDialog $dialog;
+  protected mixed $attribute;
 
-  protected $post_cancel = 'add_cancel';
-  protected $post_finish = 'add_finish';
+  protected string $post_cancel = 'add_cancel';
+  protected string $post_finish = 'add_finish';
 
   function __construct ($simplePlugin, $attribute)
   {

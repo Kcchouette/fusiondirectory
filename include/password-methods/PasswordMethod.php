@@ -31,10 +31,10 @@ declare(strict_types=1);
  */
 abstract class PasswordMethod
 {
-  public $display  = FALSE;
-  public $hash     = '';
+  public bool $display  = FALSE;
+  public string $hash     = '';
 
-  protected $lockable = TRUE;
+  protected bool $lockable = TRUE;
 
   /*!
    * \brief Password method contructor

@@ -46,10 +46,10 @@ class LdapMultiplexer
 {
 
   /* Internal stuff */
-  protected $object;
+  protected mixed $object;
 
   /* Result resource */
-  protected $sr;
+  protected mixed $sr;
 
   /*!
    * \brief LADP multiplexer constructor

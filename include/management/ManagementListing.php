@@ -30,28 +30,28 @@ declare(strict_types=1);
  */
 class ManagementListing
 {
-  public $pid;
+  public string $pid;
 
-  protected $entries      = [];
-  protected $entriesIndex = [];
-  protected $base;
+  protected array $entries      = [];
+  protected array $entriesIndex = [];
+  protected string $base;
 
-  protected $sortDirection  = NULL;
-  protected $sortColumn     = NULL;
+  protected ?array $sortDirection  = NULL;
+  protected ?int $sortColumn     = NULL;
 
-  protected $baseMode         = TRUE;
-  protected $multiSelect      = TRUE;
-  protected $bases            = [];
-  protected $header           = [];
-  protected $objectTypeCount  = [];
-  protected $baseSelector;
+  protected bool $baseMode         = TRUE;
+  protected bool $multiSelect      = TRUE;
+  protected array $bases            = [];
+  protected array $header           = [];
+  protected array $objectTypeCount  = [];
+  protected ?BaseSelector $baseSelector;
 
   /* The management class */
-  public $parent;
+  public Management $parent;
 
-  protected $columns;
+  protected array $columns;
 
-  protected $showFooter;
+  protected bool $showFooter;
 
   /*!
    * \brief Create a listing

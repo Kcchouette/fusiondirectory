@@ -44,7 +44,7 @@ class Config
   public array $current = [];
 
   /* Link to LDAP-server */
-  protected $ldapLink = NULL;
+  protected ?LDAP $ldapLink = null;
   public array $referrals = [];
 
   /*
@@ -60,9 +60,9 @@ class Config
   public string $basedir = '';
 
   /* Keep a copy of the current department list */
-  protected $departmentList;
-  protected $departmentTree;
-  protected $departmentInfo;
+  protected array $departmentList = [];
+  protected array $departmentTree = [];
+  protected array $departmentInfo = [];
 
   public string $filename = '';
   public int $last_modified = 0;

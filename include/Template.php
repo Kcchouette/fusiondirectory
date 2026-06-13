@@ -27,16 +27,16 @@ declare(strict_types=1);
 /*! \brief Class for applying a template */
 class Template implements FusionDirectoryDialog
 {
-  protected $type;
-  protected $dn;
-  protected $needed;
-  protected $attrs;
-  protected $tabObject;
-  protected $attributes;
+  protected string $type;
+  protected string $dn;
+  protected array $needed;
+  protected array $attrs;
+  protected mixed $tabObject;
+  protected array $attributes;
 
-  protected $applied = FALSE;
+  protected bool $applied = FALSE;
 
-  static protected $uiSpecialAttributes = ['dn','cn','uid','sn','givenName'];
+  static protected array $uiSpecialAttributes = ['dn','cn','uid','sn','givenName'];
 
   static function plInfo ()
   {

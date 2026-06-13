@@ -24,7 +24,7 @@ declare(strict_types=1);
  */
 abstract class DialogOrderedArrayAttribute extends OrderedArrayAttribute
 {
-  protected $dialogClass;
+  protected string $dialogClass;
 
   function __construct ($label, $description, $ldapName, $required = FALSE, $defaultValue = [], $acl = "")
   {

@@ -33,30 +33,30 @@ declare(strict_types=1);
  */
 class Pluglist
 {
-  public $menu           = '';
-  protected $iconmenu = '';
+  public string $menu           = '';
+  protected string $iconmenu = '';
 
   /*!
    * \brief The plInfo result for all plugin, using class as key.
    * Contains the plugin index in 'INDEX' and the path in 'PATH'
    */
-  public $info             = [];
+  public array $info             = [];
 
   /*!
    * \brief Foreign references on DNs
    */
-  public $dnForeignRefs = [];
+  public array $dnForeignRefs = [];
 
   /*!
    * \brief Using the plugin index as a key, the class of the plugin.
    */
-  public $dirlist          = [];
+  public array $dirlist          = [];
 
   /*!
    * \brief List plugin indexes of all plugin that the user have acl for
    */
-  protected $allowed_plugins  = [];
-  protected $silly_cache      = [];
+  protected array $allowed_plugins  = [];
+  protected array $silly_cache      = [];
 
   /*!
    * \brief List the plugins

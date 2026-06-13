@@ -38,11 +38,11 @@ define('FATAL_ERROR_DIALOG',  10006);
  */
 class MsgDialog
 {
-  private $s_Title;
-  private $s_Message;
-  private $i_Type;
-  private $i_ID;
-  private $a_Trace;
+  private string $s_Title;
+  private string $s_Message;
+  private int $i_Type;
+  private int $i_ID;
+  private array $a_Trace;
 
   /*!
    * \brief Message dialog constructor

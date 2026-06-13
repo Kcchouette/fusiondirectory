@@ -32,13 +32,13 @@ declare(strict_types=1);
 class LdapSizeLimit
 {
   /*! \brief Current size limit */
-  protected $sizeLimit;
+  protected int $sizeLimit;
 
   /*! \brief Ignore dialogs */
-  protected $ignore;
+  protected bool $ignore;
 
   /*! \brief Limit was exceeded */
-  protected $limitExceeded;
+  protected bool $limitExceeded;
 
   function __construct ()
   {

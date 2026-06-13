@@ -27,7 +27,7 @@ declare(strict_types=1);
  */
 abstract class DialogAttribute extends SetAttribute
 {
-  protected $dialogClass = NULL;
+  protected ?string $dialogClass = NULL;
 
   /*! \brief The constructor of DialogAttribute
    *

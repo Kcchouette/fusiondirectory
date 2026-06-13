@@ -36,10 +36,10 @@ declare(strict_types=1);
   */
 class LdapFilter
 {
-  static $operators = ['!', '&', '|'];
+  static array $operators = ['!', '&', '|'];
 
-  protected $operator;
-  protected $subparts;
+  protected string $operator;
+  protected array $subparts;
 
   function __construct ($operator, $subparts)
   {
@@ -135,10 +135,10 @@ class LdapFilter
  */
 class LdapFilterLeaf extends LdapFilter
 {
-  static $operators = ['=','~=','>=','<='];
+  static array $operators = ['=','~=','>=','<='];
 
-  protected $pattern;
-  protected $dnFilter = FALSE;
+  protected string $pattern;
+  protected bool $dnFilter = FALSE;
 
   function __construct ($left, $operator, $right)
   {

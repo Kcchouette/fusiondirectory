@@ -25,17 +25,17 @@ declare(strict_types=1);
 
 class TemplateDialog implements FusionDirectoryDialog
 {
-  protected $management;
-  protected $type;
-  protected $template = NULL;
-  protected $templates;
-  protected $target   = NULL;
-  protected $closed   = FALSE;
+  protected Management $management;
+  protected string $type;
+  protected ?Template $template = NULL;
+  protected array $templates;
+  protected ?string $target   = NULL;
+  protected bool $closed   = FALSE;
 
-  protected $tabObject;
+  protected mixed $tabObject;
 
-  protected $post_finish = 'template_continue';
-  protected $post_cancel = 'template_cancel';
+  protected string $post_finish = 'template_continue';
+  protected string $post_cancel = 'template_cancel';
 
   function __construct ($management, $type, $dn = NULL, $target = NULL)
   {

@@ -32,9 +32,9 @@ declare(strict_types=1);
  */
 class PasswordMethodEmpty extends PasswordMethod
 {
-  protected $lockable   = TRUE;
+  protected bool $lockable   = TRUE;
 
-  public $hash = 'empty';
+  public string $hash = 'empty';
 
   const LOCKVALUE  = '{CRYPT}!';
 

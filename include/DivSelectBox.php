@@ -31,14 +31,14 @@ declare(strict_types=1);
  */
 class DivSelectBox
 {
-  protected $headers = FALSE;
-  protected $a_entries;
-  protected $s_summary;
-  protected $cols;
+  protected array|false $headers = FALSE;
+  protected array $a_entries;
+  protected string $s_summary;
+  protected int $cols;
 
-  protected $id;
+  protected string $id;
 
-  protected $height = '200px';
+  protected string $height = '200px';
 
   /*!
    * \brief Default divSelectBox constructor

@@ -30,26 +30,26 @@ declare(strict_types=1);
  */
 class CopyPasteHandler implements FusionDirectoryDialog
 {
-  public $current = FALSE;
+  public bool $current = FALSE;
 
   /*!
    * \brief This array contains all dns of the currently copied objects
    */
-  protected $objectList = [];
+  protected array $objectList = [];
   /*!
    * \brief This array contains all remaining objects to paste
    */
-  protected $queue = [];
+  protected array $queue = [];
 
   /*!
    *  \brief The dn of the last edited object
    */
-  protected $lastdn = '';
+  protected string $lastdn = '';
 
-  protected $disallowed_objects = [];
-  protected $objects_to_fix     = [];
-  protected $clean_objects      = [];
-  protected $require_update     = FALSE;
+  protected array $disallowed_objects = [];
+  protected array $objects_to_fix     = [];
+  protected array $clean_objects      = [];
+  protected bool $require_update     = FALSE;
 
   /*!
    * \brief Create CP handler

@@ -27,9 +27,9 @@ declare(strict_types=1);
  */
 class MultiPlugin extends SimplePlugin
 {
-  protected $ignore_account = TRUE;
+  protected bool $ignore_account = TRUE;
 
-  protected static $tabClass = '';
+  protected static string $tabClass = '';
 
   static function getAttributesInfo (): array
   {

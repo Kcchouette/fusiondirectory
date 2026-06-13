@@ -25,22 +25,22 @@ declare(strict_types=1);
  */
 class ManagementFilter
 {
-  protected $types;
+  protected array $types;
 
-  protected $searchAttributes = [];
-  protected $scope = 'one';
-  protected $showTemplates = FALSE;
+  protected array $searchAttributes = [];
+  protected string $scope = 'one';
+  protected bool $showTemplates = FALSE;
 
-  protected $search = '';
+  protected string $search = '';
 
-  protected $filterElements = [];
+  protected array $filterElements = [];
 
-  protected $fixedScope;
+  protected ?bool $fixedScope;
 
   /* The management class */
-  public $parent;
+  public Management $parent;
 
-  public $pid;
+  public string $pid;
 
   /*!
    * \brief Create a management filter

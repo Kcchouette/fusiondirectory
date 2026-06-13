@@ -32,9 +32,9 @@ declare(strict_types=1);
  */
 class PasswordMethodClear extends PasswordMethod
 {
-  protected $lockable = FALSE;
+  protected bool $lockable = FALSE;
 
-  public $hash = 'clear';
+  public string $hash = 'clear';
 
   /*!
    * \brief passwordMethodClear Constructor

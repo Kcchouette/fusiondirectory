@@ -31,25 +31,25 @@ class IconThemeDir
 {
   /* Nominal (unscaled) size of the icons in this directory.
    * Required. */
-  private $Size;
+  private int $Size;
 
   /* Specifies the minimum (unscaled) size that the icons in this directory can be scaled to.
    * Defaults to the value of Size if not present. */
-  private $MinSize;
+  private int $MinSize;
 
   /* Specifies the maximum (unscaled) size that the icons in this directory can be scaled to.
    * Defaults to the value of Size if not present. */
-  private $MaxSize;
+  private int $MaxSize;
 
   /* The type of icon sizes for the icons in this directory.
    * Valid types are Fixed, Scalable and Threshold.
    * The type decides what other keys in the section are used.
    * If not specified, the default is Threshold. */
-  private $Type = 'Threshold';
+  private string $Type = 'Threshold';
 
   /* The icons in this directory can be used if the size differ at most this much from the desired (unscaled) size.
    * Defaults to 2 if not present. */
-  private $Threshold = 2;
+  private int $Threshold = 2;
 
   function __construct ($infos)
   {
@@ -105,9 +105,9 @@ class IconThemeDir
 
 class IconTheme
 {
-  private $subdirs = [];
-  private $path;
-  private $parent;
+  private array $subdirs = [];
+  private string $path;
+  private ?string $parent;
 
   function __construct ($folder, $default_parent)
   {
@@ -201,12 +201,12 @@ class IconTheme
     return NULL;
   }
 
-  static public $default_theme = 'breezy';
-  static public $extensions = ['png', 'xpm', 'svg'];
-  static public $find_closest = FALSE;
+  static public string $default_theme = 'breezy';
+  static public array $extensions = ['png', 'xpm', 'svg'];
+  static public bool $find_closest = FALSE;
 
   /* We store themes in the session. To do otherwise, override these methods. */
-  static public $session_var = 'IconThemes';
+  static public string $session_var = 'IconThemes';
 
   static public function loadThemes ($path)
   {
@@ -253,7 +253,7 @@ class IconTheme
   }
 
   /* Fallback system */
-  static public $fallbacks = [
+  static public array $fallbacks = [
     'types/user-group' => [
       ['applications', 'system-users']
     ],

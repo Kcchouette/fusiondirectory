@@ -25,7 +25,7 @@ declare(strict_types=1);
 
 class PasswordMethodArgon2 extends PasswordMethod
 {
-  public $hash = 'argon2';
+  public string $hash = 'argon2';
 
   /*!
    * \brief passwordMethodArgon2 Constructor

@@ -31,14 +31,14 @@ declare(strict_types=1);
  */
 class BaseSelector
 {
-  private $base           = '';
-  protected $pid;
-  private $action;
-  private $height         = 500;
-  private $submitButton   = TRUE;
-  protected $tree         = NULL;
-  protected $pathMapping  = [];
-  protected $lastState;
+  private string $base           = '';
+  protected string $pid;
+  private ?string $action;
+  private int $height         = 500;
+  private bool $submitButton   = TRUE;
+  protected ?string $tree         = NULL;
+  protected array $pathMapping  = [];
+  protected bool $lastState;
 
   /*!
    * \brief baseSelector contructor

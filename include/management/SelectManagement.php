@@ -25,15 +25,15 @@ declare(strict_types=1);
  */
 class SelectManagement extends Management
 {
-  protected $skipCpHandler      = TRUE;
-  public static $skipSnapshots  = TRUE;
+  protected bool $skipCpHandler      = TRUE;
+  public static bool $skipSnapshots  = TRUE;
 
-  protected $multiSelect = TRUE;
-  public $blackList;
-  public $whiteList;
+  protected bool $multiSelect = TRUE;
+  public array $blackList;
+  public array $whiteList;
 
   /* Default columns */
-  public static $columns = [
+  public static array $columns = [
     ['ObjectTypeColumn', []],
     ['LinkColumn',       ['attributes' => 'nameAttr',    'label' => 'Name']],
     ['LinkColumn',       ['attributes' => 'description', 'label' => 'Description']],

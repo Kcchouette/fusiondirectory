@@ -32,9 +32,9 @@ declare(strict_types=1);
 class PasswordMethodSasl extends PasswordMethod
 {
   // uid, or exop specified field value
-  public $uid    = '';
-  public $realm  = '';
-  public $exop   = '';
+  public string $uid    = '';
+  public string $realm  = '';
+  public string $exop   = '';
 
   /*!
    * \brief passwordMethodSasl Constructor

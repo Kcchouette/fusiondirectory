@@ -33,64 +33,64 @@ namespace FusionDirectory\Core\SimplePlugin;
 class Attribute
 {
   /* \brief Name of this attribute in the LDAP */
-  private $ldapName;
+  private string $ldapName;
   /* \brief Label of this attribute in the form */
-  private $label;
+  private string $label;
   /* \brief Description of this attribute */
-  private $description;
+  private string $description;
   /* \brief Is this attribute mandatory */
-  private $required;
+  private bool $required;
   /* \brief Should this attribute be saved into the LDAP */
-  private $inLdap = TRUE;
+  private bool $inLdap = TRUE;
 
   /* \brief Should this attribute be unique
    * FALSE  -> no unicity check
    * one    -> unicity check in the same base -> broken right now because of object ous
    * sub    -> unicity check in the same subtree
-   *  \__> this should not be used as it’s breaking reciprocity
+   *  \__> this should not be used as it's breaking reciprocity
    * whole  -> unicity check in the whole LDAP
    */
-  private $unique = FALSE;
+  private string|false $unique = FALSE;
 
   /* \brief Filter to use when checking unicity
    * Most of the time this is NULL and filter is computed from plugin objectTypes and objectClasses */
-  private $uniqueFilter = NULL;
+  private ?string $uniqueFilter = NULL;
 
   /* \brief Prefix for the html id */
-  protected $htmlid_prefix = '';
+  protected string $htmlid_prefix = '';
   /* \brief Should this attribute be shown */
-  protected $visible = TRUE;
+  protected bool $visible = TRUE;
   /* \brief Name of the ACL to use, empty if we need our own */
-  protected $acl;
+  protected string $acl;
   /* \brief Is this attribute disabled */
-  protected $disabled = FALSE;
+  protected bool $disabled = FALSE;
   /* \brief Should this attribute submit formular when changing value
    * If this is not a boolean it is a string containing a method name to call on the plugin when changing value */
-  protected $submitForm = FALSE;
+  protected bool|string $submitForm = FALSE;
   /* \brief Value of this attribute */
-  protected $value;
+  protected mixed $value;
   /* \brief Value we read from POST */
-  protected $postValue;
+  protected mixed $postValue;
   /* \brief Default value of this attribute */
-  protected $defaultValue;
+  protected mixed $defaultValue;
   /* \brief Initial value of this attribute */
-  protected $initialValue;
+  protected mixed $initialValue;
   /* \brief Reference to the plugin */
-  protected $plugin;
+  protected mixed $plugin;
   /* \brief Array of attributes to manage (prefix => value => attribute)
    * Prefix should be 'erase' or 'disable' */
-  protected $managedAttributes = [];
+  protected array $managedAttributes = [];
   /* \brief Array of multiple values groups for managed attributes */
-  protected $managedAttributesMultipleValues = [];
+  protected array $managedAttributesMultipleValues = [];
 
   /* \bried Array of booleans telling for each managing attributes if he's disabling us */
-  protected $managingAttributesOrders = [];
+  protected array $managingAttributesOrders = [];
 
   /* \bried If this is TRUE it means this attribute is not directly submitted with the form
    * but is part of a multivalue attribute.
    * It means it should not be set as required in the HTML form for instance.
    */
-  protected $isSubAttribute = FALSE;
+  protected bool $isSubAttribute = FALSE;
 
   /*! \brief The constructor of Attribute
    *
