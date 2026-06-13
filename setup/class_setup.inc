@@ -52,7 +52,7 @@ class setup implements FusionDirectoryDialog
 
     /* Ensure that setup is not reachable if fusiondirectory.conf exist (CONFIG_FILE) */
     if (file_exists(CONFIG_DIR.'/'.CONFIG_FILE)) {
-      session::destroy('Invalid setup.php call');
+      Session::destroy('Invalid setup.php call');
       header('Location: index.php');
       exit();
     }
@@ -136,7 +136,7 @@ class setup implements FusionDirectoryDialog
 
     /* Display step error messages */
     $msgs = $this->o_steps[$this->i_previous]->check();
-    msg_dialog::displayChecks($msgs);
+    MsgDialog::displayChecks($msgs);
 
     for ($i = 0; $i < $this->i_steps; $i++) {
       if ($this->o_steps[$i]->is_completed()) {
@@ -224,9 +224,9 @@ class setup implements FusionDirectoryDialog
     } else {
       $str = '   <p class="plugbottom">';
       if (isset($this->o_steps[$this->i_current - 1]) && $this->o_steps[$this->i_current - 1]->is_enabled()) {
-        $str .= '<input type="submit" name="last" value="'.msgPool::backButton().'"/>';
+        $str .= '<input type="submit" name="last" value="'.MsgPool::backButton().'"/>';
       } else {
-        $str .= '<input type="button" name="last" value="'.msgPool::backButton().'" disabled="disabled"/>';
+        $str .= '<input type="button" name="last" value="'.MsgPool::backButton().'" disabled="disabled"/>';
       }
       $str .= '&nbsp;';
       $str .= '<input type="submit" name="next" value="'._('Next').'"/>';
@@ -287,8 +287,8 @@ class setup implements FusionDirectoryDialog
     $xml = $smarty->fetch(CONFIG_TEMPLATE_DIR.CONFIG_FILE);
     $config->parse_data($xml);
     $config->set_current($config->data['MAIN']['DEFAULT']);
-    session::un_set('plist');
-    pluglist::load();
+    Session::un_set('plist');
+    Pluglist::load();
     $this->reBuildConfigStep();
   }
 
@@ -312,10 +312,10 @@ class setup implements FusionDirectoryDialog
     $display = '';
 
     /* Create a new setup class if necessary  */
-    if (!session::is_set('setup') || (isset($_GET['reset']) && ($_GET['reset'] == 1))) {
-      session::set('setup', new setup());
+    if (!Session::is_set('setup') || (isset($_GET['reset']) && ($_GET['reset'] == 1))) {
+      Session::set('setup', new setup());
     }
-    $setup = session::get('setup');
+    $setup = Session::get('setup');
 
     /* Execute formular */
     $setup->readPost();
@@ -323,6 +323,6 @@ class setup implements FusionDirectoryDialog
     $display = $setup->render();
 
     /* Store changes  in session */
-    session::set('setup', $setup);
+    Session::set('setup', $setup);
   }
 }

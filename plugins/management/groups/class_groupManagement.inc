@@ -20,7 +20,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class groupManagement extends management
+class groupManagement extends Management
 {
   public static $skipTemplates = FALSE;
 
@@ -187,16 +187,16 @@ class groupManagement extends management
       if ($triggered) {
         $res = $o_queue->append($this->dialogObject);
         if ($o_queue->is_error()) {
-          $error = new FusionDirectoryError(msgPool::siError($o_queue->get_error()));
+          $error = new FusionDirectoryError(MsgPool::siError($o_queue->get_error()));
           $error->display();
         } else {
           if (is_array($res) && count($res) > 1) {
-            msg_dialog::display(_('Action triggered'), htmlescape(sprintf(_('Action called without error (results were "%s")'), implode(', ', $res))), INFO_DIALOG);
+            MsgDialog::display(_('Action triggered'), htmlescape(sprintf(_('Action called without error (results were "%s")'), implode(', ', $res))), INFO_DIALOG);
           } else {
             if (is_array($res)) {
               $res = $res[0];
             }
-            msg_dialog::display(_('Action triggered'), htmlescape(sprintf(_('Action called without error (result was "%s")'), $res)), INFO_DIALOG);
+            MsgDialog::display(_('Action triggered'), htmlescape(sprintf(_('Action called without error (result was "%s")'), $res)), INFO_DIALOG);
           }
         }
         $this->closeDialogs();
@@ -213,14 +213,14 @@ class groupManagement extends management
     $this->dialogObject->update();
     $msgs = $this->dialogObject->check();
     if (count($msgs)) {
-      msg_dialog::displayChecks($msgs);
+      MsgDialog::displayChecks($msgs);
       return;
     }
     if ($this->siActive) {
       $o_queue = new supportDaemon();
       $o_queue->append($this->dialogObject);
       if ($o_queue->is_error()) {
-        $error = new FusionDirectoryError(msgPool::siError($o_queue->get_error()));
+        $error = new FusionDirectoryError(MsgPool::siError($o_queue->get_error()));
         $error->display();
       }
       $this->closeDialogs();

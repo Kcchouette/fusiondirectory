@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class tasks extends simplePlugin
+class tasks extends SimplePlugin
 {
   protected $displayHeader = FALSE;
 
@@ -227,7 +227,7 @@ class tasks extends simplePlugin
 
       foreach ($listOfDN as $dn) {
         // Here we create the object taskGranular
-        $tabObject = objects::create('TasksGranular');
+        $tabObject = Objects::create('TasksGranular');
 
         // Create a unique ID based on timestamp (Allowing duplicate subtasks for same members in case of repeat).
         $timestamp = microtime(TRUE);  // Get the current timestamp with microseconds
@@ -286,7 +286,7 @@ class tasks extends simplePlugin
         $errors = $tabObject->save();
 
         if (!empty($errors)) {
-          msg_dialog::displayChecks($errors);
+          MsgDialog::displayChecks($errors);
         }
       }
     }

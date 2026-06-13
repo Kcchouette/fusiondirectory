@@ -58,7 +58,7 @@ class ObjectSelectAttribute extends SelectAttribute
     $outputs = [];
     foreach ($this->objectTypes as $objectType) {
       try {
-        $infos = objects::infos($objectType);
+        $infos = Objects::infos($objectType);
         $realStoreAttr = $this->storeAttr;
         if (in_array($this->storeAttr, ['nameAttr','mainAttr'])) {
           $realStoreAttr = $infos[$this->storeAttr];
@@ -71,7 +71,7 @@ class ObjectSelectAttribute extends SelectAttribute
           $realStoreAttr    => (($realStoreAttr == 'dn') ? 'raw' : '1'),
           $realDisplayAttr  => (($realDisplayAttr == 'dn') ? 'raw' : '1'),
         ];
-        $objects = objects::ls($objectType, $attributes, NULL, $this->objectFilter);
+        $objects = Objects::ls($objectType, $attributes, NULL, $this->objectFilter);
         foreach (array_column($objects, $realStoreAttr) as $choice) {
           $choices[] = $choice;
         }

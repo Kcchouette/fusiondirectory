@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class setupStep extends simplePlugin
+class setupStep extends SimplePlugin
 {
   protected $s_short_name   = 'Still undefined';
   protected $s_title        = 'Still undefined';

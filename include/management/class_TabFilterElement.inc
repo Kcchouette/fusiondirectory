@@ -24,7 +24,7 @@ class TabFilterElement extends FilterElement
 {
   protected $tabs;
 
-  public function __construct (managementFilter $parent)
+  public function __construct (ManagementFilter $parent)
   {
     global $config;
 
@@ -32,7 +32,7 @@ class TabFilterElement extends FilterElement
 
     $this->tabs = [];
     foreach ($this->parent->parent->objectTypes as $type) {
-      $infos = objects::infos($type);
+      $infos = Objects::infos($type);
       foreach ($config->data['TABS'][$infos['tabGroup']] as $plug) {
         $class = $plug['CLASS'];
         if ($class == $infos['mainTab']) {
@@ -42,7 +42,7 @@ class TabFilterElement extends FilterElement
           continue;
         }
         if (class_available($class)) {
-          $classInfos = pluglist::pluginInfos($class);
+          $classInfos = Pluglist::pluginInfos($class);
           if (isset($classInfos['plFilterObject'])) {
             $this->tabs[$class] = [
               'filter'  => $classInfos['plFilterObject'],

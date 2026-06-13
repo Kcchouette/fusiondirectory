@@ -41,7 +41,7 @@ class ObjectAttribute extends DialogButtonAttribute
   function setParent (&$plugin)
   {
     parent::setParent($plugin);
-    $infos = objects::infos($this->objectType);
+    $infos = Objects::infos($this->objectType);
     if (in_array($this->storeAttr, ['nameAttr','mainAttr'])) {
       $this->storeAttr = $infos[$this->storeAttr];
     }
@@ -82,7 +82,7 @@ class ObjectAttribute extends DialogButtonAttribute
 
   function renderFormInput (): string
   {
-    $infos = objects::infos($this->objectType);
+    $infos = Objects::infos($this->objectType);
 
     $id = $this->getHtmlId();
     if ($this->isTemplate()) {
@@ -157,9 +157,9 @@ class ObjectAttribute extends DialogButtonAttribute
       $value = $this->getValue();
       if ($value != '') {
         if ($this->storeAttr == 'dn') {
-          $objects = objects::ls($this->objectType, $this->selectManagementParameters[2], $value, '', FALSE, 'base');
+          $objects = Objects::ls($this->objectType, $this->selectManagementParameters[2], $value, '', FALSE, 'base');
         } else {
-          $objects = objects::ls($this->objectType, $this->selectManagementParameters[2], NULL, '('.$this->storeAttr.'='.ldap_escape_f($value).')');
+          $objects = Objects::ls($this->objectType, $this->selectManagementParameters[2], NULL, '('.$this->storeAttr.'='.ldap_escape_f($value).')');
         }
         if (!empty($objects)) {
           $this->handleDialogResult(key($objects), reset($objects));

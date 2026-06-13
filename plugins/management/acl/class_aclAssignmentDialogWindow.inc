@@ -18,14 +18,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class aclAssignmentDialogWindow extends simplePlugin
+class aclAssignmentDialogWindow extends SimplePlugin
 {
   static function plInfo (): array
   {
     return [
       'plShortName'   => _('Acl Assignment Dialog'),
       'plDescription' => _('Manage acl roles assignment dialog'),
-      'plCategory'    => ['acl'],
+      'plCategory'    => ['Acl'],
 
       'plProvidedAcls' => parent::generatePlProvidedAcls(static::getAttributesInfo())
     ];
@@ -89,7 +89,7 @@ class aclAssignmentDialogWindow extends simplePlugin
     }
     $this->attributesAccess['aclMode']->resetToDefault();
 
-    $roles = objects::ls('aclRole', 'cn');
+    $roles = Objects::ls('aclRole', 'cn');
     $this->attributesAccess['aclRole']->setChoices(array_keys($roles), array_values($roles));
     $this->attributesAccess['allUsers']->setInLdap(FALSE);
     $this->attributesAccess['allUsers']->setManagedAttributes(

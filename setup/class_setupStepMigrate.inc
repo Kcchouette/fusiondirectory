@@ -223,7 +223,7 @@ class setupStepMigrate extends setupStep
       'checks' => [
         'class'     => ['fullwidth'],
         'name'      => _('PHP module and extension checks'),
-        'template'  => get_template_path("setup_migrate.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => get_template_path("setup_migrate.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
           new FakeAttribute('checks')
         ]
@@ -387,7 +387,7 @@ class setupStepMigrate extends setupStep
       /* This allow us to filter it as if it was already migrated */
       $attrs['objectClass'][] = 'gosaDepartment';
       foreach ($dep_types as $type) {
-        if (objects::isOfType($attrs, $type)) {
+        if (Objects::isOfType($attrs, $type)) {
           $dep_type = $type;
           break;
         }
@@ -402,7 +402,7 @@ class setupStepMigrate extends setupStep
           sprintf(_("Cannot handle the structural object type of your root object. Please try to add the object class '%s' manually."), "gosaDepartment")
         );
       }
-      $dep_infos = objects::infos($dep_type);
+      $dep_infos = Objects::infos($dep_type);
 
       /* Create 'current' and 'target' object properties, to be able to display
        *  a set of modifications required to create a valid FusionDirectory department.
@@ -530,7 +530,7 @@ class setupStepMigrate extends setupStep
     $res = $ldap->add($testEntry);
     $ldap->cat($dn);
     if (!$ldap->count()) {
-      logging::log('error', 'setup/'.get_class($this), $dn, [], $ldap->get_error());
+      Logging::log('error', 'setup/'.get_class($this), $dn, [], $ldap->get_error());
       throw new CheckFailedException(
         _('Failed'),
         sprintf(_('The specified user "%s" does not have full access to your LDAP database.'), $config->current['ADMINDN'])
@@ -541,7 +541,7 @@ class setupStepMigrate extends setupStep
     $res = $ldap->rmDir($dn);
     $ldap->cat($dn);
     if ($ldap->count()) {
-      logging::log('error', 'setup/'.get_class($this), $dn, [], $ldap->get_error());
+      Logging::log('error', 'setup/'.get_class($this), $dn, [], $ldap->get_error());
       throw new CheckFailedException(
         _('Failed'),
         sprintf(_('The specified user "%s" does not have full access to your ldap database.'), $config->current['ADMINDN'])
@@ -601,7 +601,7 @@ class setupStepMigrate extends setupStep
         $this->accounts_toMigrate[$groupid] = [
           /* Set objects to selected, that were selected before reload */
           'checked' => ($old[$groupid]['checked'] ?? FALSE),
-          'objects' => [],
+          'Objects' => [],
           'base'    => $base,
           'classes' => $attrs['objectClass'],
         ];
@@ -610,7 +610,7 @@ class setupStepMigrate extends setupStep
       $attrs['before']  = '';
       $attrs['after']   = '';
 
-      $this->accounts_toMigrate[$groupid]['objects'][base64_encode($attrs['dn'])] = $attrs;
+      $this->accounts_toMigrate[$groupid]['Objects'][base64_encode($attrs['dn'])] = $attrs;
     }
 
     if (count($this->accounts_toMigrate) == 0) {
@@ -702,8 +702,8 @@ class setupStepMigrate extends setupStep
     foreach ($this->$var as $key => &$entry) {
       $entry['checked'] = isset($_POST['migrate_'.$key]);
       if ($entry['checked']) {
-        if (isset($entry['objects'])) {
-          $objects =& $entry['objects'];
+        if (isset($entry['Objects'])) {
+          $objects =& $entry['Objects'];
         } else {
           $objects = [&$entry];
         }
@@ -884,7 +884,7 @@ class setupStepMigrate extends setupStep
     if ($attrs = $ldap->fetch()) {
       $roledn = $attrs['dn'];
     } else {
-      $tabObject  = objects::create('aclRole');
+      $tabObject  = Objects::create('aclRole');
       $baseObject = $tabObject->getBaseObject();
 
       $baseObject->cn               = 'admin';
@@ -896,7 +896,7 @@ class setupStepMigrate extends setupStep
     }
 
     /* Creating user */
-    $tabObject  = objects::create('user');
+    $tabObject  = Objects::create('user');
     $baseObject = $tabObject->getBaseObject();
     $baseObject->givenName    = 'System';
     $baseObject->sn           = 'Administrator';
@@ -911,13 +911,13 @@ class setupStepMigrate extends setupStep
     $tabObject->update();
     $errors = $tabObject->save();
     if (!empty($errors)) {
-      msg_dialog::displayChecks($errors);
+      MsgDialog::displayChecks($errors);
       return FALSE;
     }
     $admindn = $tabObject->dn;
 
     /* Assigning role */
-    $tabObject  = objects::open($config->current['BASE'], 'aclAssignment');
+    $tabObject  = Objects::open($config->current['BASE'], 'aclAssignment');
     $baseObject = $tabObject->getBaseObject();
 
     $assignments = $baseObject->gosaAclEntry;
@@ -1100,14 +1100,14 @@ class setupStepMigrate extends setupStep
           if (!isset($this->{$var}[$groupid])) {
             $this->{$var}[$groupid] = [
               'checked' => FALSE,
-              'objects' => [],
+              'Objects' => [],
               'base'    => $base,
               'classes' => $attrs['objectClass'],
             ];
           }
 
           $attrs['ldif'] = '';
-          $this->{$var}[$groupid]['objects'][base64_encode($attrs['dn'])] = $attrs;
+          $this->{$var}[$groupid]['Objects'][base64_encode($attrs['dn'])] = $attrs;
           if (++$count >= static::$objectNumberLimit) {
             $sizeLimitHit = TRUE;
             break 2;
@@ -1167,7 +1167,7 @@ class setupStepMigrate extends setupStep
     foreach ($this->$var as $b_dn => &$entry) {
       $entry['checked'] = isset($_POST['migrate_'.$b_dn]);
       if ($entry['checked']) {
-        foreach ($entry['objects'] as &$object) {
+        foreach ($entry['Objects'] as &$object) {
           $dn   = $object['dn'];
           $d_dn = preg_replace('/,.*$/', ','.$destination_dep, $dn);
           if ($only_ldif) {
@@ -1318,8 +1318,8 @@ class setupStepMigrate extends setupStep
       '/ou=tokens,/',
       '/ou=supannobjects,/'
     ];
-    foreach (objects::types() as $type) {
-      $infos = objects::infos($type);
+    foreach (Objects::types() as $type) {
+      $infos = Objects::infos($type);
       if (isset($infos['ou']) && ($infos['ou'] != '')) {
         $skip_dns[] = '/^'.preg_quote($infos['ou'], '/').'/';
       }

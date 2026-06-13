@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class configInLdapTabs extends simpleTabs
+class configInLdapTabs extends SimpleTabs
 {
   function save ()
   {
@@ -28,9 +28,9 @@ class configInLdapTabs extends simpleTabs
     /* check_and_reload */
     $config->check_and_reload(TRUE);
     /* reload plist as well as some plInfo might use $config or get_ou */
-    session::un_set('plist');
-    pluglist::load();
-    session::un_set('passwordMethod::get_available_methods');
+    Session::un_set('plist');
+    Pluglist::load();
+    Session::un_set('PasswordMethod::get_available_methods');
 
     /* reload inldap configuration for hooks and config changes */
     $config->load_inldap_config();

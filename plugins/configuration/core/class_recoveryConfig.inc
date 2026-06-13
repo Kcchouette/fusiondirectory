@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class recoveryConfig extends simplePlugin
+class recoveryConfig extends SimplePlugin
 {
   static function plInfo (): array
   {
@@ -40,7 +40,7 @@ class recoveryConfig extends simplePlugin
       'settings' => [
         'name'      => _('Password recovery settings'),
         'class'     => ['alone'],
-        'template'  => get_template_path('simpleplugin_section_alone.tpl'),
+        'Template'  => get_template_path('simpleplugin_section_alone.tpl'),
         'attrs'     => [
           new StringAttribute(
             _('Recovery RDN'), _('The branch where recovery tokens are stored'),

@@ -113,12 +113,12 @@ class setupStepConfig extends configInLdap
       /* Save in LDAP */
       $errors = $this->save();
       if (!empty($errors)) {
-        msg_dialog::displayChecks($errors);
+        MsgDialog::displayChecks($errors);
         return TRUE;
       }
       /* Insert default config values, even for installed plugin */
-      session::un_set('plist');
-      pluglist::load();
+      Session::un_set('plist');
+      Pluglist::load();
       $config->loadPlist($plist);
       $config->checkLdapConfig(TRUE);
       /* Reload config from LDAP */

@@ -20,7 +20,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class aclAssignmentCreationDialog extends simplePlugin
+class aclAssignmentCreationDialog extends SimplePlugin
 {
   protected $post_finish = 'add_finish';
   protected $post_cancel = 'add_cancel';
@@ -32,7 +32,7 @@ class aclAssignmentCreationDialog extends simplePlugin
     return [
       'plShortName'   => _('Acl assignment creation'),
       'plDescription' => _('Manage acl roles assignment on an arbitrary dn'),
-      'plCategory'    => ['acl'],
+      'plCategory'    => ['Acl'],
 
       'plProvidedAcls' => []
     ];
@@ -91,8 +91,8 @@ class aclAssignmentCreationDialog extends simplePlugin
     $smarty->assign($this->attributesAccess['baseDn']->getAcl().'ACL', 'rwcdm');
     return parent::render()."\n".
     '<p class="plugbottom">'."\n".
-    '  <input type="submit" name="'.$this->post_finish.'" value="'.msgPool::addButton().'"/>&nbsp;'."\n".
-    '  <input type="submit" formnovalidate="formnovalidate" name="'.$this->post_cancel.'" value="'.msgPool::cancelButton().'"/>'."\n".
+    '  <input type="submit" name="'.$this->post_finish.'" value="'.MsgPool::addButton().'"/>&nbsp;'."\n".
+    '  <input type="submit" formnovalidate="formnovalidate" name="'.$this->post_cancel.'" value="'.MsgPool::cancelButton().'"/>'."\n".
     '</p>';
   }
 
@@ -100,7 +100,7 @@ class aclAssignmentCreationDialog extends simplePlugin
   {
     $msgs = $this->check();
     if (count($msgs)) {
-      msg_dialog::displayChecks($msgs);
+      MsgDialog::displayChecks($msgs);
       return;
     }
     try {
@@ -124,7 +124,7 @@ class aclAssignmentCreationDialog extends simplePlugin
   }
 }
 
-class aclManagement extends management
+class aclManagement extends Management
 {
   protected $skipCpHandler     = TRUE;
 
@@ -156,7 +156,7 @@ class aclManagement extends management
   protected function setUpListing ()
   {
     /* Set baseMode to FALSE */
-    $this->listing  = new managementListing($this, FALSE);
+    $this->listing  = new ManagementListing($this, FALSE);
   }
 
   protected function setUpFilter (array $filterElementDefinitions)
@@ -183,7 +183,7 @@ class aclManagement extends management
     $type = 'aclAssignment';
 
     /* This might throw an exception which is catched in aclAssignmentCreationDialog */
-    $tabObject = objects::open($dn, $type);
+    $tabObject = Objects::open($dn, $type);
 
     /* This will happen only if the exception is not thrown */
     $this->closeDialogs();
@@ -191,7 +191,7 @@ class aclManagement extends management
     $this->currentDn        = $dn;
 
     $this->openTabObject($tabObject);
-    logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Creating new ACL assignment');
+    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Creating new ACL assignment');
   }
 
   /*! \brief Display confirmation dialog
@@ -199,7 +199,7 @@ class aclManagement extends management
   protected function removeConfirmationDialog (array $objects)
   {
     $smarty = get_smarty();
-    $smarty->assign('objects', $objects);
+    $smarty->assign('Objects', $objects);
     $smarty->assign('multiple', TRUE);
     return $smarty->fetch(get_template_path('remove.tpl', TRUE, dirname(__FILE__)));
   }

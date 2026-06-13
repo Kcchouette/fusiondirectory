@@ -23,7 +23,7 @@ declare(strict_types=1);
 /*!
  * \brief Phone number selection
  */
-class phoneSelect extends selectManagement
+class PhoneSelect extends SelectManagement
 {
   /* Default columns */
   public static $columns = [
@@ -36,9 +36,9 @@ class phoneSelect extends selectManagement
 /*!
  * \brief Phone number selection dialog
  */
-class phoneSelectDialog extends GenericSingleSelectManagementDialog
+class PhoneSelectDialog extends GenericSingleSelectManagementDialog
 {
-  protected $dialogClass = 'phoneSelect';
+  protected $dialogClass = 'PhoneSelect';
 }
 
 /*! \brief This class allow to handle easily an LDAP attribute that contains a phone number
@@ -59,7 +59,7 @@ class PhoneNumberAttribute extends StringAttribute
 class PhoneNumberButtonAttribute extends PhoneNumberAttribute
 {
   protected $type;
-  protected $dialogClass = 'phoneSelectDialog';
+  protected $dialogClass = 'PhoneSelectDialog';
 
   function __construct ($label, $description, $ldapName, $required = FALSE, $defaultValue = '', $type = 'phone', $acl = '')
   {

@@ -45,10 +45,10 @@ class VisibilityTest extends TestCase
     public function testKeyClassesHaveVisibleProperties(): void
     {
         $keyFiles = [
-            'class_ldap.inc',
-            'class_config.inc',
-            'class_userinfo.inc',
-            'class_pluglist.inc',
+            'Ldap.php',
+            'Config.php',
+            'UserInfo.php',
+            'Pluglist.php',
         ];
 
         foreach ($keyFiles as $filename) {

@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class department extends simplePlugin
+class department extends SimplePlugin
 {
   static protected $namingAttr  = 'ou';
   protected $structuralOC       = ['organizationalUnit'];
@@ -166,10 +166,10 @@ class department extends simplePlugin
 
     $namingAttr = static::$namingAttr;
 
-    if (($namingAttr == 'ou') && tests::is_department_name_reserved($this->$namingAttr)) {
+    if (($namingAttr == 'ou') && Tests::is_department_name_reserved($this->$namingAttr)) {
       $errors[] = new SimplePluginCheckError(
         $this,
-        msgPool::reserved(_('Name'))
+        MsgPool::reserved(_('Name'))
       );
     }
 

@@ -112,7 +112,7 @@ class ManagementConfigurationDialog extends ManagementDialog
     ];
   }
 
-  function __construct (management $parent)
+  function __construct (Management $parent)
   {
     global $config;
 
@@ -180,7 +180,7 @@ class ManagementConfigurationDialog extends ManagementDialog
   {
     global $config;
     $errors = $config->updateManagementConfig(get_class($this->parent), NULL, TRUE);
-    msg_dialog::displayChecks($errors);
+    MsgDialog::displayChecks($errors);
     if (empty($errors)) {
       $this->attributesAccess['resetInLdapUser']->setVisible(FALSE);
     }
@@ -190,7 +190,7 @@ class ManagementConfigurationDialog extends ManagementDialog
   {
     global $config;
     $errors = $config->updateManagementConfig(get_class($this->parent), NULL, FALSE);
-    msg_dialog::displayChecks($errors);
+    MsgDialog::displayChecks($errors);
     if (empty($errors)) {
       $this->attributesAccess['resetInLdap']->setVisible(FALSE);
     }

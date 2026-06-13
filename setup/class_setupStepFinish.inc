@@ -28,7 +28,7 @@ class setupStepFinish extends setupStep
     return [
       'welcome' => [
         'name'      => _('Welcome'),
-        'template'  => get_template_path("setup_finish.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => get_template_path("setup_finish.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
         ]
       ]
@@ -63,7 +63,7 @@ class setupStepFinish extends setupStep
      *   - Permisssion are set correctly
      */
     if (isset($_POST['next']) && $exists && !$this->is_world_readable(CONFIG_DIR.'/'.CONFIG_FILE)) {
-      session::destroy();
+      Session::destroy();
       header('Location: index.php');
       exit();
     }

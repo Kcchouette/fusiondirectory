@@ -263,9 +263,9 @@ class TimeHisAttribute extends CompositeAttribute
   {
     $values = parent::readValues($value);
     if ($this->convert) {
-      $datetime = new DateTime('T'.implode(':', $values), timezone::utc());
+      $datetime = new DateTime('T'.implode(':', $values), Timezone::utc());
 
-      $datetime->setTimeZone(timezone::getDefaultTimeZone());
+      $datetime->setTimeZone(Timezone::getDefaultTimeZone());
       if (count($values) < 3) {
         $values = explode(':', $datetime->format('H:i'));
       } else {
@@ -278,8 +278,8 @@ class TimeHisAttribute extends CompositeAttribute
   function writeValues (array $values)
   {
     if ($this->convert) {
-      $datetime = new DateTime('T'.implode(':', $values), timezone::getDefaultTimeZone());
-      $datetime->setTimeZone(timezone::utc());
+      $datetime = new DateTime('T'.implode(':', $values), Timezone::getDefaultTimeZone());
+      $datetime->setTimeZone(Timezone::utc());
       if (count($values) < 3) {
         $values = explode(':', $datetime->format('H:i'));
       } else {
@@ -292,9 +292,9 @@ class TimeHisAttribute extends CompositeAttribute
   function displayValue ($value): string
   {
     $values = parent::readValues($value);
-    $datetime = new DateTime('T'.implode(':', $values), timezone::utc());
+    $datetime = new DateTime('T'.implode(':', $values), Timezone::utc());
     if ($this->convert) {
-      $datetime->setTimeZone(timezone::getDefaultTimeZone());
+      $datetime->setTimeZone(Timezone::getDefaultTimeZone());
     }
     if (count($values) < 3) {
       return $datetime->format('H:i');
@@ -377,7 +377,7 @@ class GeneralizedTimeDisplayAttribute extends GeneralizedTimeDateAttribute
       return '';
     }
     $date = $this->getDateValue();
-    $date->setTimezone(timezone::getDefaultTimeZone());
+    $date->setTimezone(Timezone::getDefaultTimeZone());
     return htmlescape($date->format($this->displayFormat));
   }
 }
@@ -397,12 +397,12 @@ class EpochDaysDateAttribute extends DateAttribute
 
   protected function ldapToDate ($ldapValue)
   {
-    $date = DateTime::createFromFormat('U', (string)($ldapValue * static::$secondsPerDay), timezone::utc());
+    $date = DateTime::createFromFormat('U', (string)($ldapValue * static::$secondsPerDay), Timezone::utc());
     if ($date !== FALSE) {
       return $date;
     } else {
       trigger_error('LDAP value for '.$this->getLdapName().' was not in the right date format.');
-      return new DateTime($ldapValue, timezone::utc());
+      return new DateTime($ldapValue, Timezone::utc());
     }
   }
 

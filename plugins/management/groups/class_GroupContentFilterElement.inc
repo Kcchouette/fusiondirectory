@@ -25,7 +25,7 @@ class GroupContentFilterElement extends FilterElement
 {
   protected $types;
 
-  public function __construct (managementFilter $parent)
+  public function __construct (ManagementFilter $parent)
   {
     global $config;
 
@@ -34,7 +34,7 @@ class GroupContentFilterElement extends FilterElement
     $this->types = [];
     foreach (ogroup::$objectTypes as $key => $type) {
       try {
-        $infos = objects::infos($type);
+        $infos = Objects::infos($type);
         $this->types[$type] = [
           'filter'  => '(gosaGroupObjects=*'.$key.'*)',
           'infos'   => $infos,

@@ -20,7 +20,7 @@ declare(strict_types=1);
 */
 
 
-/*! \brief This class allow to handle easily a String LDAP attribute that needs to be validated by a test from class tests
+/*! \brief This class allow to handle easily a String LDAP attribute that needs to be validated by a test from class Tests
  *
  */
 class TestValidateAttribute extends StringAttribute
@@ -30,7 +30,7 @@ class TestValidateAttribute extends StringAttribute
   function validate ()
   {
     $func = $this->testFunc;
-    if (!tests::$func($this->value)) {
+    if (!Tests::$func($this->value)) {
       return new SimplePluginCheckError(
         $this,
         SimplePluginCheckError::invalidValue(sprintf('"%s"', $this->value))

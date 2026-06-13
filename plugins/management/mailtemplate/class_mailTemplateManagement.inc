@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class mailTemplateManagement extends management
+class mailTemplateManagement extends Management
 {
 
   public static $columns = [
@@ -48,7 +48,7 @@ class mailTemplateManagement extends management
     $createMenu = [];
 
     foreach ($this->objectTypes as $type) {
-      $infos  = objects::infos($type);
+      $infos  = Objects::infos($type);
       $img    = 'geticon.php?context=actions&icon=document-new&size=16';
       if (isset($infos['icon'])) {
         $img = $infos['icon'];

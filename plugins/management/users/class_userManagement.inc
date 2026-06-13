@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class userManagement extends management
+class userManagement extends Management
 {
   public $neededAttrs = ['userPassword' => '*'];
 
@@ -69,7 +69,7 @@ class userManagement extends management
   function lockUsers (array $action)
   {
     global $config, $ui;
-    logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action, 'Lock');
+    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action, 'Lock');
 
     // Filter out entries we are not allowed to modify
     $disallowed = [];
@@ -82,7 +82,7 @@ class userManagement extends management
       }
     }
     if (count($disallowed)) {
-      $error = new FusionDirectoryPermissionError(msgPool::permModify($disallowed));
+      $error = new FusionDirectoryPermissionError(MsgPool::permModify($disallowed));
       $error->display();
     }
 
@@ -95,7 +95,7 @@ class userManagement extends management
       static::lockUser($action['subaction'], ($entry['userPassword'][0] ?? ''), $dn);
 
       // Small procedure in order to re-open the user in order to trigger plugins to update accordingly.
-      $userObject = objects::open($dn, 'user');
+      $userObject = Objects::open($dn, 'user');
       $userObject->save();
     }
   }
@@ -108,7 +108,7 @@ class userManagement extends management
    */
   static function lockUser (string $action, string $pwd, string $dn, bool $lockEverything = TRUE)
   {
-    $method = passwordMethod::get_method($pwd, $dn);
+    $method = PasswordMethod::get_method($pwd, $dn);
     if (!$method->is_lockable()) {
       $hn = $method->get_hash_name();
       if (is_array($hn)) {
@@ -130,13 +130,13 @@ class userManagement extends management
       $success = $method->lock_account($dn, $lockEverything);
       // Requiring logging mechanism for audit.
       if ($success) {
-        logging::log('security', 'account', $dn, [], 'DN : ' . $dn . ' is locked.');
+        Logging::log('security', 'account', $dn, [], 'DN : ' . $dn . ' is locked.');
       }
     } elseif (($action == 'unlock') && $method->is_locked($dn)) {
       $success = $method->unlock_account($dn);
       // Requiring logging mechanism for audit.
       if ($success) {
-        logging::log('security', 'account', $dn, [], 'DN : ' . $dn . ' is unlocked.');
+        Logging::log('security', 'account', $dn, [], 'DN : ' . $dn . ' is unlocked.');
       }
     }
 

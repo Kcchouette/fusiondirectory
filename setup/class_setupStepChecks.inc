@@ -28,14 +28,14 @@ class setupStepChecks extends setupStep
     return [
       'modules' => [
         'name'      => _('PHP module and extension checks'),
-        'template'  => get_template_path("setup_checks.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => get_template_path("setup_checks.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
           new FakeAttribute('basic_checks')
         ]
       ],
       'setup' => [
         'name'      => _('PHP setup configuration'),
-        'template'  => get_template_path("setup_checks.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => get_template_path("setup_checks.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
           new FakeAttribute('config_checks')
         ]
@@ -65,71 +65,71 @@ class setupStepChecks extends setupStep
     $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
 
     /* Check for LDAP extension */
-    $N = msgPool::checkingFor("LDAP");
+    $N = MsgPool::checkingFor("LDAP");
     $D = _("FusionDirectory requires this module to talk with your LDAP server.");
-    $S = msgPool::installPhpModule("LDAP");
+    $S = MsgPool::installPhpModule("LDAP");
     $R = function_exists("ldap_bind");
     $M = TRUE;
     $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];
 
     /* Check for gettext support */
-    $N = msgPool::checkingFor("gettext");
+    $N = MsgPool::checkingFor("gettext");
     $D = _("FusionDirectory requires this module for an internationalized interface.");
-    $S = msgPool::installPhpModule("gettext");
+    $S = MsgPool::installPhpModule("gettext");
     $R = function_exists("bindtextdomain");
     $M = TRUE;
     $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];
 
     /* Check for curl support */
-    $N = msgPool::checkingFor('curl');
+    $N = MsgPool::checkingFor('curl');
     $D = _('FusionDirectory requires this module to communicate with different types of servers and protocols.');
-    $S = msgPool::installPhpModule('curl');
+    $S = MsgPool::installPhpModule('curl');
     $R = function_exists('curl_init');
     $M = TRUE;
     $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
 
     /* Check for json support */
-    $N = msgPool::checkingFor('json');
+    $N = MsgPool::checkingFor('json');
     $D = _('FusionDirectory requires this module to encode variables for javascript use.');
-    $S = msgPool::installPhpModule('json');
+    $S = MsgPool::installPhpModule('json');
     $R = function_exists('json_encode');
     $M = TRUE;
     $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
 
     /* Check for filter support */
-    $N = msgPool::checkingFor('filter');
+    $N = MsgPool::checkingFor('filter');
     $D = _('FusionDirectory requires this module to filters a variable with a specified filter.');
-    $S = msgPool::installPhpModule('filter');
+    $S = MsgPool::installPhpModule('filter');
     $R = function_exists('filter_var');
     $M = TRUE;
     $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
 
     /* Check for iconv */
-    $N = msgPool::checkingFor("iconv");
+    $N = MsgPool::checkingFor("iconv");
     $D = _("FusionDirectory requires this module for the samba integration.");
-    $S = msgPool::installPhpModule("iconv");
+    $S = MsgPool::installPhpModule("iconv");
     $R = function_exists("iconv");
     $M = TRUE;
     $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];
 
     /* Check if mbstring module is available */
-    $N = msgPool::checkingFor(_("mbstring"));
+    $N = MsgPool::checkingFor(_("mbstring"));
     $D = _("FusionDirectory requires this module to handle unicode strings.");
-    $S = msgPool::installPhpModule("mbstring");
+    $S = MsgPool::installPhpModule("mbstring");
     $R = function_exists("mb_strlen");
     $M = TRUE;
     $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];
 
-    $N = msgPool::checkingFor(_('imagick'));
+    $N = MsgPool::checkingFor(_('imagick'));
     $D = _('FusionDirectory requires this extension to handle images.');
-    $S = msgPool::installPhpModule('imagick');
+    $S = MsgPool::installPhpModule('imagick');
     $R = class_exists('Imagick', FALSE);
     $M = TRUE;
     $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
 
-    $N = msgPool::checkingFor(_("compression module"));
+    $N = MsgPool::checkingFor(_("compression module"));
     $D = _("FusionDirectory requires this extension to handle snapshots.");
-    $S = msgPool::installPhpModule("compile with --with-zlib");
+    $S = MsgPool::installPhpModule("compile with --with-zlib");
     $R = function_exists("gzcompress");
     $M = FALSE;
     $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];

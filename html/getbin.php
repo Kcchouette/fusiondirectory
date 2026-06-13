@@ -26,12 +26,12 @@
 
 error_reporting(0);
 session_cache_limiter('private');
-session::start();
+Session::start();
 reset_errors();
 
 /* Logged in? Simple security check */
-if (!session::is_set('ui')) {
-  logging::log('security', 'unknown', '', [], 'Error: getbin.php called without session');
+if (!Session::is_set('ui')) {
+  Logging::log('security', 'unknown', '', [], 'Error: getbin.php called without session');
   header('Location: index.php');
   exit;
 }
@@ -47,11 +47,11 @@ if (isset($_GET['key'])) {
   $key .= $_GET['key'];
 }
 
-$bintype = (session::is_set($key.'type') ? session::get($key.'type') : 'octet-stream');
+$bintype = (Session::is_set($key.'type') ? Session::get($key.'type') : 'octet-stream');
 header('Content-type: '.$bintype);
-if (session::is_set($key.'file')) {
-  header('Content-disposition: attachment; filename="'.session::get($key.'file').'"');
+if (Session::is_set($key.'file')) {
+  header('Content-disposition: attachment; filename="'.Session::get($key.'file').'"');
 }
 
-echo session::get($key);
+echo Session::get($key);
 error_reporting(E_ALL | E_NOTICE);

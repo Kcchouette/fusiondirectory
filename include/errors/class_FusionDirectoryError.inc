@@ -59,7 +59,7 @@ class FusionDirectoryError extends Error
 
   public function display ()
   {
-    msg_dialog::display(...$this->computeMsgDialogParameters());
+    MsgDialog::display(...$this->computeMsgDialogParameters());
   }
 
   public static function formatTrace (Throwable $throwable): array

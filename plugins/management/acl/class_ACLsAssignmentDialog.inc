@@ -51,7 +51,7 @@ class ACLsAssignmentDialog extends GenericDialog
     $this->dialog->update();
     $messages = $this->dialog->check();
     if (!empty($messages)) {
-      msg_dialog::displayChecks($messages);
+      MsgDialog::displayChecks($messages);
       return;
     }
     $this->attribute->addValue('', $this->dialog->getAclEntry());

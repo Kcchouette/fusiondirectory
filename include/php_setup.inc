@@ -206,8 +206,8 @@ function gosaRaiseError ($errno, $errstr, $errfile, $errline)
   }
 
   /* Send all errors to logging class, except "Ldap : No such object" messages*/
-  if (class_exists('logging') && !preg_match('/No such object/', $errstr)) {
-    logging::log('error', 'php', $errfile, [], 'Type:' . $errno . ', Message:' . $errstr . ', File:' . $errfile . ', Line: ' . $errline);
+  if (class_exists('Logging') && !preg_match('/No such object/', $errstr)) {
+    Logging::log('error', 'php', $errfile, [], 'Type:' . $errno . ', Message:' . $errstr . ', File:' . $errfile . ', Line: ' . $errline);
   }
 
   /* Error messages are hidden in FusionDirectory, so we only send them to the logging class and abort here */
@@ -246,7 +246,7 @@ function gosaRaiseError ($errno, $errstr, $errfile, $errline)
   /* Flush in case of fatal errors */
   if (preg_match('/^fatal/i', $errstr) || (PHP_ERROR_FATAL === 'TRUE')) {
     trigger_error("Source error: " . $errstr . " in " . $errfile . " on line " . $errline);
-    session::destroy('Fatal error');
+    Session::destroy('Fatal error');
     if (PHP_ERROR_FATAL === 'TRUE') {
       $error_collector = str_replace('display: none;', '', $error_collector);
     }
@@ -266,7 +266,7 @@ function gosaRaiseError ($errno, $errstr, $errfile, $errline)
 function fusiondirectoryExceptionHandler (Throwable $throwable)
 {
   try {
-    logging::log('error', 'fatal', '', [], 'Uncaught ' . get_class($throwable) . ': ' . $throwable->getMessage());
+    Logging::log('error', 'fatal', '', [], 'Uncaught ' . get_class($throwable) . ': ' . $throwable->getMessage());
   } catch (Throwable $t) {
     /* Ignore exceptions/errors here */
   }

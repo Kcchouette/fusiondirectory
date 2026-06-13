@@ -20,7 +20,7 @@ declare(strict_types=1);
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class mailAddressSelect extends selectManagement
+class MailAddressSelect extends SelectManagement
 {
   /* Default columns */
   public static $columns = [
@@ -34,7 +34,7 @@ class mailAddressSelect extends selectManagement
  */
 class MailSelectDialog extends GenericSelectManagementDialog
 {
-  protected $dialogClass = 'mailAddressSelect';
+  protected $dialogClass = 'MailAddressSelect';
 }
 
 /*! \brief This class allows to handle an attribute for selecting an mail address
@@ -100,21 +100,21 @@ class MailsAttribute extends DialogAttribute
       'submit', 'add'.$id,
       [
         'class' => 'subattribute',
-        'value' => msgPool::addButton(FALSE),
+        'value' => MsgPool::addButton(FALSE),
       ]
     );
     $buttons  .= $this->renderInputField(
       'submit', 'add'.$id.'_dialog',
       [
         'class' => 'dialog subattribute',
-        'value' => sprintf(_('%s (from list)'), msgPool::addButton(FALSE)),
+        'value' => sprintf(_('%s (from list)'), MsgPool::addButton(FALSE)),
       ]
     );
     $buttons  .= $this->renderInputField(
       'submit', 'del'.$id,
       [
         'class' => 'subattribute',
-        'value' => msgPool::delButton(FALSE),
+        'value' => MsgPool::delButton(FALSE),
       ]
     );
     return $buttons;

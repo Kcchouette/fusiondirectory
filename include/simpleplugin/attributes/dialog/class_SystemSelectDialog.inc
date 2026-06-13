@@ -23,5 +23,5 @@ declare(strict_types=1);
 */
 class SystemSelectDialog extends GenericSelectManagementDialog
 {
-  protected $dialogClass = 'systemSelect';
+  protected $dialogClass = 'SystemSelect';
 }

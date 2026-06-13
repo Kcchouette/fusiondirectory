@@ -21,8 +21,8 @@
 
 /**
  * @var Smarty $smarty
- * @var pluglist $plist
- * @var userinfo $ui
+ * @var Pluglist $plist
+ * @var SERINFO $ui
  * @var bool $cleanup
  */
 

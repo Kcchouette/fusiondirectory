@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class ogrouptabs extends simpleTabs_noSpecial
+class ogrouptabs extends SimpleTabsNoSpecial
 {
   protected $groupObjects = NULL;
   protected $removed_tabs = [];
@@ -116,8 +116,8 @@ class ogrouptabs extends simpleTabs_noSpecial
 
   function addTab ($class)
   {
-    logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $class, 'Adding tab ');
-    $plInfos = pluglist::pluginInfos($class);
+    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $class, 'Adding tab ');
+    $plInfos = Pluglist::pluginInfos($class);
     $this->by_name[$class]  = $plInfos['plShortName'];
     $this->plNotify[$class] = FALSE;
     if (isset($this->removed_tabs[$class])) {
@@ -182,7 +182,7 @@ class ogrouptabs extends simpleTabs_noSpecial
       if (isset($this->by_object[$key])) {
         continue;
       }
-      logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $key, 'Removing');
+      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $key, 'Removing');
 
       $obj->dn = $this->dn;
       $tabErrors = $obj->remove(FALSE);

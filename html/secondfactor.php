@@ -44,8 +44,8 @@ bindtextdomain($domain, LOCALE_DIR);
 textdomain($domain);
 
 /* Remember everything we did after the last click */
-session::start();
-session::set('DEBUGLEVEL', 0);
+Session::start();
+Session::set('DEBUGLEVEL', 0);
 reset_errors();
 
 /* Force SSL for second factor */
@@ -57,42 +57,42 @@ if ($ssl != '') {
 CSRFProtection::check();
 
 /* Logged in? Redirect to FD */
-if (session::is_set('connected')) {
+if (Session::is_set('connected')) {
   header('Location: main.php');
   exit;
 }
 
 /* Missing data? Redirect to login */
-if (!session::is_set('ui') || !session::is_set('config')) {
+if (!Session::is_set('ui') || !Session::is_set('Config')) {
   header('Location: index.php');
   exit;
 }
 
-$ui     = session::get('ui');
-$config = session::get('config');
+$ui     = Session::get('ui');
+$config = Session::get('Config');
 
-timezone::setDefaultTimezoneFromConfig();
+Timezone::setDefaultTimezoneFromConfig();
 
 /* Check for invalid sessions */
-if (session::get('_LAST_PAGE_REQUEST') != '') {
+if (Session::get('_LAST_PAGE_REQUEST') != '') {
   /* check FusionDirectory.conf for defined session lifetime */
   $max_life = $config->get_cfg_value('sessionLifetime', 60 * 60 * 2);
 
   if ($max_life > 0) {
     /* get time difference between last page reload */
-    $request_time = (time() - session::get('_LAST_PAGE_REQUEST'));
+    $request_time = (time() - Session::get('_LAST_PAGE_REQUEST'));
 
     /* If page wasn't reloaded for more than max_life seconds
      * kill session
      */
     if ($request_time > $max_life) {
-      session::destroy('main.php called with expired session');
+      Session::destroy('main.php called with expired session');
       header('Location: index.php?signout=1&message=expired');
       exit;
     }
   }
 }
-session::set('_LAST_PAGE_REQUEST', time());
+Session::set('_LAST_PAGE_REQUEST', time());
 
 foreach (LoginPost::$secondFactorMethods as $secondFactorMethod) {
   if (!class_available($secondFactorMethod)) {
@@ -101,7 +101,7 @@ foreach (LoginPost::$secondFactorMethods as $secondFactorMethod) {
   $secondFactorMethod::earlyProcess();
 }
 
-session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
+Session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
 
 /* Set template compile directory */
 $smarty->setCompileDir($config->get_cfg_value('templateCompileDirectory', SPOOL_DIR));

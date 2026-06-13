@@ -40,7 +40,7 @@ class GroupContentColumn extends Column
         continue;
       }
       try {
-        $infos  = objects::infos(ogroup::$objectTypes[$types[$i]]);
+        $infos  = Objects::infos(ogroup::$objectTypes[$types[$i]]);
         $result .= '<img src="'.htmlescape($infos['icon']).'"'.
                     ' alt="'.htmlescape($infos['name']).'"'.
                     ' title="'.htmlescape($infos['name']).'"/>';

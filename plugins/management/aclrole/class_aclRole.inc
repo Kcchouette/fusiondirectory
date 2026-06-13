@@ -42,7 +42,7 @@ class ACLsAttribute extends DialogOrderedArrayAttribute
   function readValue ($value)
   {
     $acl = explode(':', $value, 2);
-    return [$acl[0], acl::extractACL($acl[1])];
+    return [$acl[0], Acl::extractACL($acl[1])];
   }
 
   function writeValue ($key, $value)
@@ -67,7 +67,7 @@ class ACLsAttribute extends DialogOrderedArrayAttribute
   }
 }
 
-class aclRole extends simplePlugin
+class aclRole extends SimplePlugin
 {
   static function plInfo (): array
   {
@@ -76,7 +76,7 @@ class aclRole extends simplePlugin
       'plDescription' => _('Manage acl roles'),
       'plObjectClass' => ['gosaRole'],
       'plObjectType'  => ['aclRole' => [
-        'aclCategory' => 'acl',
+        'aclCategory' => 'Acl',
         'name'        => _('ACL role'),
         'ou'          => get_ou('aclRoleRDN'),
         'icon'        => 'geticon.php?context=categories&icon=acl&size=16',

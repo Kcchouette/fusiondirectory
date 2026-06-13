@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class tasksDashboard extends management
+class tasksDashboard extends Management
 {
 
   function __construct ($objectTypes = FALSE, array $filterElementDefinitions = [['TabFilterElement',    []],])
@@ -63,7 +63,7 @@ class tasksDashboard extends management
   protected function setUpListing ()
   {
     /* Set baseMode to FALSE */
-    $this->listing  = new managementListing($this, FALSE);
+    $this->listing  = new ManagementListing($this, FALSE);
   }
 
   // Allowing us to add additional actions and remove unrequired ones.
@@ -94,7 +94,7 @@ class tasksDashboard extends management
 
   function tasksUpdate ($dn)
   {
-    $tabObject    = objects::open($dn, 'tasksGranular');
+    $tabObject    = Objects::open($dn, 'tasksGranular');
     $tabObject->by_object['tasksGranular']->attributesAccess['fdTasksGranularStatus']->setValue(1);
     $errors = $tabObject->save();
 

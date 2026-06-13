@@ -205,7 +205,7 @@ class SnapshotHandler
   {
     global $config;
     if (!$this->enabled()) {
-      logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot are disabled but tried to create snapshot');
+      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot are disabled but tried to create snapshot');
       return;
     }
 
@@ -220,7 +220,7 @@ class SnapshotHandler
 
     /* check if the dn exists */
     if (!$ldap->dn_exists($dn)) {
-      logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Tried to snapshot non-existing dn');
+      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Tried to snapshot non-existing dn');
       return;
     }
 
@@ -283,7 +283,7 @@ class SnapshotHandler
       $error = new FusionDirectoryLdapError($new_dn, LDAP_ADD, $ldap->get_error(), $ldap->get_errno());
       $error->display();
     }
-    logging::log('snapshot', 'create', $new_dn, array_keys($target), $ldap->get_error());
+    Logging::log('snapshot', 'create', $new_dn, array_keys($target), $ldap->get_error());
   }
 
   // function verifing the configuration retention for snapshots.
@@ -356,7 +356,7 @@ class SnapshotHandler
       $error = new FusionDirectoryLdapError($dn, LDAP_DEL, $ldap->get_error(), $ldap->get_errno());
       $error->display();
     }
-    logging::log('snapshot', 'delete', $dn, [], $ldap->get_error());
+    Logging::log('snapshot', 'delete', $dn, [], $ldap->get_error());
   }
 
   /*!
@@ -453,7 +453,7 @@ class SnapshotHandler
   {
     global $config;
     if (!$this->enabled()) {
-      logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot are disabled but tried to restore snapshot');
+      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot are disabled but tried to restore snapshot');
       return FALSE;
     }
 
@@ -478,7 +478,7 @@ class SnapshotHandler
     /* Import the given data */
     try {
       $ldap->import_complete_ldif($data, FALSE, FALSE);
-      logging::log('snapshot', 'restore', $dn, [], $ldap->get_error());
+      Logging::log('snapshot', 'restore', $dn, [], $ldap->get_error());
       if (!$ldap->success()) {
         $error = new FusionDirectoryLdapError($dn, NULL, $ldap->get_error(), $ldap->get_errno());
         $error->display();
@@ -488,7 +488,7 @@ class SnapshotHandler
     } catch (LDIFImportException $e) {
       $error = new FusionDirectoryError($e->getMessage(), 0, $e);
       $error->display();
-      logging::log('snapshot', 'restore', $dn, [], $e->getMessage());
+      Logging::log('snapshot', 'restore', $dn, [], $e->getMessage());
       return FALSE;
     }
   }

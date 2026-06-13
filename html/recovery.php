@@ -22,4 +22,4 @@ require_once('../include/php_setup.inc');
 require_once('functions.inc');
 require_once('variables.inc');
 
-passwordRecovery::run();
+PasswordRecovery::run();

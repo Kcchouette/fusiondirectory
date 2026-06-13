@@ -69,7 +69,7 @@ class SnapshotCreateDialog extends ManagementDialog
     ];
   }
 
-  function __construct (string $dn, management $parent, string $aclCategory)
+  function __construct (string $dn, Management $parent, string $aclCategory)
   {
     parent::__construct(NULL, NULL, $parent);
     // The attribut will be passed to parent for later saving, dataSource might require same logic.

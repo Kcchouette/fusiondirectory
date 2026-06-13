@@ -51,8 +51,8 @@ class Lock
 
     /* Remember which entries were opened as read only, because we
         don't need to remove any locks for them later */
-    if (!session::is_set('LOCK_CACHE')) {
-      session::set('LOCK_CACHE', ['']);
+    if (!Session::is_set('LOCK_CACHE')) {
+      Session::set('LOCK_CACHE', ['']);
     }
     if (is_array($object)) {
       foreach ($object as $obj) {
@@ -65,7 +65,7 @@ class Lock
       $user = $ui->dn;
     }
 
-    $cache = &session::get_ref('LOCK_CACHE');
+    $cache = &Session::get_ref('LOCK_CACHE');
     if (isset($_POST['open_readonly'])) {
       $cache['READ_ONLY'][$object] = TRUE;
       return;
@@ -152,8 +152,8 @@ class Lock
     /* If this object was opened in read only mode then
         skip removing the lock entry, there wasn't any lock created.
       */
-    if (session::is_set('LOCK_CACHE')) {
-      $cache = &session::get_ref('LOCK_CACHE');
+    if (Session::is_set('LOCK_CACHE')) {
+      $cache = &Session::get_ref('LOCK_CACHE');
       if (isset($cache['READ_ONLY'][$object])) {
         unset($cache['READ_ONLY'][$object]);
         return;
@@ -332,11 +332,11 @@ class Lock
   public static function genLockedMessage (array $locks, bool $allowReadonly = FALSE, ?string $action = NULL): string
   {
     /* Save variables from LOCK_VARS_TO_USE in session - for further editing */
-    if (session::is_set('LOCK_VARS_TO_USE') && count(session::get('LOCK_VARS_TO_USE'))) {
+    if (Session::is_set('LOCK_VARS_TO_USE') && count(Session::get('LOCK_VARS_TO_USE'))) {
       $LOCK_VARS_USED_GET       = [];
       $LOCK_VARS_USED_POST      = [];
       $LOCK_VARS_USED_REQUEST   = [];
-      $LOCK_VARS_TO_USE         = session::get('LOCK_VARS_TO_USE');
+      $LOCK_VARS_TO_USE         = Session::get('LOCK_VARS_TO_USE');
 
       foreach ($LOCK_VARS_TO_USE as $name) {
         if (empty($name)) {
@@ -361,10 +361,10 @@ class Lock
           }
         }
       }
-      session::set('LOCK_VARS_TO_USE',        []);
-      session::set('LOCK_VARS_USED_GET',      $LOCK_VARS_USED_GET);
-      session::set('LOCK_VARS_USED_POST',     $LOCK_VARS_USED_POST);
-      session::set('LOCK_VARS_USED_REQUEST',  $LOCK_VARS_USED_REQUEST);
+      Session::set('LOCK_VARS_TO_USE',        []);
+      Session::set('LOCK_VARS_USED_GET',      $LOCK_VARS_USED_GET);
+      Session::set('LOCK_VARS_USED_POST',     $LOCK_VARS_USED_POST);
+      Session::set('LOCK_VARS_USED_REQUEST',  $LOCK_VARS_USED_REQUEST);
     }
 
     /* Prepare and show template */

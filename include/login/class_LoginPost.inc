@@ -91,7 +91,7 @@ class LoginPost extends LoginMethod
   /*! \brief Redirect to the second factor page */
   static protected function redirectSecondFactorPage ()
   {
-    session::un_set('connected');
+    Session::un_set('connected');
     header('Location: secondfactor.php');
     exit;
   }
@@ -101,7 +101,7 @@ class LoginPost extends LoginMethod
   {
     global $smarty,$message,$config,$ssl,$error_collector,$error_collector_mailto;
 
-    $lang = session::get('lang');
+    $lang = Session::get('lang');
 
     error_reporting(E_ALL | E_NOTICE);
 
@@ -155,7 +155,7 @@ class LoginPost extends LoginMethod
     } else {
       $smarty->assign('php_errors', '');
     }
-    $smarty->assign('msg_dialogs',  msg_dialog::get_dialogs());
+    $smarty->assign('msg_dialogs',  MsgDialog::get_dialogs());
     $smarty->assign('usePrototype', 'false');
     $smarty->assign('date',         date('l, dS F Y H:i:s O'));
     $smarty->assign('lang',         preg_replace('/_.*$/', '', $lang));
@@ -173,7 +173,7 @@ class LoginPost extends LoginMethod
   {
     global $smarty,$message,$config,$ssl,$error_collector,$error_collector_mailto;
 
-    $lang = session::get('lang');
+    $lang = Session::get('lang');
 
     error_reporting(E_ALL | E_NOTICE);
 
@@ -201,7 +201,7 @@ class LoginPost extends LoginMethod
     } else {
       $smarty->assign('php_errors', '');
     }
-    $smarty->assign('msg_dialogs',  msg_dialog::get_dialogs());
+    $smarty->assign('msg_dialogs',  MsgDialog::get_dialogs());
     $smarty->assign('usePrototype', 'false');
     $smarty->assign('date',         date('l, dS F Y H:i:s O'));
     $smarty->assign('lang',         preg_replace('/_.*$/', '', $lang));

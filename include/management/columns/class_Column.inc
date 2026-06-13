@@ -40,11 +40,11 @@ class Column
   /*!
    * \brief Builds a column object from given data
    *
-   * \param managementListing $parent the managementListing instance
+   * \param ManagementListing $parent the managementListing instance
    * \param string $type a column class
    * \param array $data an associative array with "attributes" and "label"
    * */
-  static function build (managementListing $parent, string $type, array $data): Column
+  static function build (ManagementListing $parent, string $type, array $data): Column
   {
     $attributes = NULL;
     $label      = NULL;
@@ -61,7 +61,7 @@ class Column
     return new $type($parent, $attributes, $label);
   }
 
-  function __construct (managementListing $parent, ?array $attributes = NULL, ?string $label = NULL)
+  function __construct (ManagementListing $parent, ?array $attributes = NULL, ?string $label = NULL)
   {
     $this->parent = $parent;
     $this->label  = $label;
@@ -153,7 +153,7 @@ class Column
     if (isset($attrs)) {
       foreach ($attrs as $attr) {
         if (($attr == 'mainAttr') || ($attr == 'nameAttr')) {
-          $infos  = objects::infos($entry->getTemplatedType());
+          $infos  = Objects::infos($entry->getTemplatedType());
           $attr   = $infos[$attr];
         }
         if (isset($entry[$attr])) {

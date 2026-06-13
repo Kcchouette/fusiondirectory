@@ -43,7 +43,7 @@ class PostalAddressAttribute extends TextAreaAttribute
   }
 }
 
-class user extends simplePlugin
+class user extends SimplePlugin
 {
   // This is used to see if the password is locked. The "was" is better interpreted as "is" - it is historical here.
   private $was_locked;
@@ -313,7 +313,7 @@ class user extends simplePlugin
 
   private function applyPattern ($pattern)
   {
-    $fields = templateHandling::listFields($pattern);
+    $fields = TemplateHandling::listFields($pattern);
     $attrs  = [];
     foreach ($fields as $field) {
       if (in_array($field, $this->attributes)) {
@@ -332,7 +332,7 @@ class user extends simplePlugin
       trigger_error('Could not find field ' . $field . ' in any tab!');
     }
 
-    return templateHandling::parseString($pattern, $attrs);
+    return TemplateHandling::parseString($pattern, $attrs);
   }
 
   function compute_dn (): string
@@ -387,7 +387,7 @@ class user extends simplePlugin
     }
 
     if (!$this->is_template && $this->was_locked && $this->attributesAccess['userPassword']->hasChanged()) {
-      $methods = passwordMethod::get_available_methods();
+      $methods = PasswordMethod::get_available_methods();
       $pmethod = new $methods[$this->attributesAccess['userPassword']->getMethod()]($this->dn);
       $pmethod->lock_account($this->dn);
     }
@@ -402,8 +402,8 @@ class user extends simplePlugin
     /* Update current locale settings, if we have edited ourselves */
     if (isset($this->attrs['preferredLanguage']) && ($this->dn == $ui->dn)) {
       $ui->language = $this->preferredLanguage;
-      session::set('ui', $ui);
-      session::set('Last_init_lang', 'update');
+      Session::set('ui', $ui);
+      Session::set('Last_init_lang', 'update');
     }
     return parent::post_save();
   }
@@ -458,7 +458,7 @@ class user extends simplePlugin
   function fillHookAttrs (array &$addAttrs)
   {
     parent::fillHookAttrs($addAttrs);
-    $addAttrs['passwordMethod'] = $this->attributesAccess['userPassword']->getMethod();
+    $addAttrs['PasswordMethod'] = $this->attributesAccess['userPassword']->getMethod();
     $addAttrs['userLocked']     = (int)($this->attributesAccess['userPassword']->isLocked());
     $addAttrs['passwordClear']  = $this->attributesAccess['userPassword']->getClear();
   }
@@ -520,8 +520,8 @@ class user extends simplePlugin
       }
       if (isset($policy['pwdMinAge'][0]) && isset($attrs['pwdChangedTime'][0])) {
         $date = LdapGeneralizedTime::fromString($attrs['pwdChangedTime'][0]);
-        $date->setTimezone(timezone::utc());
-        $now = new DateTime('now', timezone::utc());
+        $date->setTimezone(Timezone::utc());
+        $now = new DateTime('now', Timezone::utc());
         if ($now->getTimeStamp() < $date->getTimeStamp() + $policy['pwdMinAge'][0]) {
           return sprintf(_('You must wait %d seconds before changing your password again'), $policy['pwdMinAge'][0] - ($now->getTimeStamp() - $date->getTimeStamp()));
         }
@@ -533,7 +533,7 @@ class user extends simplePlugin
         unset($attrs['pwdHistory']['count']);
         foreach ($attrs['pwdHistory'] as $pwdHistory) {
           $pwdHistory = explode('#', $pwdHistory, 4);
-          $method     = passwordMethod::get_method($pwdHistory[3], $user);
+          $method     = PasswordMethod::get_method($pwdHistory[3], $user);
           if ($method->checkPassword($new_password, $pwdHistory[3])) {
             return _('Password is in history of old passwords');
           }
@@ -542,7 +542,7 @@ class user extends simplePlugin
       if (($current_password !== NULL) && ($current_password == $new_password)) {
         return _('Password is not being changed from existing value');
       } elseif (isset($attrs['userPassword'][0])) {
-        $method = passwordMethod::get_method($attrs['userPassword'][0], $user);
+        $method = PasswordMethod::get_method($attrs['userPassword'][0], $user);
         if ($method->checkPassword($new_password, $attrs['userPassword'][0])) {
           return _('Password is not being changed from existing value');
         }
@@ -555,12 +555,12 @@ class user extends simplePlugin
     } elseif ($new_password != $repeated_password) {
       return _('The passwords you\'ve entered as "New password" and "Repeated new password" do not match.');
     } elseif ($new_password == '') {
-      return msgPool::required(_('New password'));
+      return MsgPool::required(_('New password'));
     } elseif ($check_differ && (mb_substr($current_password, 0, $differ) == mb_substr($new_password, 0, $differ))) {
       return _('The password used as new and current are too similar.');
     } elseif ($check_length && (mb_strlen($new_password) < $length)) {
       return _('The password used as new is too short.');
-    } elseif (!passwordMethod::is_harmless($new_password)) {
+    } elseif (!PasswordMethod::is_harmless($new_password)) {
       return _('The password contains possibly problematic Unicode characters!');
     }
 

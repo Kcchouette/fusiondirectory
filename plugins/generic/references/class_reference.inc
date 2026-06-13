@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class reference extends simplePlugin
+class reference extends SimplePlugin
 {
   public $uid;
   public $cn;
@@ -31,7 +31,7 @@ class reference extends simplePlugin
     return [
       'plShortName'   => _('References'),
       'plDescription' => _('References'),
-      'plCategory'    => ['acl'],
+      'plCategory'    => ['Acl'],
       'plObjectType'  => [
         'special' => [
           'name' => 'special'
@@ -52,7 +52,7 @@ class reference extends simplePlugin
         'attrs'     => [
           new FakeAttribute('refs')
         ],
-        'template'  => get_template_path('contents.tpl', TRUE, dirname(__FILE__))
+        'Template'  => get_template_path('contents.tpl', TRUE, dirname(__FILE__))
       ],
     ];
   }

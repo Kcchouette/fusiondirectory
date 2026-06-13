@@ -56,8 +56,8 @@ session_cache_expire(60 * 24);
 ini_set("session.gc_maxlifetime", 24 * 60 * 60);
 
 /* Start session */
-session::start();
-session::set('DEBUGLEVEL', 0);
+Session::start();
+Session::set('DEBUGLEVEL', 0);
 
 CSRFProtection::check();
 
@@ -85,8 +85,8 @@ if (isset($_POST['lang_selected']) && $_POST['lang_selected'] != '') {
   if (!preg_match('/utf(-)?8$/i', $lang)) {
     $lang .= '.UTF-8';
   }
-} elseif (session::is_set('lang')) {
-  $lang = session::get('lang');
+} elseif (Session::is_set('lang')) {
+  $lang = Session::get('lang');
 
   /* Append .UTF-8 to language string if necessary */
   if (!preg_match('/utf(-)?8$/i', $lang)) {
@@ -102,14 +102,14 @@ $smarty->assign('lang', preg_replace('/_.*$/', '', $lang));
 $smarty->assign('rtl',  Language::isRTL($lang));
 
 /* Minimal config */
-if (!session::is_set('config')) {
-  $config = new config('');
-  session::set('config', $config);
+if (!Session::is_set('Config')) {
+  $config = new Config('');
+  Session::set('Config', $config);
 }
-$config = session::get('config');
+$config = Session::get('Config');
 IconTheme::loadThemes('themes');
 /* Fake user bypassing acl system */
-$ui = new userinfoNoAuth('setup');
+$ui = new UserInfoNoAuth('setup');
 /* Call setup */
 setup::mainInc();
 /**
@@ -121,7 +121,7 @@ $focus .= 'next_msg_dialog();';
 $focus .= '</script>';
 
 /* show web frontend */
-$setup = session::get('setup');
+$setup = Session::get('setup');
 
 $smarty->assign('date',           date('l, dS F Y H:i:s O'));
 $smarty->assign('headline',       $setup->get_header_text());
@@ -132,7 +132,7 @@ $smarty->assign("navigation",     $setup->get_navigation_html());
 $smarty->assign("headline_image", $setup->get_header_image());
 $smarty->assign("focus",          $focus);
 $smarty->assign('CSRFtoken',      CSRFProtection::getToken());
-$smarty->assign("msg_dialogs",    msg_dialog::get_dialogs());
+$smarty->assign("msg_dialogs",    MsgDialog::get_dialogs());
 
 if ($error_collector != "") {
   $smarty->assign("php_errors", preg_replace("/%BUGBODY%/", $error_collector_mailto, $error_collector)."</div>");

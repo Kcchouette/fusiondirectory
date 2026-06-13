@@ -44,25 +44,25 @@ bindtextdomain($domain, LOCALE_DIR);
 textdomain($domain);
 
 /* Remember everything we did after the last click */
-session::start();
+Session::start();
 reset_errors();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  logging::debug(DEBUG_POST, __LINE__, '', __FILE__, $_POST, '_POST');
+  Logging::debug(DEBUG_POST, __LINE__, '', __FILE__, $_POST, '_POST');
 }
-logging::debug(DEBUG_SESSION, __LINE__, '', __FILE__, $_SESSION, '_SESSION');
+Logging::debug(DEBUG_SESSION, __LINE__, '', __FILE__, $_SESSION, '_SESSION');
 
 /* Logged in? Simple security check */
-if (!session::is_set('connected')) {
-  session::destroy('main.php called without session');
+if (!Session::is_set('connected')) {
+  Session::destroy('main.php called without session');
   header('Location: index.php?message=nosession');
   exit;
 }
 
 CSRFProtection::check();
 
-$ui     = session::get('ui');
-$config = session::get('config');
+$ui     = Session::get('ui');
+$config = Session::get('Config');
 
 /* If SSL is forced, just forward to the SSL enabled site */
 if (($config->get_cfg_value('forcessl') == 'TRUE') && ($ssl != '')) {
@@ -70,31 +70,31 @@ if (($config->get_cfg_value('forcessl') == 'TRUE') && ($ssl != '')) {
   exit;
 }
 
-timezone::setDefaultTimezoneFromConfig();
+Timezone::setDefaultTimezoneFromConfig();
 
 /* Check for invalid sessions */
-if (session::get('_LAST_PAGE_REQUEST') != '') {
+if (Session::get('_LAST_PAGE_REQUEST') != '') {
   /* check FusionDirectory.conf for defined session lifetime */
   $max_life = $config->get_cfg_value('sessionLifetime', 60 * 60 * 2);
 
   if ($max_life > 0) {
     /* get time difference between last page reload */
-    $request_time = (time() - session::get('_LAST_PAGE_REQUEST'));
+    $request_time = (time() - Session::get('_LAST_PAGE_REQUEST'));
 
     /* If page wasn't reloaded for more than max_life seconds
      * kill session
      */
     if ($request_time > $max_life) {
-      session::destroy('main.php called with expired session');
+      Session::destroy('main.php called with expired session');
       header('Location: index.php?signout=1&message=expired');
       exit;
     }
   }
 }
-session::set('_LAST_PAGE_REQUEST', time());
+Session::set('_LAST_PAGE_REQUEST', time());
 
 
-logging::debug(DEBUG_CONFIG, __LINE__, '', __FILE__, $config->data, "config");
+Logging::debug(DEBUG_CONFIG, __LINE__, '', __FILE__, $config->data, "Config");
 
 /* Set template compile directory */
 $smarty->setCompileDir($config->get_cfg_value('templateCompileDirectory', SPOOL_DIR));
@@ -102,14 +102,14 @@ $smarty->setCompileDir($config->get_cfg_value('templateCompileDirectory', SPOOL_
 Language::init();
 
 /* Prepare plugin list */
-pluglist::load();
+Pluglist::load();
 /**
- * @var pluglist $plist built by pluglist::load
+ * @var Pluglist $plist built by Pluglist::load
  */
 
 /* Check previous plugin index */
-if (session::is_set('plugin_index')) {
-  $old_plugin_index = session::get('plugin_index');
+if (Session::is_set('plugin_index')) {
+  $old_plugin_index = Session::get('plugin_index');
 } else {
   $old_plugin_index = '';
 }
@@ -119,15 +119,15 @@ $plist->gen_menu();
 $smarty->assign('hideMenus', FALSE);
 /* check user expiration status */
 $expired = $ui->expired_status();
-if (($expired == POSIX_WARN_ABOUT_EXPIRATION) && !session::is_set('POSIX_WARN_ABOUT_EXPIRATION__DONE')) {
-  logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__, $expired, 'This user account ('.$ui->uid.') is about to expire');
+if (($expired == POSIX_WARN_ABOUT_EXPIRATION) && !Session::is_set('POSIX_WARN_ABOUT_EXPIRATION__DONE')) {
+  Logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__, $expired, 'This user account ('.$ui->uid.') is about to expire');
 
   // The users password is about to expire soon, display a warning message.
-  logging::log('security', 'fusiondirectory', '', [], 'password for user "'.$ui->uid.'" is about to expire');
-  msg_dialog::display(_('Password change'), htmlescape(_('Your password is about to expire, please change your password!')), INFO_DIALOG);
-  session::set('POSIX_WARN_ABOUT_EXPIRATION__DONE', TRUE);
+  Logging::log('security', 'fusiondirectory', '', [], 'password for user "'.$ui->uid.'" is about to expire');
+  MsgDialog::display(_('Password change'), htmlescape(_('Your password is about to expire, please change your password!')), INFO_DIALOG);
+  Session::set('POSIX_WARN_ABOUT_EXPIRATION__DONE', TRUE);
 } elseif ($expired == POSIX_FORCE_PASSWORD_CHANGE) {
-  logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__, $expired, 'This user account expired');
+  Logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__, $expired, 'This user account expired');
 
   // The password is expired, we are now going to enforce a new one from the user.
 
@@ -154,7 +154,7 @@ if (isset($_GET['plug']) && $plist->plugin_access_allowed($_GET['plug'])) {
   /* set to welcome page as default plugin */
   $plugin_index = 'welcome';
 }
-session::set('plugin_index', $plugin_index);
+Session::set('plugin_index', $plugin_index);
 
 /* Handle plugin locks.
     - Remove the plugin from session if we switched to another. (cleanup)
@@ -166,7 +166,7 @@ $remove_lock  = FALSE;
 
 /* Check if we have changed the selected plugin */
 if (!empty($old_plugin_index) && ($old_plugin_index != $plugin_index)) {
-  pluglist::runMainInc($old_plugin_index, TRUE);
+  Pluglist::runMainInc($old_plugin_index, TRUE);
 } elseif ((isset($_GET['reset']) && $_GET['reset'] == 1) || isset($_POST['delete_lock'])) {
   /* Reset was posted, remove all created locks for the current plugin */
   $remove_lock = TRUE;
@@ -183,7 +183,7 @@ if (memory_get_usage() > (to_byte(ini_get('memory_limit')) - 2048000)) {
 
 /* show web frontend */
 $smarty->assign("date", date("l, dS F Y H:i:s O"));
-$lang = session::get('lang');
+$lang = Session::get('lang');
 $smarty->assign('lang',  preg_replace('/_.*$/', '', $lang));
 $smarty->assign('rtl',   Language::isRTL($lang));
 if (isset($plugin_index)) {
@@ -207,31 +207,31 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST')
   && (isset($_POST['delete_lock']) || isset($_POST['open_readonly']))) {
 
   /* Set old Post data */
-  if (session::is_set('LOCK_VARS_USED_GET')) {
-    foreach (session::get('LOCK_VARS_USED_GET') as $name => $value) {
+  if (Session::is_set('LOCK_VARS_USED_GET')) {
+    foreach (Session::get('LOCK_VARS_USED_GET') as $name => $value) {
       $_GET[$name]  = $value;
     }
   }
-  if (session::is_set('LOCK_VARS_USED_POST')) {
-    foreach (session::get('LOCK_VARS_USED_POST') as $name => $value) {
+  if (Session::is_set('LOCK_VARS_USED_POST')) {
+    foreach (Session::get('LOCK_VARS_USED_POST') as $name => $value) {
       $_POST[$name] = $value;
     }
   }
-  if (session::is_set('LOCK_VARS_USED_REQUEST')) {
-    foreach (session::get('LOCK_VARS_USED_REQUEST') as $name => $value) {
+  if (Session::is_set('LOCK_VARS_USED_REQUEST')) {
+    foreach (Session::get('LOCK_VARS_USED_REQUEST') as $name => $value) {
       $_REQUEST[$name] = $value;
     }
   }
 }
 
 /* Load plugin */
-pluglist::runMainInc($plugin_index);
+Pluglist::runMainInc($plugin_index);
 /**
- * @var string $display Filled by pluglist::runMainInc
+ * @var string $display Filled by Pluglist::runMainInc
  */
 
 /* Print_out last ErrorMessage repeated string. */
-$smarty->assign("msg_dialogs", msg_dialog::get_dialogs());
+$smarty->assign("msg_dialogs", MsgDialog::get_dialogs());
 $smarty->assign("contents", $display);
 $smarty->assign("sessionLifetime", $config->get_cfg_value("sessionLifetime", 60 * 60 * 2));
 
@@ -268,6 +268,6 @@ $display  = $smarty->fetch(get_template_path('headers.tpl')).
 echo $display;
 
 /* Save plist and config */
-session::set('plist', $plist);
-session::set('config', $config);
+Session::set('plist', $plist);
+Session::set('Config', $config);
 reset_errors();

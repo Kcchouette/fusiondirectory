@@ -23,7 +23,7 @@ declare(strict_types=1);
  */
 class GenericSelectManagementDialog extends GenericDialog
 {
-  protected $dialogClass = 'selectManagement';
+  protected $dialogClass = 'SelectManagement';
 
   public function __construct ($simplePlugin, $attribute)
   {
@@ -35,7 +35,7 @@ class GenericSelectManagementDialog extends GenericDialog
   {
     $result = $this->dialog->detectPostActions();
     if (isset($result['targets'])) {
-      if ($this->dialog instanceof selectManagement) {
+      if ($this->dialog instanceof SelectManagement) {
         $headpage = $this->dialog->listing;
       } else {
         $headpage = $this->dialog->getHeadpage();

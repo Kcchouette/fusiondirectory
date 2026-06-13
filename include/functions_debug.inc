@@ -41,7 +41,7 @@ declare(strict_types=1);
  * based on the print_a() function from
  * Stephan Pirson (Saibot)
  */
-class printAClass
+class PrintAClass
 {
 
   // this can be changed to FALSE if you don't like the fancy string formatting

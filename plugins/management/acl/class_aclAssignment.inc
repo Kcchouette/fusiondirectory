@@ -18,18 +18,18 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class aclAssignment extends simplePlugin
+class aclAssignment extends SimplePlugin
 {
   static function plInfo (): array
   {
     global $config;
     $oc = [
       'aclAssignment' => [
-        'aclCategory' => 'acl',
+        'aclCategory' => 'Acl',
         'name'        => _('Acl assignment'),
         'ou'          => '',
         'icon'        => 'geticon.php?context=categories&icon=acl&size=16',
-        'tabClass'    => 'simpleTabs_noSpecial',
+        'tabClass'    => 'SimpleTabsNoSpecial',
         'mainAttr'    => FALSE
       ],
     ];
@@ -102,7 +102,7 @@ class aclAssignment extends simplePlugin
     /* Refresh users ACLs */
     $ui = get_userinfo();
     $ui->loadACL();
-    session::set('ui', $ui);
+    Session::set('ui', $ui);
   }
 
   function post_save ()
@@ -112,7 +112,7 @@ class aclAssignment extends simplePlugin
     /* Refresh users ACLs */
     $ui = get_userinfo();
     $ui->loadACL();
-    session::set('ui', $ui);
+    Session::set('ui', $ui);
   }
 
   function foreignKeyUpdate (string $field, $oldvalue, $newvalue, array $source)

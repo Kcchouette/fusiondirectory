@@ -28,7 +28,7 @@ class RoleMembersAttribute extends UsersAttribute
     if ($config->get_cfg_value('RestrictRoleMembers') == 'TRUE') {
       if ($this->whitelistDns === NULL) {
         /* Computes a list of members of all groups within our branch */
-        $groups = objects::ls('ogroup', ['member' => '*'], $this->plugin->base);
+        $groups = Objects::ls('ogroup', ['member' => '*'], $this->plugin->base);
         if (empty($groups)) {
           $this->whitelistDns = [];
         } else {
@@ -45,7 +45,7 @@ class RoleMembersAttribute extends UsersAttribute
   }
 }
 
-class roleGeneric extends simplePlugin
+class roleGeneric extends SimplePlugin
 {
   static function plInfo (): array
   {
@@ -125,12 +125,12 @@ class roleGeneric extends simplePlugin
       $removingOccupants  = array_diff($savedOccupants, $this->roleOccupant);
       foreach ($addingOccupants as $dn) {
         if (strpos($ui->get_permissions($dn, 'user/userRoles', 'rolesMembership', $this->acl_skip_write()), 'w') === FALSE) {
-          $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($dn, 'rolesMembership'));
+          $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($dn, 'rolesMembership'));
         }
       }
       foreach ($removingOccupants as $dn) {
         if (strpos($ui->get_permissions($dn, 'user/userRoles', 'rolesMembership', $this->acl_skip_write()), 'w') === FALSE) {
-          $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($dn, 'rolesMembership'));
+          $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($dn, 'rolesMembership'));
         }
       }
     }

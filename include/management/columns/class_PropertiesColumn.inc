@@ -26,7 +26,7 @@ class PropertiesColumn extends Column
 {
   protected $tabs;
 
-  function __construct (managementListing $parent, ?array $attributes = NULL, ?string $label = NULL)
+  function __construct (ManagementListing $parent, ?array $attributes = NULL, ?string $label = NULL)
   {
     global $config;
 
@@ -35,7 +35,7 @@ class PropertiesColumn extends Column
     $this->tabs = [];
 
     foreach ($this->parent->parent->objectTypes as $type) {
-      $infos = objects::infos($type);
+      $infos = Objects::infos($type);
       $this->tabs[$type] = [];
       foreach ($config->data['TABS'][$infos['tabGroup']] as $plug) {
         if ($plug['CLASS'] == $infos['mainTab']) {
@@ -113,11 +113,11 @@ class PropertiesColumn extends Column
       return $entry->cache[__CLASS__]['icons'];
     }
 
-    $infos = objects::infos($entry->getTemplatedType());
+    $infos = Objects::infos($entry->getTemplatedType());
     $icons = [];
 
     /* Main tab is always there */
-    $pInfos = pluglist::pluginInfos($infos['mainTab']);
+    $pInfos = Pluglist::pluginInfos($infos['mainTab']);
     $icons[]  = [
       'icon'  => (isset($pInfos['plSmallIcon']) ? $pInfos['plSmallIcon'] : $infos['icon']),
       'title' => $pInfos['plShortName'],
@@ -137,7 +137,7 @@ class PropertiesColumn extends Column
 
         $status = $class::isAccount($attrs);
         if ($status !== FALSE) {
-          $pInfos = pluglist::pluginInfos($class);
+          $pInfos = Pluglist::pluginInfos($class);
           if (isset($pInfos['plSmallIcon'])) {
             $icons[] = [
               'icon'  => $pInfos['plSmallIcon'],
@@ -145,7 +145,7 @@ class PropertiesColumn extends Column
               'tab'   => $class,
             ];
           } else {
-            logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $pInfos['plShortName']." ($class)", 'No icon for');
+            Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $pInfos['plShortName']." ($class)", 'No icon for');
           }
         } else {
           $icons[] = [

@@ -23,12 +23,12 @@ declare(strict_types=1);
 /*!
  * \brief Management dialog
  */
-class ManagementDialog extends simplePlugin
+class ManagementDialog extends SimplePlugin
 {
   protected $post_cancel = 'edit_cancel';
   protected $post_finish = 'edit_finish';
 
-  function __construct (?string $dn = NULL, $object = NULL, ?management $parent = NULL, bool $mainTab = FALSE, ?array $attributesInfo = NULL)
+  function __construct (?string $dn = NULL, $object = NULL, ?Management $parent = NULL, bool $mainTab = FALSE, ?array $attributesInfo = NULL)
   {
     parent::__construct($dn, $object, $parent, $mainTab, $attributesInfo);
   }
@@ -47,12 +47,12 @@ class ManagementDialog extends simplePlugin
   {
     $msgs = $this->check();
     if (count($msgs)) {
-      msg_dialog::displayChecks($msgs);
+      MsgDialog::displayChecks($msgs);
       return;
     } else {
       $errors = $this->save();
       if (count($errors)) {
-        msg_dialog::displayChecks($errors);
+        MsgDialog::displayChecks($errors);
         return;
       } else {
         $this->parent->removeLocks();
@@ -81,8 +81,8 @@ class ManagementDialog extends simplePlugin
       return '';
     }
     return  '<p class="plugbottom">'.
-            ' <input type="submit" name="'.$this->post_finish.'" value="'.msgPool::saveButton().'"/>'.
-            ' <input type="submit" formnovalidate="formnovalidate" name="'.$this->post_cancel.'" value="'.msgPool::cancelButton().'"/>'.
+            ' <input type="submit" name="'.$this->post_finish.'" value="'.MsgPool::saveButton().'"/>'.
+            ' <input type="submit" formnovalidate="formnovalidate" name="'.$this->post_cancel.'" value="'.MsgPool::cancelButton().'"/>'.
             '</p>';
   }
 }

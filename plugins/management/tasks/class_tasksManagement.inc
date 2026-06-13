@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class tasksManagement extends management
+class tasksManagement extends Management
 {
 
   /*
@@ -52,7 +52,7 @@ class tasksManagement extends management
   protected function setUpListing ()
   {
     /* Set baseMode to FALSE */
-    $this->listing  = new managementListing($this, FALSE);
+    $this->listing  = new ManagementListing($this, FALSE);
   }
 
 }

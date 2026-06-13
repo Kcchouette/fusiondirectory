@@ -28,7 +28,7 @@ class UserPasswordAttribute extends CompositeAttribute
   {
     global $config;
 
-    $temp = passwordMethod::get_available_methods();
+    $temp = PasswordMethod::get_available_methods();
 
     /* Create password methods array */
     $pwd_methods        = $config->get_cfg_value('passwordAllowedHashes', $temp['name']);
@@ -201,7 +201,7 @@ class UserPasswordAttribute extends CompositeAttribute
           return [$pw_storage, $password, $password, $this->attributes[3]->getValue(), $locked];
         }
       }
-      $tmp = passwordMethod::get_method($value);
+      $tmp = PasswordMethod::get_method($value);
       $pw_storage = $tmp->get_hash();
       $locked     = $tmp->is_locked('', $value);
       if ($istemplate && empty($password)) {
@@ -221,7 +221,7 @@ class UserPasswordAttribute extends CompositeAttribute
     if (!$this->plugin->is_template && (!$this->attributes[0]->hasChanged()) && ($this->needPassword[$values[0]] || ($values[0] == 'empty')) && ($values[1] == '')) {
       return $values[3];
     }
-    $temp = passwordMethod::get_available_methods();
+    $temp = PasswordMethod::get_available_methods();
     if (!isset($temp[$values[0]])) {
       trigger_error('Unknown password method '.$values[0]);
       return $values[3];

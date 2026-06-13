@@ -88,7 +88,7 @@ class Action
         'category'  => $category,
         'class'     => $class,
         'attribute' => $attribute,
-        'acl'       => str_split($acl),
+        'Acl'       => str_split($acl),
       ];
     }
 
@@ -118,7 +118,7 @@ class Action
     }
   }
 
-  function setParent (management $parent)
+  function setParent (Management $parent)
   {
     $this->parent = $parent;
   }
@@ -153,7 +153,7 @@ class Action
     return [$this->name];
   }
 
-  function execute (management $management, array $action)
+  function execute (Management $management, array $action)
   {
     if ($this->callable === FALSE) {
       return;
@@ -261,7 +261,7 @@ class Action
         }
       } else {
         foreach ($types as $type) {
-          $infos = objects::infos($type);
+          $infos = Objects::infos($type);
           if (!empty($acl['class'])) {
             /* Class with empty category may be used in special cases like '/SnapshotHandler/c'*/
             $module = $infos['aclCategory'].'/'.$acl['class'];
@@ -275,7 +275,7 @@ class Action
       }
 
       // Check rights
-      foreach ($acl['acl'] as $part) {
+      foreach ($acl['Acl'] as $part) {
         if (strpos($checkAcl, $part) === FALSE) {
           return FALSE;
         }

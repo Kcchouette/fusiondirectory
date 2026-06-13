@@ -172,7 +172,7 @@ class ACLEditionDialog implements FusionDirectoryDialog
 
     if ($this->dialogState == 'create') {
       /* Draw list */
-      $aclList = new divSelectBox('aclList');
+      $aclList = new DivSelectBox('aclList');
       $aclList->setHeight('auto');
 
       /* Add settings for all categories to the (permanent) list */
@@ -224,7 +224,7 @@ class ACLEditionDialog implements FusionDirectoryDialog
         if ($idx == 0) {
           continue;
         }
-        $pInfos = pluglist::pluginInfos($class);
+        $pInfos = Pluglist::pluginInfos($class);
         $key = $this->aclObject.'/'.$class;
         /* Create sub acl if it does not exist */
         if (!isset($this->aclContents[$key])) {
@@ -271,7 +271,7 @@ class ACLEditionDialog implements FusionDirectoryDialog
         $aclObjects[$key] = [
           'name'      => $pInfos['plShortName'],
           'tname'     => preg_replace('/[^a-z0-9]/i', '_', $key),
-          'acl'       => $this->aclContents[$key],
+          'Acl'       => $this->aclContents[$key],
           'globalAcl' => $this->aclContents[$key][0],
           'expand'    => ((count($this->aclContents[$key]) > 1) || !empty($this->aclContents[$key][0])),
           'attrs'     => $attrs,
@@ -290,7 +290,7 @@ class ACLEditionDialog implements FusionDirectoryDialog
         $aclObjects['all'] = [
           'name'      => _('All objects in current subtree'),
           'tname'     => preg_replace('/[^a-z0-9]/i', '_', $key),
-          'acl'       => $this->aclContents[$key],
+          'Acl'       => $this->aclContents[$key],
           'globalAcl' => $this->aclContents[$key][0],
           'expand'    => ((count($this->aclContents[$key]) > 1) || !empty($this->aclContents[$key][0])),
           'attrs'     => [],

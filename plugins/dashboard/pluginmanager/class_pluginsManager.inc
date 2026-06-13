@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-class pluginsManager extends simplePlugin
+class pluginsManager extends SimplePlugin
 {
   static function plInfo (): array
   {
@@ -47,7 +47,7 @@ class pluginsManager extends simplePlugin
         'name'  => _('Plugins List'),
         'plShortName'   => _('Plugins List'),
         'attrs' => [new FakeAttribute('pluginsList')],
-        'template' => get_template_path('plugins_list.tpl', TRUE, dirname(__FILE__)),
+        'Template' => get_template_path('plugins_list.tpl', TRUE, dirname(__FILE__)),
       ],
     ];
   }
@@ -70,7 +70,7 @@ class pluginsManager extends simplePlugin
     $ldap->search('(objectClass=fdPluginManager)', ['cn','description','fdPluginManagerInfoVersion','fdPluginManagerInfoAuthors','fdPluginManagerInfoStatus','fdPluginManagerInfoOrigin','fdPluginManagerSupportProvider','fdPluginManagerSupportHomeUrl']);
 
     $id   = 'pluginsStats';
-    $div  = new divSelectBox('rows'.$id);
+    $div  = new DivSelectBox('rows'.$id);
     $smarty = get_smarty();
     $div->setHeight(300);
     $div->setHeaders([_('Name'), _('Description'), _('Version'),_('Authors'),_('Status'),_('Origin'),_('Provider'),_('Support URL')]);

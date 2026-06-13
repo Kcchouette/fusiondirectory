@@ -43,12 +43,12 @@ header('X-Frame-Options: deny');
 
 /* Set error handler to own one, initialize time calculation
    and start session. */
-session::start();
+Session::start();
 
 if (isset($_REQUEST['signout']) && $_REQUEST['signout']) {
   $reason = '';
-  if (session::is_set('connected')) {
-    $config = session::get('config');
+  if (Session::is_set('connected')) {
+    $config = Session::get('Config');
     if (
       ($config->get_cfg_value('casActivated') == 'TRUE') ||
       ($config->get_cfg_value('LoginMethod') === 'LoginCAS')
@@ -72,8 +72,8 @@ if (isset($_REQUEST['signout']) && $_REQUEST['signout']) {
       }
     }
   }
-  session::destroy($reason);
-  session::start();
+  Session::destroy($reason);
+  Session::start();
 }
 
 /* Reset errors */
@@ -97,12 +97,12 @@ if (!is_readable(CONFIG_DIR.'/'.CONFIG_FILE)) {
 }
 
 /* Parse configuration file */
-$config = new config(CONFIG_DIR.'/'.CONFIG_FILE, $BASE_DIR);
-session::set('config', $config);
-session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
-logging::debug(DEBUG_CONFIG, __LINE__, '', __FILE__, $config->data, 'config');
+$config = new Config(CONFIG_DIR.'/'.CONFIG_FILE, $BASE_DIR);
+Session::set('Config', $config);
+Session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
+Logging::debug(DEBUG_CONFIG, __LINE__, '', __FILE__, $config->data, 'Config');
 /* Configuration was reloaded, so plist needs to be as well */
-session::un_set('plist');
+Session::un_set('plist');
 unset($plist);
 
 /* Set template compile directory */
@@ -129,11 +129,11 @@ if (isset($_SERVER['HTTP_X_FUSIONDIRECTORY_LOCATION'])) {
   if (isset($config->data['LOCATIONS'][$server])) {
     // Valid location found - switch to it
     $config->set_current($server);
-    logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__,
+    Logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__,
       $server, 'Switched to location via HTTP header');
   } else {
     // Invalid location in header - log but continue with default
-    logging::log(
+    Logging::log(
       'security',
       'login warning',
       'N/A',
@@ -157,7 +157,7 @@ if (
   ($config->get_cfg_value('httpAuthActivated') == 'TRUE') ||
   ($config->get_cfg_value('httpHeaderAuthActivated') == 'TRUE') ||
   in_array($config->get_cfg_value('LoginMethod'), ['LoginCas', 'LoginHTTPAuth', 'LoginHTTPHeader'])) {
-  session::set('DEBUGLEVEL', 0);
+  Session::set('DEBUGLEVEL', 0);
 }
 
 /* If SSL is forced, just forward to the SSL enabled site */

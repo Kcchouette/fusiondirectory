@@ -153,7 +153,7 @@ function plugin_available ($plugin)
  */
 function DEBUG ($level, $line, $function, $file, $data, $info = '')
 {
-  logging::debug($level, $line, $function, $file, $data, $info);
+  Logging::debug($level, $line, $function, $file, $data, $info);
 }
 
 /*!
@@ -204,7 +204,7 @@ function get_template_path ($filename = '', $plugin = FALSE, $path = '')
   /* Return plugin dir or root directory? */
   if ($plugin) {
     if ($path == '') {
-      $path = session::get('plugin_dir');
+      $path = Session::get('plugin_dir');
       $nf   = preg_replace('!^'.$BASE_DIR.'/!', '', preg_replace('/^\.\.\//', '', $path));
     } else {
       $nf = preg_replace('!^'.$BASE_DIR.'/!', '', $path);
@@ -1144,7 +1144,7 @@ function check_schema (array $cfg)
 
   /* Get objectclasses */
   $ldapObj = new LDAP($cfg['admin'], $cfg['password'], $cfg['connection'], FALSE, $cfg['tls']);
-  $ldap = new ldapMultiplexer($ldapObj);
+  $ldap = new LdapMultiplexer($ldapObj);
   $objectclasses = $ldap->get_objectclasses(TRUE);
   if (count($objectclasses) == 0) {
     $warning = new FusionDirectoryWarning(htmlescape(_('Cannot get schema information from server. No schema check possible!')));
@@ -1304,7 +1304,7 @@ function get_correct_class_name ($cls)
  */
 function change_password ($dn, $password, $hash = "")
 {
-  $userTabs = objects::open($dn, 'user');
+  $userTabs = Objects::open($dn, 'user');
   $userTab  = $userTabs->getBaseObject();
   $userTab->userPassword = [
     $hash,
@@ -1500,7 +1500,7 @@ function mark ($needle, $haystack)
 
 function reset_errors ()
 {
-  session::set('errorsAlreadyPosted', []);
+  Session::set('errorsAlreadyPosted', []);
 }
 
 function load_all_classes ()

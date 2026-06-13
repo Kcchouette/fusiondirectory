@@ -27,7 +27,7 @@ class FilterElement
 {
   protected $parent;
 
-  public function __construct (managementFilter $parent)
+  public function __construct (ManagementFilter $parent)
   {
     $this->parent = $parent;
   }

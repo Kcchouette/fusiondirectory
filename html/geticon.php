@@ -24,12 +24,12 @@
 @require_once("variables.inc");
 
 session_cache_limiter("private");
-session::start();
+Session::start();
 reset_errors();
 
 $theme = '';
-if (session::is_set('config')) {
-  $config = session::get('config');
+if (Session::is_set('Config')) {
+  $config = Session::get('Config');
   $theme  = $config->get_cfg_value('theme');
 } else {
   header("cache-control: no-cache");

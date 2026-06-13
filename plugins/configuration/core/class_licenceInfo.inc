@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class licenceInfo extends simplePlugin
+class licenceInfo extends SimplePlugin
 {
   /* ldap attribute => ini variable */
   public static $subscriptionAttributes = [
@@ -211,7 +211,7 @@ class licenceInfo extends simplePlugin
         }
         $errors = $this->parent->save();
         if (count($errors) > 0) {
-          msg_dialog::displayChecks($errors);
+          MsgDialog::displayChecks($errors);
           /* Reset fields to LDAP value */
           foreach (array_keys(static::$subscriptionAttributes) as $attr) {
             $this->attributesAccess[$attr]->setValue($this->attributesAccess[$attr]->getInitialValue());

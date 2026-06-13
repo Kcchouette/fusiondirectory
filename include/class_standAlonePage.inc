@@ -38,11 +38,11 @@ abstract class standAlonePage
     if ($this->interactive) {
       /* Destroy old session if exists.
           Else you will get your old session back, if you not logged out correctly. */
-      session::destroy();
-      session::start();
+      Session::destroy();
+      Session::start();
 
       $config = $this->loadConfig();
-      session::set('config', $config);
+      Session::set('Config', $config);
 
       /* Generate server list */
       $this->directories = [];
@@ -50,8 +50,8 @@ abstract class standAlonePage
         $this->directories[$key] = $key;
       }
 
-      $ui = new userinfoNoAuth(get_class($this));
-      session::set('ui', $ui);
+      $ui = new UserInfoNoAuth(get_class($this));
+      Session::set('ui', $ui);
     }
 
     static::init();
@@ -71,7 +71,7 @@ abstract class standAlonePage
       if (isset($config->data['LOCATIONS'][$server])) {
         // Valid location found - switch to it
         $this->directory = validate($server);
-        logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__,
+        Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__,
           $server, 'Switched to location via HTTP header');
       }
     } elseif (isset($_POST['server']) && isset($this->directories[$_POST['server']])) {
@@ -111,10 +111,10 @@ abstract class standAlonePage
 
     CSRFProtection::check();
 
-    $ui     = session::get('ui');
-    $config = session::get('config');
+    $ui     = Session::get('ui');
+    $config = Session::get('Config');
 
-    timezone::setDefaultTimezoneFromConfig();
+    Timezone::setDefaultTimezoneFromConfig();
 
     Language::init();
 
@@ -123,7 +123,7 @@ abstract class standAlonePage
     $ssl = $this->checkForSSL();
 
     /* Prepare plugin list */
-    pluglist::load();
+    Pluglist::load();
   }
 
   function loadConfig ()
@@ -142,9 +142,9 @@ abstract class standAlonePage
     }
 
     /* Parse configuration file */
-    $config = new config(CONFIG_DIR.'/'.CONFIG_FILE, $BASE_DIR);
-    session::set('DEBUGLEVEL', $config->get_cfg_value('debuglevel'));
-    logging::debug(DEBUG_CONFIG, __LINE__, __FUNCTION__, __FILE__, $config->data, 'config');
+    $config = new Config(CONFIG_DIR.'/'.CONFIG_FILE, $BASE_DIR);
+    Session::set('DEBUGLEVEL', $config->get_cfg_value('debuglevel'));
+    Logging::debug(DEBUG_CONFIG, __LINE__, __FUNCTION__, __FILE__, $config->data, 'Config');
     return $config;
   }
 
@@ -176,7 +176,7 @@ abstract class standAlonePage
     $smarty->assign('changed',    FALSE);
     $smarty->assign('copynotice', copynotice());
 
-    $lang = session::get('lang');
+    $lang = Session::get('lang');
     $smarty->assign('lang',         preg_replace('/_.*$/', '', $lang));
     $smarty->assign('rtl',          Language::isRTL($lang));
     $smarty->assign('usePrototype', 'FALSE');
@@ -203,7 +203,7 @@ abstract class standAlonePage
       $smarty->assign('php_errors', '');
     }
 
-    $smarty->assign('msg_dialogs',  msg_dialog::get_dialogs());
+    $smarty->assign('msg_dialogs',  MsgDialog::get_dialogs());
   }
 
   function checkForSSL ()
@@ -246,16 +246,16 @@ abstract class standAlonePage
 
   static function run ()
   {
-    session::start();
+    Session::start();
 
     $class = get_called_class();
-    if (session::is_set('standAlonePage_'.$class)) {
-      $page = session::get('standAlonePage_'.$class);
+    if (Session::is_set('standAlonePage_'.$class)) {
+      $page = Session::get('standAlonePage_'.$class);
       $page->init();
     } else {
       $page = new $class();
     }
-    session::set('standAlonePage_'.$class, $page);
+    Session::set('standAlonePage_'.$class, $page);
 
     $page->execute();
   }

@@ -24,7 +24,7 @@ class FixedFilterElement extends FilterElement
 {
   protected $filter;
 
-  public function __construct (managementFilter $parent, string $filter)
+  public function __construct (ManagementFilter $parent, string $filter)
   {
     parent::__construct($parent);
 

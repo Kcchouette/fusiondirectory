@@ -33,7 +33,7 @@ class DeadCodeTest extends TestCase
      */
     public function testDeprecatedPrepare4filterRemoved(): void
     {
-        $file = $this->projectDir . '/include/class_ldap.inc';
+        $file = $this->projectDir . '/include/Ldap.php';
         $content = file_get_contents($file);
 
         $this->assertDoesNotMatchRegularExpression(
@@ -48,7 +48,7 @@ class DeadCodeTest extends TestCase
      */
     public function testDeprecatedLsMethodRemoved(): void
     {
-        $file = $this->projectDir . '/include/class_ldap.inc';
+        $file = $this->projectDir . '/include/Ldap.php';
         $content = file_get_contents($file);
 
         $this->assertDoesNotMatchRegularExpression(

@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class configInLdap extends simplePlugin
+class configInLdap extends SimplePlugin
 {
   static function plInfo (): array
   {
@@ -431,9 +431,9 @@ class configInLdap extends simplePlugin
     $languages = array_merge(["" => _("Automatic")], $languages);
     $attributesInfo['look_n_feel']['attrs'][0]->setChoices(array_keys($languages), array_values($languages));
     /* Timezones */
-    $attributesInfo['look_n_feel']['attrs'][2]->setChoices(timezone::_get_tz_zones());
+    $attributesInfo['look_n_feel']['attrs'][2]->setChoices(Timezone::_get_tz_zones());
     /* Password methods */
-    $methods = passwordMethod::get_available_methods();
+    $methods = PasswordMethod::get_available_methods();
     $methods = $methods['name'];
     if (!in_array('sasl', $methods)) {
       $methods[] = 'sasl';
@@ -452,14 +452,14 @@ class configInLdap extends simplePlugin
         {
           return sprintf(_('Group %s'), $group);
         },
-        objects::ls('ogroup')
+        Objects::ls('ogroup')
       ),
       array_map(
         function ($role)
         {
           return sprintf(_('Role %s'), $role);
         },
-        objects::ls('role')
+        Objects::ls('role')
       )
     );
     $attributesInfo['miscellaneous']['attrs'][3]->attribute->attributes[0]->setChoices(
@@ -467,7 +467,7 @@ class configInLdap extends simplePlugin
       array_values($groupsAndRoles)
     );
     $menuPlugins = [];
-    $plist = session::get('plist');
+    $plist = Session::get('plist');
     foreach ($config->data['SECTIONS'] as $section => $section_infos) {
       foreach ($config->data['MENU'][$section] as $info) {
         if (isset($info['CLASS'])) {
@@ -589,7 +589,7 @@ class configInLdap extends simplePlugin
     }
 
     if (($this->fdLdapSizeLimit !== '') && ($this->fdLdapSizeLimit > 0)) {
-      $error = ldapSizeLimit::checkMaxInputVars($this->fdLdapSizeLimit);
+      $error = LdapSizeLimit::checkMaxInputVars($this->fdLdapSizeLimit);
       if ($error !== FALSE) {
         $messages[] = new SimplePluginCheckError(
           $this->attributesAccess['fdLdapSizeLimit'],
@@ -642,9 +642,9 @@ class configInLdap extends simplePlugin
         $ldap->cd($config->current['BASE']);
         $ldap->cd($restrictedOu);
         $ldap->add($attrs);
-        logging::log('create', 'organizationalUnit', $restrictedOu, [], 'Successfully created');
+        Logging::log('create', 'organizationalUnit', $restrictedOu, [], 'Successfully created');
       } catch (Exception $e) {
-        msg_dialog::display(_('Error'),
+        MsgDialog::display(_('Error'),
           sprintf(_('Failed to create organizational unit %s: %s'), $restrictedOu, $e->getMessage()),
           ERROR_DIALOG);
         return;
@@ -668,9 +668,9 @@ class configInLdap extends simplePlugin
         $ldap->cd($restrictedOu);
         $ldap->cd($defaultUserDn);
         $ldap->add($attrs);
-        logging::log('create', 'inetOrgPerson', $defaultUserDn, [], 'Successfully created');
+        Logging::log('create', 'inetOrgPerson', $defaultUserDn, [], 'Successfully created');
       } catch (Exception $e) {
-        msg_dialog::display(_('Error'),
+        MsgDialog::display(_('Error'),
           sprintf(_('Failed to create default user %s: %s'), $defaultUserDn, $e->getMessage()),
           ERROR_DIALOG);
       }
@@ -680,7 +680,7 @@ class configInLdap extends simplePlugin
   static function get_themes ()
   {
     $themesdir  = '../ihtml/themes/';
-    $themes     = array_keys(session::get(IconTheme::$session_var));
+    $themes     = array_keys(Session::get(IconTheme::$session_var));
     if ($dir = opendir("$themesdir")) {
       while (($file = readdir($dir)) !== FALSE) {
         if (is_dir("$themesdir/$file") && !preg_match("/^\./", $file)) {

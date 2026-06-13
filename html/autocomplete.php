@@ -25,12 +25,12 @@
 @require_once("variables.inc");
 
 session_cache_limiter("private");
-session::start();
+Session::start();
 reset_errors();
 
 /* Logged in? Simple security check */
-if (!session::is_set('ui')) {
-  logging::log('security', 'unknown', '', [], 'Error: autocomplete.php called without session');
+if (!Session::is_set('ui')) {
+  Logging::log('security', 'unknown', '', [], 'Error: autocomplete.php called without session');
   header('Location: index.php');
   exit;
 }
@@ -39,12 +39,12 @@ if (!session::is_set('ui')) {
 if (isset($_GET['type']) && $_GET['type'] == "base") {
 
   // Find dn based on name and description
-  if (session::is_set("pathMapping") && count($_POST) == 1) {
+  if (Session::is_set("pathMapping") && count($_POST) == 1) {
     $res          = "";
-    $pathMapping  = session::get("pathMapping");
+    $pathMapping  = Session::get("pathMapping");
     $search       = preg_replace('/&quot;/', '"', current($_POST));
 
-    $config         = session::get('config');
+    $config         = Session::get('Config');
     $departmentInfo = $config->getDepartmentInfo();
     foreach ($departmentInfo as $dn => $info) {
       if (!isset($pathMapping[$dn])) {
@@ -70,12 +70,12 @@ if (isset($_GET['type']) && $_GET['type'] == "base") {
     }
   }
 } else {
-  $ui = session::get('ui');
-  $config = session::get('config');
+  $ui = Session::get('ui');
+  $config = Session::get('Config');
 
   /* Is there a filter object arround? */
-  if (session::is_set('autocomplete')) {
-    $filter = session::get('autocomplete');
+  if (Session::is_set('autocomplete')) {
+    $filter = Session::get('autocomplete');
     $filter->processAutocomplete();
   }
 }

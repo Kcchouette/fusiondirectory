@@ -69,7 +69,7 @@ class LoginHTTPHeader extends LoginMethod
       );
     }
 
-    $ui = userinfo::getLdapUser(static::$username);
+    $ui = UserInfo::getLdapUser(static::$username);
 
     if ($ui === FALSE) {
       throw new FatalError(
@@ -102,7 +102,7 @@ class LoginHTTPHeader extends LoginMethod
       /* Everything went well, redirect to main.php */
       static::redirect();
     } else {
-      echo msg_dialog::get_dialogs();
+      echo MsgDialog::get_dialogs();
       throw new FatalError(
         htmlescape(sprintf(
           _('Login with user "%s" triggered error: %s (Location: %s)'),

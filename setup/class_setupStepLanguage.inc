@@ -68,9 +68,9 @@ class setupStepLanguage extends setupStep
     $this->is_completed   = TRUE;
 
     if ($this->lang_selected != '') {
-      session::set('lang', $this->lang_selected);
+      Session::set('lang', $this->lang_selected);
     } else {
-      session::set('lang', $this->lang);
+      Session::set('lang', $this->lang);
     }
     return TRUE;
   }

@@ -18,11 +18,11 @@ class ErrorHandlingTest extends TestCase
     public function testNoDieInLibraryCode(): void
     {
         $libraryFiles = [
-            'class_pluglist.inc',
-            'class_config.inc',
-            'class_ldapFilter.inc',
-            'class_IconTheme.inc',
-            'simpleplugin/attributes/dialog/class_DialogOrderedArrayAttribute.inc',
+            'Pluglist.php',
+            'Config.php',
+            'LdapFilter.php',
+            'IconTheme.php',
+            'simpleplugin/attributes/dialog/DialogOrderedArrayAttribute.php',
         ];
 
         foreach ($libraryFiles as $relativePath) {

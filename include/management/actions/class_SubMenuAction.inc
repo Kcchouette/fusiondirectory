@@ -50,7 +50,7 @@ class SubMenuAction extends Action
     $this->parent->registerAction($this);
   }
 
-  function setParent (management $parent)
+  function setParent (Management $parent)
   {
     parent::setParent($parent);
     foreach ($this->actions as $action) {
@@ -63,7 +63,7 @@ class SubMenuAction extends Action
     return array_keys($this->handlers);
   }
 
-  function execute (management $management, array $action)
+  function execute (Management $management, array $action)
   {
     if (isset($action['subaction']) && isset($this->handlers[$action['action'].'_'.$action['subaction']])) {
       return $this->handlers[$action['action'].'_'.$action['subaction']]->execute($management, $action);

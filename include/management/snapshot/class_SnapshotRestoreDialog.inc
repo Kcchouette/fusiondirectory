@@ -61,7 +61,7 @@ class SnapshotRestoreDialog extends ManagementDialog
     ];
   }
 
-  function __construct (string $dn, management $parent, bool $global, array $aclCategories)
+  function __construct (string $dn, Management $parent, bool $global, array $aclCategories)
   {
     $this->global       = $global;
     parent::__construct(NULL, NULL, $parent);
@@ -102,7 +102,7 @@ class SnapshotRestoreDialog extends ManagementDialog
 
       // Display confirmation dialog.
       $smarty = get_smarty();
-      $smarty->assign('objects', $objects);
+      $smarty->assign('Objects', $objects);
       $str = $smarty->fetch(get_template_path('simple-remove.tpl'));
     } elseif ($this->dialog == 'restore') {
       $objects = [
@@ -116,7 +116,7 @@ class SnapshotRestoreDialog extends ManagementDialog
 
       // Display confirmation dialog.
       $smarty = get_smarty();
-      $smarty->assign('objects', $objects);
+      $smarty->assign('Objects', $objects);
       $str = $smarty->fetch(get_template_path('restore-confirm.tpl'));
     } else {
       $smarty = get_smarty();
@@ -134,7 +134,7 @@ class SnapshotRestoreDialog extends ManagementDialog
       $smarty->assign('SnapshotHandlerACL', $acl);
       $str = parent::render();
       $str .= '<p class="plugbottom">'.
-             '  <input type="submit" formnovalidate="formnovalidate" name="'.$this->post_cancel.'" value="'.msgPool::backButton().'"/>'.
+             '  <input type="submit" formnovalidate="formnovalidate" name="'.$this->post_cancel.'" value="'.MsgPool::backButton().'"/>'.
              '</p>';
     }
 

@@ -31,7 +31,7 @@ class LinkColumn extends Column
 
   protected function renderLink (ListingEntry $entry, $htmlValue): string
   {
-    if ($this->parent->parent instanceof selectManagement) {
+    if ($this->parent->parent instanceof SelectManagement) {
       if ($this->parent->getMultiSelect()) {
         return '<label title="'.$entry->dn.'" for="listing_selected_'.$entry->row.'">'.$htmlValue.'</label>';
       } else {

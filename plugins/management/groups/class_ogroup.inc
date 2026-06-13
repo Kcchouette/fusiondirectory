@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class ogroup extends simplePlugin
+class ogroup extends SimplePlugin
 {
   var $used_workstations = [];
 
@@ -150,8 +150,8 @@ class ogroup extends simplePlugin
         - Check() will complain if such a system is assigned to this object group.*/
     $this->used_workstations = [];
     try {
-      $ws_dns = array_keys(objects::ls(['workstation','terminal']));
-      $res = objects::ls('ogroup', ['member' => '*'], NULL, '(&(member=*)(|(gosaGroupObjects=[W])(gosaGroupObjects=[T])))');
+      $ws_dns = array_keys(Objects::ls(['workstation','terminal']));
+      $res = Objects::ls('ogroup', ['member' => '*'], NULL, '(&(member=*)(|(gosaGroupObjects=[W])(gosaGroupObjects=[T])))');
     } catch (NonExistingObjectTypeException $e) {
       /* If workstation/terminal objectType is not existing, systems plugin is missing so there are no systems */
       $ws_dns = [];
@@ -282,12 +282,12 @@ class ogroup extends simplePlugin
       $removingMembers  = array_diff($savedMembers, $userMembers);
       foreach ($addingMembers as $dn) {
         if (strpos($ui->get_permissions($dn, 'user/userRoles', 'groupsMembership', $this->acl_skip_write()), 'w') === FALSE) {
-          $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($dn, 'groupsMembership'));
+          $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($dn, 'groupsMembership'));
         }
       }
       foreach ($removingMembers as $dn) {
         if (strpos($ui->get_permissions($dn, 'user/userRoles', 'groupsMembership', $this->acl_skip_write()), 'w') === FALSE) {
-          $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($dn, 'groupsMembership'));
+          $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($dn, 'groupsMembership'));
         }
       }
     }
@@ -310,11 +310,11 @@ class ogroup extends simplePlugin
     parent::handleForeignKeys($olddn, $newdn, $mode);
     if ($this->attributeHaveChanged('gosaGroupObjects')) {
       /* Propagate member type changes to parent groups */
-      $parents = objects::ls('ogroup', ['dn' => 'raw'], NULL, '(member='.ldap_escape_f($this->dn).')');
+      $parents = Objects::ls('ogroup', ['dn' => 'raw'], NULL, '(member='.ldap_escape_f($this->dn).')');
       foreach (array_keys($parents) as $dn) {
-        $tabobject = objects::open($dn, 'ogroup');
+        $tabobject = Objects::open($dn, 'ogroup');
         $errors = $tabobject->save();
-        msg_dialog::displayChecks($errors);
+        MsgDialog::displayChecks($errors);
       }
     }
   }

@@ -77,7 +77,7 @@ class BaseSelectorAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
       $this->orig_dn = $this->plugin->dn;
       /* Instanciate base selector */
       $this->initialValue = $this->value;
-      $this->baseSelector = new baseSelector($this->plugin->get_allowed_bases(), $this->value);
+      $this->baseSelector = new BaseSelector($this->plugin->get_allowed_bases(), $this->value);
       $this->baseSelector->setSubmitButton(FALSE);
       $this->baseSelector->setHeight(300);
       $this->baseSelector->update(TRUE);
@@ -95,9 +95,9 @@ class BaseSelectorAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
       /* Refresh base */
       if (!$this->baseSelector->update()) {
         if ($this->plugin->dn == 'new') {
-          $error = new SimplePluginPermissionError($this, msgPool::permCreate());
+          $error = new SimplePluginPermissionError($this, MsgPool::permCreate());
         } else {
-          $error = new SimplePluginPermissionError($this, msgPool::permMove($this->plugin->dn));
+          $error = new SimplePluginPermissionError($this, MsgPool::permMove($this->plugin->dn));
         }
         $error->display();
       }
@@ -115,16 +115,16 @@ class BaseSelectorAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
     } else {
       /* Check if we are allowed to create/move this user */
       if (($this->orig_dn == 'new') && !$this->plugin->acl_is_createable($this->value)) {
-        return new SimplePluginPermissionError($this, msgPool::permCreate());
+        return new SimplePluginPermissionError($this, MsgPool::permCreate());
       } elseif (
         ($this->orig_dn != 'new') &&
         ($this->plugin->dn != $this->orig_dn) &&
         !$this->plugin->acl_is_moveable($this->value)) {
-        return new SimplePluginPermissionError($this, msgPool::permMove($this->plugin->dn));
+        return new SimplePluginPermissionError($this, MsgPool::permMove($this->plugin->dn));
       }
       // Check if a wrong base was supplied
       if (!$this->baseSelector->checkLastBaseUpdate()) {
-        return new SimplePluginCheckError($this, msgPool::check_base());
+        return new SimplePluginCheckError($this, MsgPool::check_base());
       }
     }
   }

@@ -124,7 +124,7 @@ class ObjectLinkAttribute extends DisplayLDAPAttribute
     }
 
     try {
-      return objects::link($this->value, $this->type);
+      return Objects::link($this->value, $this->type);
     } catch (NonExistingLdapNodeException $e) {
       return '<a><img src="geticon.php?context=status&amp;icon=dialog-warning&amp;size=16" alt="warning" class="center"/>&nbsp;'.sprintf(_('Invalid: %s'), $this->value).'</a>';
     }

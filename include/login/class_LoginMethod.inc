@@ -104,11 +104,11 @@ class LoginMethod
     global $ui, $config, $message, $smarty;
     /* Login as user, initialize user ACL's */
     try {
-      $ui = userinfo::loginUser(static::$username, static::$password);
+      $ui = UserInfo::loginUser(static::$username, static::$password);
     } catch (LoginFailureException $e) {
       /* Load plist to be able to log */
-      pluglist::load();
-      logging::log('security', 'login failure', static::$username, [], 'Authentication failed: '.$e->getMessage());
+      Pluglist::load();
+      Logging::log('security', 'login failure', static::$username, [], 'Authentication failed: '.$e->getMessage());
       /* Show the same message whether the user exists or not to avoid information leak */
       $message = $e->getMessage();
       $smarty->assign('focusfield', 'password');
@@ -126,16 +126,16 @@ class LoginMethod
     Lock::deleteByUser($ui->dn);
 
     /* Save userinfo and plugin structure */
-    session::set('ui', $ui);
+    Session::set('ui', $ui);
 
     /* User might have its own language, re-run initLanguage */
     $plistReloaded = Language::init();
 
     /* We need a fully loaded plist and config to test account expiration */
     if (!$plistReloaded) {
-      session::un_set('plist');
+      Session::un_set('plist');
     }
-    pluglist::load();
+    Pluglist::load();
 
     /* Check that newly installed plugins have their configuration in the LDAP (will reload plist if needed) */
     $config->checkLdapConfig();
@@ -144,7 +144,7 @@ class LoginMethod
     $expired = $ui->expired_status();
 
     if ($expired == POSIX_ACCOUNT_EXPIRED) {
-      logging::log('security', 'account', $ui->dn, [], 'Account for user "'.static::$username.'" has expired');
+      Logging::log('security', 'account', $ui->dn, [], 'Account for user "'.static::$username.'" has expired');
       $message = _('Account locked. Please contact your system administrator!');
       $smarty->assign('focusfield', 'username');
       return FALSE;
@@ -158,15 +158,15 @@ class LoginMethod
   {
     global $config, $ui;
 
-    $ui = session::get('ui');
+    $ui = Session::get('ui');
 
     //Create new session ID to avoir session_fixation security issues after sucess login
     session_regenerate_id();
 
     /* Not account expired or password forced change go to main page */
-    logging::log('security', 'login', $ui->uid, [], 'Logged in successfully');
-    session::set('connected', 1);
-    session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
+    Logging::log('security', 'login', $ui->uid, [], 'Logged in successfully');
+    Session::set('connected', 1);
+    Session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
   }
 
   /*! \brief Final step of successful login: redirect to main.php */
@@ -185,7 +185,7 @@ class LoginMethod
         $status = static::$step();
         if (is_string($status)) {
           /* Deprecated */
-          msg_dialog::display(_('LDAP error'), $status, LDAP_ERROR);
+          MsgDialog::display(_('LDAP error'), $status, LDAP_ERROR);
           return FALSE;
         } elseif ($status === FALSE) {
           return FALSE;
@@ -219,7 +219,7 @@ class LoginMethod
     try {
       $method::loginProcess();
     } catch (Exception $e) {
-      $lang = session::get('lang');
+      $lang = Session::get('lang');
 
       $display = '<h1>'.htmlescape(_('An unrecoverable error occurred. Please contact your administator.')).'</h1><p>';
       if (ini_get('display_errors') == 1) {

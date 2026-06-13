@@ -50,12 +50,12 @@ class ObjectsAttribute extends GenericDialogAttribute
     foreach ($objectTypes as $i => $type) {
       try {
         if (!empty($specialAttributes)) {
-          $infos = objects::infos($type);
+          $infos = Objects::infos($type);
           foreach ($specialAttributes as $attribute) {
             $attributes[$infos[$attribute]] = '*';
           }
         }
-        $filterAttributes = objects::getFilterObject($type)->listUsedAttributes();
+        $filterAttributes = Objects::getFilterObject($type)->listUsedAttributes();
         foreach ($filterAttributes as $attribute) {
           if ($attribute != 'dn') {
             $attributes[$attribute] = '*';
@@ -102,9 +102,9 @@ class ObjectsAttribute extends GenericDialogAttribute
 
     try {
       if ($this->store_attr == 'dn') {
-        $objects = objects::ls($this->selectManagementParameters[0], $this->selectManagementParameters[2], $value, '', FALSE, 'base');
+        $objects = Objects::ls($this->selectManagementParameters[0], $this->selectManagementParameters[2], $value, '', FALSE, 'base');
       } else {
-        $objects = objects::ls($this->selectManagementParameters[0], $this->selectManagementParameters[2], NULL, '('.$this->store_attr.'='.ldap_escape_f($value).')');
+        $objects = Objects::ls($this->selectManagementParameters[0], $this->selectManagementParameters[2], NULL, '('.$this->store_attr.'='.ldap_escape_f($value).')');
       }
     } catch (EmptyFilterException $e) {
       $objects = [];
@@ -127,7 +127,7 @@ class ObjectsAttribute extends GenericDialogAttribute
       if (is_array($attrs)) {
         foreach ($this->selectManagementParameters[0] as $type) {
           try {
-            if (objects::isOfType($attrs, $type)) {
+            if (Objects::isOfType($attrs, $type)) {
               $objectType = $type;
             }
           } catch (NonExistingObjectTypeException $e) {
@@ -139,7 +139,7 @@ class ObjectsAttribute extends GenericDialogAttribute
       }
       if ($objectType !== NULL) {
         if (in_array($this->display_attr, ['nameAttr','mainAttr'])) {
-          $infos = objects::infos($objectType);
+          $infos = Objects::infos($objectType);
           $display = $attrs[$infos[$this->display_attr]][0];
         } else {
           $display = $attrs[$this->display_attr][0];
@@ -182,7 +182,7 @@ class ObjectsAttribute extends GenericDialogAttribute
       $infos = [];
       try {
         if ($this->types[$key] !== FALSE) {
-          $infos = objects::infos($this->types[$key]);
+          $infos = Objects::infos($this->types[$key]);
         }
       } catch (NonExistingObjectTypeException $e) {
         /* Ignore non-existing types, plugins may have been removed */

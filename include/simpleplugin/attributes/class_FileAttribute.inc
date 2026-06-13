@@ -184,9 +184,9 @@ class FileDownloadAttribute extends FileAttribute
       if ($this->download) {
         foreach (array_keys($_POST) as $name) {
           if (preg_match('/^download'.$this->getHtmlId().'/', $name)) {
-            session::set('binary', $this->value);
-            session::set('binarytype', 'octet-stream');
-            session::set('binaryfile', $this->computeFilename());
+            Session::set('binary', $this->value);
+            Session::set('binarytype', 'octet-stream');
+            Session::set('binaryfile', $this->computeFilename());
             header('location: getbin.php');
             exit();
           }
@@ -268,9 +268,9 @@ class FileTextAreaAttribute extends FileDownloadAttribute
       if ($this->download) {
         foreach (array_keys($_POST) as $name) {
           if (preg_match('/^download'.$this->getHtmlId().'/', $name)) {
-            session::set('binary', $this->value);
-            session::set('binarytype', 'octet-stream');
-            session::set('binaryfile', $this->computeFilename());
+            Session::set('binary', $this->value);
+            Session::set('binarytype', 'octet-stream');
+            Session::set('binaryfile', $this->computeFilename());
             header('location: getbin.php');
             exit();
           }
@@ -468,11 +468,11 @@ class ImageAttribute extends FileAttribute
       );
     }
     if (($this->getValue() == '') && ($this->placeholder != '')) {
-      session::set('binary'.$key, $this->placeholder);
+      Session::set('binary'.$key, $this->placeholder);
     } else {
-      session::set('binary'.$key, $this->getValue());
+      Session::set('binary'.$key, $this->getValue());
     }
-    session::set('binarytype', 'image/'.$this->format);
+    Session::set('binarytype', 'image/'.$this->format);
     return $this->renderAcl($display);
   }
 

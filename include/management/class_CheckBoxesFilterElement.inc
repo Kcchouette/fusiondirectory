@@ -29,11 +29,11 @@ class CheckBoxesFilterElement extends FilterElement
   /*!
    * \brief __construct
    *
-   * \param managementFilter $parent
+   * \param ManagementFilter $parent
    * \param string $name Name of the filter element
    * \param array $items Associative array of items with keys: name, ?desc, filter, ?icon
    */
-  public function __construct (managementFilter $parent, string $name, array $items, string $operator = '&')
+  public function __construct (ManagementFilter $parent, string $name, array $items, string $operator = '&')
   {
     global $config;
 
@@ -93,7 +93,7 @@ class CheckBoxesFilterElement extends FilterElement
         }
       }
       if (!empty($subfilters)) {
-        $filter = new ldapFilter($this->operator, $subfilters);
+        $filter = new LdapFilter($this->operator, $subfilters);
         $filters[] = (string)$filter;
       }
     }

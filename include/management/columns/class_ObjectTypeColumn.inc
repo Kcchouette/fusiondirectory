@@ -43,12 +43,12 @@ class ObjectTypeColumn extends Column
       }
     }
     if ($isTemplate) {
-      $infos = objects::infos($entry->getTemplatedType());
+      $infos = Objects::infos($entry->getTemplatedType());
       return '<img title="'.htmlescape($entry->dn).'" src="'.htmlescape('geticon.php?context=devices&icon=template&size=16').'" alt="'.htmlescape(sprintf(_('%s template'), $infos['name'])).'"/>';
     } elseif (!empty($types)) {
       $cell = '';
       foreach ($types as $type) {
-        $infos = objects::infos($type);
+        $infos = Objects::infos($type);
         $title = (isset($this->attributes) ? $infos['name'] : $entry->dn);
         $cell .= '<img title="'.htmlescape($title).'" src="'.htmlescape($infos['icon']).'" alt="'.htmlescape($infos['name']).'"/>';
       }

@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class userRoles extends simplePlugin
+class userRoles extends SimplePlugin
 {
   var $objectclasses = [];
 
@@ -77,7 +77,7 @@ class userRoles extends simplePlugin
 
     /* Groups handling */
     $groups      = [];
-    $groupsattrs = objects::ls('ogroup', ['cn' => 1,  'description' => 1], NULL, '', TRUE);
+    $groupsattrs = Objects::ls('ogroup', ['cn' => 1,  'description' => 1], NULL, '', TRUE);
     foreach ($groupsattrs as $dn => $groupattr) {
       $groupDisplay = $groupattr['cn'];
       if (isset($groupattr['description'])) {
@@ -98,7 +98,7 @@ class userRoles extends simplePlugin
       }
     } else {
       if (($this->dn != '') && ($this->dn != 'new')) {
-        $myGroups  = objects::ls(
+        $myGroups  = Objects::ls(
           'ogroup', NULL, NULL,
           '(member='.$this->dn.')'
         );
@@ -116,7 +116,7 @@ class userRoles extends simplePlugin
 
     /* Roles handling */
     $roles        = [];
-    $rolesattrs  = objects::ls('role', ['cn' => 1,  'description' => 1], NULL, '', TRUE);
+    $rolesattrs  = Objects::ls('role', ['cn' => 1,  'description' => 1], NULL, '', TRUE);
     foreach ($rolesattrs as $dn => $roleattr) {
       $roleDisplay = $roleattr['cn'];
       if (isset($roleattr['description'])) {
@@ -137,7 +137,7 @@ class userRoles extends simplePlugin
       }
     } else {
       if (($this->dn != '') && ($this->dn != 'new')) {
-        $myRoles  = objects::ls(
+        $myRoles  = Objects::ls(
           'role', NULL, NULL,
           '(roleOccupant='.$this->dn.')'
         );
@@ -194,7 +194,7 @@ class userRoles extends simplePlugin
       /* Remove all groups */
       foreach ($this->savedGroupsMembership as $key => $ogroupdn) {
         try {
-          $g = objects::open($ogroupdn, 'ogroup');
+          $g = Objects::open($ogroupdn, 'ogroup');
           $g->getBaseObject()->attributesAccess['member']->searchAndRemove($this->dn);
           $msg = $g->save();
           if (empty($msg)) {
@@ -221,7 +221,7 @@ class userRoles extends simplePlugin
       /* Remove all roles */
       foreach ($this->savedRolesMembership as $key => $roledn) {
         try {
-          $r = objects::open($roledn, 'role');
+          $r = Objects::open($roledn, 'role');
           $r->getBaseObject()->attributesAccess['roleOccupant']->searchAndRemove($this->dn);
           $msg = $r->save();
           if (empty($msg)) {
@@ -313,9 +313,9 @@ class userRoles extends simplePlugin
       foreach ($groupsMembership as $ogroupdn) {
         if (!in_array($ogroupdn, $this->savedGroupsMembership)) {
           try {
-            $g = objects::open($ogroupdn, 'ogroup');
+            $g = Objects::open($ogroupdn, 'ogroup');
             if (!in_array($ogroupdn, $this->templateGroups) && !$g->getBaseObject()->attrIsWriteable('member')) {
-              $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($ogroupdn, 'member'));
+              $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($ogroupdn, 'member'));
               continue;
             }
             $g->getBaseObject()->attributesAccess['member']->addValue($this->dn, $fake_attrs);
@@ -337,9 +337,9 @@ class userRoles extends simplePlugin
       foreach ($this->savedGroupsMembership as $key => $ogroupdn) {
         if (!in_array($ogroupdn, $groupsMembership)) {
           try {
-            $g = objects::open($ogroupdn, 'ogroup');
+            $g = Objects::open($ogroupdn, 'ogroup');
             if (!$g->getBaseObject()->attrIsWriteable('member')) {
-              $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($ogroupdn, 'member'));
+              $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($ogroupdn, 'member'));
               continue;
             }
             $g->getBaseObject()->attributesAccess['member']->searchAndRemove($this->dn);
@@ -362,9 +362,9 @@ class userRoles extends simplePlugin
       foreach ($rolesMembership as $roledn) {
         if (!in_array($roledn, $this->savedRolesMembership)) {
           try {
-            $r = objects::open($roledn, 'role');
+            $r = Objects::open($roledn, 'role');
             if (!in_array($roledn, $this->templateRoles) && !$r->getBaseObject()->attrIsWriteable('roleOccupant')) {
-              $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($roledn, 'roleOccupant'));
+              $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($roledn, 'roleOccupant'));
               continue;
             }
             $r->getBaseObject()->attributesAccess['roleOccupant']->addValue($this->dn, $fake_attrs);
@@ -386,9 +386,9 @@ class userRoles extends simplePlugin
       foreach ($this->savedRolesMembership as $key => $roledn) {
         if (!in_array($roledn, $rolesMembership)) {
           try {
-            $r = objects::open($roledn, 'role');
+            $r = Objects::open($roledn, 'role');
             if (!$r->getBaseObject()->attrIsWriteable('roleOccupant')) {
-              $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($roledn, 'roleOccupant'));
+              $errors[] = new SimplePluginPermissionError($this, MsgPool::permModify($roledn, 'roleOccupant'));
               continue;
             }
             $r->getBaseObject()->attributesAccess['roleOccupant']->searchAndRemove($this->dn);

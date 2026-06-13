@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class aclRoleManagement extends management
+class aclRoleManagement extends Management
 {
   public static function plInfo (): array
   {
@@ -28,7 +28,7 @@ class aclRoleManagement extends management
       'plIcon'        => 'geticon.php?context=categories&icon=acl&size=48',
       'plSection'     => ['accessControl' => ['name' => _('Access Control'), 'priority' => 5]],
       'plPriority'    => 0,
-      'plCategory'    => ['acl'],
+      'plCategory'    => ['Acl'],
       'plManages'     => ['aclRole'],
 
       'plProvidedAcls' => []

@@ -48,7 +48,7 @@ class ListingEntry implements ArrayAccess
   /* Cache where columns may store stuff */
   public $cache = [];
 
-  public function __construct (managementListing $listing, string $type, string $dn, array $attrs, ?int $row = NULL)
+  public function __construct (ManagementListing $listing, string $type, string $dn, array $attrs, ?int $row = NULL)
   {
     $this->listing  = $listing;
     $this->type     = $type;
@@ -95,15 +95,15 @@ class ListingEntry implements ArrayAccess
 
   public function getTemplatedFields (): array
   {
-    return templateHandling::fieldsFromLDAP($this->attrs);
+    return TemplateHandling::fieldsFromLDAP($this->attrs);
   }
 
   public function checkAcl (string $acls): bool
   {
     global $ui;
 
-    $infos  = objects::infos($this->getTemplatedType());
-    $rights = $ui->get_permissions($this->aclBase, $infos['aclCategory'].'/'.($this->isTemplate() ? 'template' : $infos['mainTab']));
+    $infos  = Objects::infos($this->getTemplatedType());
+    $rights = $ui->get_permissions($this->aclBase, $infos['aclCategory'].'/'.($this->isTemplate() ? 'Template' : $infos['mainTab']));
     foreach (str_split($acls) as $acl) {
       if (strpos($rights, $acl) === FALSE) {
         return FALSE;
@@ -117,7 +117,7 @@ class ListingEntry implements ArrayAccess
   {
     global $ui;
 
-    $infos  = objects::infos($this->getTemplatedType());
+    $infos  = Objects::infos($this->getTemplatedType());
     return $ui->allow_snapshot_create($this->aclBase, $infos['aclCategory']);
   }
 
@@ -125,7 +125,7 @@ class ListingEntry implements ArrayAccess
   {
     global $ui;
 
-    $infos  = objects::infos($this->getTemplatedType());
+    $infos  = Objects::infos($this->getTemplatedType());
     return $ui->allow_snapshot_restore($this->aclBase, $infos['aclCategory'], FALSE);
   }
 }

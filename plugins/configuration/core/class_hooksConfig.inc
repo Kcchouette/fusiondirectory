@@ -19,7 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class hooksConfig extends simplePlugin
+class hooksConfig extends SimplePlugin
 {
   static function plInfo (): array
   {
@@ -38,8 +38,8 @@ class hooksConfig extends simplePlugin
     global $config;
 
     $plugins = [];
-    if (session::is_set('plist')) {
-      $plugins = array_keys(session::get('plist')->info);
+    if (Session::is_set('plist')) {
+      $plugins = array_keys(Session::get('plist')->info);
     }
     sort($plugins);
 

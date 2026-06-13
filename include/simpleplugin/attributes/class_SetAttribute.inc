@@ -313,7 +313,7 @@ class SetAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
     $buttons  = $this->renderInputField(
       'submit', 'add'.$id,
       [
-        'value'           => msgPool::addButton(FALSE),
+        'value'           => MsgPool::addButton(FALSE),
         'formnovalidate'  => 'formnovalidate',
         'class'           => 'subattribute',
       ]
@@ -321,7 +321,7 @@ class SetAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
     $buttons .= $this->renderInputField(
       'submit', 'del'.$id,
       [
-        'value'           => msgPool::delButton(FALSE),
+        'value'           => MsgPool::delButton(FALSE),
         'formnovalidate'  => 'formnovalidate',
         'class'           => 'subattribute',
       ]
@@ -504,7 +504,7 @@ class OrderedArrayAttribute extends SetAttribute
       $this->size = min(15, $this->getValueCount());
     }
     $id = $this->getHtmlId();
-    $div = new divSelectBox('rows'.$id);
+    $div = new DivSelectBox('rows'.$id);
     $smarty = get_smarty();
     $height = ($this->size * 26) + 6;
     if ($this->headers) {
@@ -734,7 +734,7 @@ class OrderedArrayAttribute extends SetAttribute
     $buttons = $this->renderInputField(
       'submit', 'add'.$id,
       [
-        'value'           => msgPool::addButton(FALSE),
+        'value'           => MsgPool::addButton(FALSE),
         'formnovalidate'  => 'formnovalidate',
         'class'           => 'subattribute',
       ]
