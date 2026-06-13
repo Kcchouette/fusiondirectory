@@ -33,7 +33,7 @@ class LoginHTTPAuth extends LoginMethod
   /*! \brief All login steps in the right order for HTTP auth login */
   static function loginProcess ()
   {
-    global $config, $message;
+    global $message;
 
     static::init();
 

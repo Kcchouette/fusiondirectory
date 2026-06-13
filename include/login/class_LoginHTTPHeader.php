@@ -33,7 +33,7 @@ class LoginHTTPHeader extends LoginMethod
   /*! \brief All login steps in the right order for HTTP Header login */
   static function loginProcess ()
   {
-    global $config, $message, $ui;
+    global $message, $ui;
 
     static::init();
 
@@ -41,7 +41,7 @@ class LoginHTTPHeader extends LoginMethod
     $message = '';
 
     // Get username header configuration
-    $header = $config->get_cfg_value('httpHeaderAuthHeaderName', 'AUTH_USER');
+    $header = config()->get_cfg_value('httpHeaderAuthHeaderName', 'AUTH_USER');
     // History - be aware to set the header to AUTH-USER without X and score, not underscore.
     $headerKey = 'HTTP_'.strtoupper(str_replace('-', '_', $header));
 
@@ -54,7 +54,7 @@ class LoginHTTPHeader extends LoginMethod
         htmlescape(sprintf(
           _('No value found in HTTP header "%s" (Location: %s)'),
           $header,
-          $config->current['NAME']
+          config()->current['NAME']
         ))
       );
     }
@@ -64,7 +64,7 @@ class LoginHTTPHeader extends LoginMethod
         htmlescape(sprintf(
           _('Empty value in HTTP header "%s" (Location: %s)'),
           $header,
-          $config->current['NAME']
+          config()->current['NAME']
         ))
       );
     }
@@ -76,7 +76,7 @@ class LoginHTTPHeader extends LoginMethod
         htmlescape(sprintf(
           _('Header user "%s" could not be found in LDAP (Location: %s)'),
           static::$username,
-          $config->current['NAME']
+          config()->current['NAME']
         ))
       );
     } elseif (is_string($ui)) {
@@ -85,7 +85,7 @@ class LoginHTTPHeader extends LoginMethod
           _('Login with user "%s" triggered error: %s (Location: %s)'),
           static::$username,
           $ui,
-          $config->current['NAME']
+          config()->current['NAME']
         ))
       );
     }
@@ -108,7 +108,7 @@ class LoginHTTPHeader extends LoginMethod
           _('Login with user "%s" triggered error: %s (Location: %s)'),
           static::$username,
           $message,
-          $config->current['NAME']
+          config()->current['NAME']
         ))
       );
     }

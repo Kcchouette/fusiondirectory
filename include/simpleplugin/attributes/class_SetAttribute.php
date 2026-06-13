@@ -776,10 +776,9 @@ class SubNodesAttribute extends OrderedArrayAttribute
 
   protected function loadAttrValue (array $attrs)
   {
-    global $config;
     /* Should we take dn from attrs or plugin? */
     if (isset($attrs['dn'])) {
-      $ldap = $config->get_ldap_link();
+      $ldap = config()->get_ldap_link();
       $ldap->cd($attrs['dn']);
       $ldap->search('objectClass='.$this->objectClass, ['*'], 'one');
       $this->value = [];

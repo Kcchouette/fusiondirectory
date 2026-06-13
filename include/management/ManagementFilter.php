@@ -49,8 +49,6 @@ class ManagementFilter
    */
   function __construct (Management $parent, ?bool $fixedScope = NULL, array $filterElementDefinitions = [])
   {
-    global $config;
-
     $this->parent = $parent;
 
     $this->pid = preg_replace('/[^0-9]/', '', strval(microtime(TRUE)));

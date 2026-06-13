@@ -93,14 +93,13 @@ class GenericDialogAttribute extends DialogAttribute
 
   protected function fillDisplayValue ($i)
   {
-    global $config;
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
 
     $value = $this->value[$i];
     if ($this->store_attr == 'dn') {
       $ldap->cat($value, $this->ldapAttributesToGet());
     } else {
-      $ldap->cd($config->current['BASE']);
+      $ldap->cd(config()->current['BASE']);
       $ldap->search('('.$this->store_attr.'='.ldap_escape_f($value).')', $this->ldapAttributesToGet());
     }
     $attrs = $ldap->fetch(TRUE);
