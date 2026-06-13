@@ -1,2 +1,4 @@
- 
+
 .directory
+tools/*.phar
+tools/*.sig
