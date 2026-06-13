@@ -43,7 +43,7 @@ class Session
   /*!
    * \brief Deprecated
    */
-  public static function global_is_set ($name)
+  public static function globalIsSet ($name)
   {
     return static::is_set($name);
   }
@@ -63,7 +63,7 @@ class Session
   /*!
    * \brief Deprecated
    */
-  public static function global_set ($name, $value)
+  public static function globalSet ($name, $value)
   {
     static::set($name, $value);
   }
@@ -85,7 +85,7 @@ class Session
   /*!
    * \brief Deprecated
    */
-  public static function global_get ($name)
+  public static function globalGet ($name)
   {
     return static::get($name);
   }
@@ -111,7 +111,7 @@ class Session
   /*!
    * \brief Deprecated
    */
-  public static function global_delete ($name)
+  public static function globalDelete ($name)
   {
     return static::un_set($name);
   }
@@ -131,7 +131,7 @@ class Session
   /*!
    * \brief Deprecated
    */
-  public static function global_un_set ($name)
+  public static function globalUnSet ($name)
   {
     return static::un_set($name);
   }

@@ -13,27 +13,27 @@ class AclChecker
 
     public function isWriteable(string $attribute, bool $skipWrite = false): bool
     {
-        return $this->plugin->acl_is_writeable($attribute, $skipWrite);
+        return $this->plugin->aclIsWriteable($attribute, $skipWrite);
     }
 
     public function isReadable(string $attribute): bool
     {
-        return $this->plugin->acl_is_readable($attribute);
+        return $this->plugin->aclIsReadable($attribute);
     }
 
     public function isCreateable(?string $base = null): bool
     {
-        return $this->plugin->acl_is_createable($base);
+        return $this->plugin->aclIsCreateable($base);
     }
 
     public function isRemoveable(?string $base = null): bool
     {
-        return $this->plugin->acl_is_removeable($base);
+        return $this->plugin->aclIsRemoveable($base);
     }
 
     public function isMoveable(?string $base = null): bool
     {
-        return $this->plugin->acl_is_moveable($base);
+        return $this->plugin->aclIsMoveable($base);
     }
 
     public function hasPermissions(): bool

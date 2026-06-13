@@ -153,7 +153,7 @@ class LDAP
 
     /* Sadly we've no proper return values here. Use the error message instead. */
     if (!$ldap->success()) {
-      throw new FatalError(htmlescape(sprintf(_('FATAL: Error when connecting to LDAP. Server said "%s".'), $ldap->get_error())));
+      throw new FatalError(htmlescape(sprintf(_('FATAL: Error when connecting to LDAP. Server said "%s".'), $ldap->getError())));
     }
 
     /* Preset connection base to $base and return to caller */
@@ -275,7 +275,7 @@ class LDAP
    */
   function rebind ($ldap, $referral)
   {
-    $credentials = $this->get_credentials($referral);
+    $credentials = $this->getCredentials($referral);
     if (@ldap_bind($ldap, $credentials['ADMINDN'], $credentials['ADMINPASSWORD'])) {
       $this->error      = "Success";
       $this->hascon     = TRUE;
@@ -428,7 +428,7 @@ class LDAP
    * \param integer $srp srp
    *
    */
-  function parse_result ($srp): array
+  function parseResult ($srp): array
   {
     if ($this->hascon && $this->hasres[$srp]) {
       if (ldap_parse_result($this->cid, $this->sr[$srp], $errcode, $matcheddn, $errmsg, $referrals, $controls)) {
@@ -499,7 +499,7 @@ class LDAP
    *
    * \param string $filter The filter of the research
    */
-  function object_match_filter ($dn, $filter)
+  function objectMatchFilter ($dn, $filter)
   {
     if ($this->hascon) {
       if ($this->reconnect) {
@@ -507,14 +507,14 @@ class LDAP
       }
       $res  = @ldap_read($this->cid, $dn, $filter, ["objectClass"]);
       if ($res !== FALSE) {
-        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'object_match_filter(dn="'.$dn.'",filter="'.$filter.'")');
+        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'objectMatchFilter(dn="'.$dn.'",filter="'.$filter.'")');
         return @ldap_count_entries($this->cid, $res);
       } else {
         return FALSE;
       }
     } else {
       $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'object_match_filter(dn="'.$dn.'",filter="'.$filter.'")');
+      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'objectMatchFilter(dn="'.$dn.'",filter="'.$filter.'")');
       return FALSE;
     }
   }
@@ -524,7 +524,7 @@ class LDAP
    *
    * \param $size The limit
    */
-  function set_size_limit ($size)
+  function setSizeLimit ($size)
   {
     /* Ignore zero settings */
     if ($size == 0) {
@@ -535,7 +535,7 @@ class LDAP
     } else {
       $this->error = "Could not connect to LDAP server";
     }
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $size, 'set_size_limit');
+    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $size, 'setSizeLimit');
   }
 
   /*!
@@ -689,7 +689,7 @@ class LDAP
     }
   }
 
-  function mod_add ($attrs = "", $dn = "")
+  function modAdd ($attrs = "", $dn = "")
   {
     if ($this->hascon) {
       if ($this->reconnect) {
@@ -701,11 +701,11 @@ class LDAP
 
       $r = @ldap_mod_add($this->cid, $dn, $attrs);
       $this->error = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'mod_add('.$dn.')');
+      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modAdd('.$dn.')');
       return $r;
     } else {
       $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'mod_add('.$dn.')');
+      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modAdd('.$dn.')');
       return "";
     }
   }
@@ -742,7 +742,7 @@ class LDAP
    *
    * \return Boolean TRUE on success else FALSE.
    */
-  function rename_dn ($source, $dest)
+  function renameDn ($source, $dest)
   {
     /* Check if source and destination are the same entry */
     if (strtolower($source) == strtolower($dest)) {
@@ -752,7 +752,7 @@ class LDAP
     }
 
     /* Check if destination entry exists */
-    if ($this->dn_exists($dest)) {
+    if ($this->dnExists($dest)) {
       trigger_error("Destination '$dest' already exists.");
       $this->error = "Destination '$dest' already exists.";
       return FALSE;
@@ -775,7 +775,7 @@ class LDAP
       $this->error = ldap_error($this->cid);
 
       /* Check if destination dn exists, if not the server may not support this operation */
-      $r &= $this->dn_exists($dest);
+      $r &= $this->dnExists($dest);
       Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rename("'.$source.'","'.$dest.'")');
       return $r;
     } else {
@@ -787,7 +787,7 @@ class LDAP
 
 
   /*!
-   * \brief Function rmdir_recursive
+   * \brief Function rmdirRecursive
    *
    * Based on recursive_remove, adding two thing: full subtree remove, and delete own node.
    *
@@ -797,7 +797,7 @@ class LDAP
    *
    * \return TRUE on sucessfull , 0 in error, and "" when we don't get a ldap conection
    */
-  function rmdir_recursive ($srp, $deletedn)
+  function rmdirRecursive ($srp, $deletedn)
   {
     if ($this->hascon) {
       if ($this->reconnect) {
@@ -823,11 +823,11 @@ class LDAP
         }
       }
       $this->error = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdir_recursive("'.$deletedn.'")');
+      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdirRecursive("'.$deletedn.'")');
       return ($r ? $r : 0);
     } else {
       $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdir_recursive("'.$deletedn.'")');
+      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdirRecursive("'.$deletedn.'")');
       return "";
     }
   }
@@ -840,7 +840,7 @@ class LDAP
 
     $str = "";
     if (isset($attrs['objectClass'])
-      && preg_match("/^objectClass: value #([0-9]*) invalid per syntax$/", $this->get_additional_error(), $m)) {
+      && preg_match("/^objectClass: value #([0-9]*) invalid per syntax$/", $this->getAdditionalError(), $m)) {
       $ocs = $attrs['objectClass'];
       if (!is_array($ocs)) {
         $ocs = [$ocs];
@@ -850,7 +850,7 @@ class LDAP
       }
     }
     if ($error == "Undefined attribute type") {
-      $str = " - <b>attribute: ".preg_replace("/:.*$/", "", $this->get_additional_error())."</b>";
+      $str = " - <b>attribute: ".preg_replace("/:.*$/", "", $this->getAdditionalError())."</b>";
     }
 
     Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $attrs, "Erroneous data");
@@ -891,7 +891,7 @@ class LDAP
    *
    * \param array $changes The changes
    */
-  function modify_batch (array $changes)
+  function modifyBatch (array $changes)
   {
     if (count($changes) == 0) {
       return TRUE;
@@ -902,11 +902,11 @@ class LDAP
       }
       $r            = @ldap_modify_batch($this->cid, $this->basedn, $changes);
       $this->error  = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modify_batch('.$this->basedn.')');
+      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modifyBatch('.$this->basedn.')');
       return $r;
     } else {
       $this->error = 'Could not connect to LDAP server';
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modify_batch('.$this->basedn.')');
+      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modifyBatch('.$this->basedn.')');
       return FALSE;
     }
   }
@@ -941,7 +941,7 @@ class LDAP
    *
    * Creates missing trees, in our example ou=orga,dc=base will get created if not existing, same thing for ou=example,ou=orga,dc=base
    * */
-  function create_missing_trees ($srp, $target, $ignoreReferralBases = TRUE)
+  function createMissingTrees ($srp, $target, $ignoreReferralBases = TRUE)
   {
     $real_path = substr($target, 0, strlen($target) - strlen($this->basedn) - 1);
 
@@ -954,7 +954,7 @@ class LDAP
     $cdn = $this->basedn;
 
     /* Load schema if available... */
-    $classes = $this->get_objectclasses();
+    $classes = $this->getObjectclasses();
 
     foreach ($l as $part) {
       if ($part != "dummy") {
@@ -976,7 +976,7 @@ class LDAP
       }
 
       /* Create missing entry? */
-      if (!$this->dn_exists($cdn)) {
+      if (!$this->dnExists($cdn)) {
         $type   = preg_replace('/^([^=]+)=.*$/', '\\1', $cdn);
         $param  = preg_replace('/^[^=]+=([^,]+).*$/', '\\1', $cdn);
         $param  = preg_replace(['/\\\\,/','/\\\\"/'], [',','"'], $param);
@@ -1059,9 +1059,9 @@ class LDAP
         if (!$this->success()) {
           Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $cdn, 'dn');
           Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $na, 'Content');
-          Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->get_error(), 'LDAP error');
+          Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->getError(), 'LDAP error');
 
-          throw new FusionDirectoryLdapError($cdn, LDAP_ADD, $this->get_error(), $this->get_errno());
+          throw new FusionDirectoryLdapError($cdn, LDAP_ADD, $this->getError(), $this->getErrno());
         }
       }
     }
@@ -1073,7 +1073,7 @@ class LDAP
    *
    * \return string containts LDAP_OPT_ERROR_STRING
    */
-  function get_additional_error ()
+  function getAdditionalError ()
   {
     $additional_error = '';
     @ldap_get_option($this->cid, LDAP_OPT_ERROR_STRING, $additional_error);
@@ -1093,12 +1093,12 @@ class LDAP
   /*!
    * \brief Get the error
    */
-  function get_error ($details = TRUE): string
+  function getError ($details = TRUE): string
   {
     if (($this->error == 'Success') || !$details) {
       return $this->error;
     } else {
-      $adderror = $this->get_additional_error();
+      $adderror = $this->getAdditionalError();
       if ($adderror != '') {
         return sprintf(
           _('%s (%s, while operating on "%s" using LDAP server "%s")'),
@@ -1118,7 +1118,7 @@ class LDAP
    *
    * Must be run right after the ldap request
    */
-  function get_errno (): int
+  function getErrno (): int
   {
     if ($this->error == 'Success') {
       return 0;
@@ -1135,10 +1135,10 @@ class LDAP
   function hitSizeLimit (): bool
   {
     /* LDAP_SIZELIMIT_EXCEEDED 0x04 */
-    return ($this->get_errno() == 0x04);
+    return ($this->getErrno() == 0x04);
   }
 
-  function get_credentials ($url, $referrals = NULL)
+  function getCredentials ($url, $referrals = NULL)
   {
     $ret    = [];
     $url    = preg_replace('!\?\?.*$!', '', $url);
@@ -1225,9 +1225,9 @@ class LDAP
     return $res;
   }
 
-  function dn_exists ($dn): bool
+  function dnExists ($dn): bool
   {
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'dn_exists('.$dn.')');
+    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'dnExists('.$dn.')');
     return (@ldap_read($this->cid, $dn, '(objectClass=*)', ['objectClass']) !== FALSE);
   }
 
@@ -1319,7 +1319,7 @@ class LDAP
    *
    * \param boolean $DeleteOldEntries
    */
-  function import_complete_ldif ($srp, $str_attr, $JustModify, $DeleteOldEntries)
+  function importCompleteLdif ($srp, $str_attr, $JustModify, $DeleteOldEntries)
   {
     $entries = $this->parseLdif($str_attr);
 
@@ -1329,12 +1329,12 @@ class LDAP
 
     foreach ($entries as $startLine => $entry) {
       /* Delete before insert */
-      $usermdir = ($this->dn_exists($entry['dn']) && $DeleteOldEntries);
+      $usermdir = ($this->dnExists($entry['dn']) && $DeleteOldEntries);
       /* Should we use Modify instead of Add */
-      $usemodify = ($this->dn_exists($entry['dn']) && $JustModify);
+      $usemodify = ($this->dnExists($entry['dn']) && $JustModify);
 
       /* If we can't Import, return with a file error */
-      if (!$this->import_single_entry($srp, $entry, $usemodify, $usermdir)) {
+      if (!$this->importSingleEntry($srp, $entry, $usemodify, $usermdir)) {
         throw new LDIFImportException(sprintf(_('Error while importing dn: "%s", please check your LDIF from line %s on!'), $entry['dn'][0], $startLine));
       }
     }
@@ -1356,7 +1356,7 @@ class LDAP
    *
    * \param boolean $delete
    */
-  protected function import_single_entry ($srp, $data, $modify, $delete)
+  protected function importSingleEntry ($srp, $data, $modify, $delete)
   {
     global $config;
 
@@ -1389,13 +1389,13 @@ class LDAP
 
       /* Delete existing entry */
       if ($delete) {
-        $this->rmdir_recursive($srp, $dn);
+        $this->rmdirRecursive($srp, $dn);
       }
 
       /* Create missing trees */
       $this->cd($config->current['BASE']);
       try {
-        $this->create_missing_trees($srp, preg_replace('/^[^,]+,/', '', $dn));
+        $this->createMissingTrees($srp, preg_replace('/^[^,]+,/', '', $dn));
       } catch (FusionDirectoryError $error) {
         $error->display();
       }
@@ -1430,7 +1430,7 @@ class LDAP
     }
 
     if (!$this->success()) {
-      $error = new FusionDirectoryLdapError($dn, $operation, $this->get_error(), $this->get_errno());
+      $error = new FusionDirectoryLdapError($dn, $operation, $this->getError(), $this->getErrno());
       $error->display();
     }
 
@@ -1443,11 +1443,11 @@ class LDAP
    *
    * \param boolean $force_reload FALSE
    */
-  function get_objectclasses ($force_reload = FALSE)
+  function getObjectclasses ($force_reload = FALSE)
   {
     /* Return the cached results. */
-    if (class_available('Session') && Session::is_set('LDAP_CACHE::get_objectclasses') && !$force_reload) {
-      return Session::get('LDAP_CACHE::get_objectclasses');
+    if (class_available('Session') && Session::is_set('LDAP_CACHE::getObjectclasses') && !$force_reload) {
+      return Session::get('LDAP_CACHE::getObjectclasses');
     }
 
     // Get base to look for schema
@@ -1518,7 +1518,7 @@ class LDAP
       }
     }
     if (class_available('Session')) {
-      Session::set('LDAP_CACHE::get_objectclasses', $objectclasses);
+      Session::set('LDAP_CACHE::getObjectclasses', $objectclasses);
     }
 
     return $objectclasses;
@@ -1581,7 +1581,7 @@ class LDAP
     }
   }
 
-  public static function get_naming_contexts ($server, $admin = '', $password = '')
+  public static function getNamingContexts ($server, $admin = '', $password = '')
   {
     /* Build LDAP connection */
     $ds = ldap_connect($server);
@@ -1595,7 +1595,7 @@ class LDAP
     $res    = @ldap_read($ds, '', 'objectClass=*', ['namingContexts']);
     $attrs  = @ldap_get_entries($ds, $res);
 
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $attrs[0]['namingcontexts'], 'get_naming_contexts');
+    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $attrs[0]['namingcontexts'], 'getNamingContexts');
     return $attrs[0]['namingcontexts'];
   }
 }

@@ -49,7 +49,7 @@ abstract class PasswordMethod
   /*!
    * \brief Get the Hash name
    */
-  abstract static function get_hash_name ();
+  abstract static function getHashName ();
 
   /*!
    * \brief Generate template hash
@@ -59,14 +59,14 @@ abstract class PasswordMethod
    *
    * \return string the password hash
    */
-  abstract public function generate_hash (string $pwd, bool $locked = FALSE): string;
+  abstract public function generateHash (string $pwd, bool $locked = FALSE): string;
 
   /*!
    * \brief Is available
    *
    * \return TRUE
    */
-  public function is_available (): bool
+  public function isAvailable (): bool
   {
     return TRUE;
   }
@@ -76,7 +76,7 @@ abstract class PasswordMethod
    *
    * \return boolean TRUE
    */
-  public function need_password (): bool
+  public function needPassword (): bool
   {
     return TRUE;
   }
@@ -86,7 +86,7 @@ abstract class PasswordMethod
    *
    * \return boolean
    */
-  public function is_lockable (): bool
+  public function isLockable (): bool
   {
     return $this->lockable;
   }
@@ -96,7 +96,7 @@ abstract class PasswordMethod
    *
    * \param string $dn The DN
    */
-  function is_locked ($dn = '', $pwd = ''): bool
+  function isLocked ($dn = '', $pwd = ''): bool
   {
     global $config;
     if (!$this->lockable) {
@@ -105,7 +105,7 @@ abstract class PasswordMethod
 
     /* Get current password hash */
     if (!empty($dn)) {
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $ldap->cd($config->current['BASE']);
       $ldap->cat($dn, ['userPassword']);
       $attrs = $ldap->fetch();
@@ -124,25 +124,25 @@ abstract class PasswordMethod
    *
    * \param string $dn
    */
-  function lock_account ($dn = '', bool $lockEverything = TRUE)
+  function lockAccount ($dn = '', bool $lockEverything = TRUE)
   {
-    return $this->generic_modify_account($dn, 'LOCK', $lockEverything);
+    return $this->genericModifyAccount($dn, 'LOCK', $lockEverything);
   }
 
   /*!
-   * \brief Unlocks an account which was locked by 'lock_account()'.
-   *        For details about the locking mechanism see 'lock_account()'.
+   * \brief Unlocks an account which was locked by 'lockAccount()'.
+   *        For details about the locking mechanism see 'lockAccount()'.
    */
-  function unlock_account ($dn = '')
+  function unlockAccount ($dn = '')
   {
-    return $this->generic_modify_account($dn, 'UNLOCK');
+    return $this->genericModifyAccount($dn, 'UNLOCK');
   }
 
   /*!
-   * \brief Unlocks an account which was locked by 'lock_account()'.
-   *        For details about the locking mechanism see 'lock_account()'.
+   * \brief Unlocks an account which was locked by 'lockAccount()'.
+   *        For details about the locking mechanism see 'lockAccount()'.
    */
-  private function generic_modify_account ($dn, string $mode, bool $lockEverything = TRUE)
+  private function genericModifyAccount ($dn, string $mode, bool $lockEverything = TRUE)
   {
     global $config;
     if (!$this->lockable) {
@@ -208,7 +208,7 @@ abstract class PasswordMethod
     }
     $modify['userPassword'] = $pwd;
 
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     $ldap->cd($dn);
     $ldap->modify($modify);
 
@@ -222,8 +222,8 @@ abstract class PasswordMethod
         MsgDialog::displayChecks($errors);
       }
     } else {
-      Logging::log('error', strtolower($mode), $dn, [], 'error while '.strtolower($mode).'ing: '.$ldap->get_error());
-      $error = new FusionDirectoryLdapError($dn, LDAP_MOD, $ldap->get_error(), $ldap->get_errno());
+      Logging::log('error', strtolower($mode), $dn, [], 'error while '.strtolower($mode).'ing: '.$ldap->getError());
+      $error = new FusionDirectoryLdapError($dn, LDAP_MOD, $ldap->getError(), $ldap->getErrno());
       $error->display();
     }
     return $ldap->success();
@@ -233,34 +233,34 @@ abstract class PasswordMethod
   /*!
    * \brief This function returns all loaded classes for password encryption
    */
-  static function get_available_methods (): array
+  static function getAvailableMethods (): array
   {
     global $class_mapping;
     $ret  = [];
     $i    = 0;
 
-    if (!Session::is_set('PasswordMethod::get_available_methods')) {
+    if (!Session::is_set('PasswordMethod::getAvailableMethods')) {
       foreach (array_keys($class_mapping) as $class) {
         if (preg_match('/^passwordMethod.+/i', $class)) {
           $test = new $class('');
-          if ($test->is_available()) {
-            $plugs = $test->get_hash_name();
+          if ($test->isAvailable()) {
+            $plugs = $test->getHashName();
             if (!is_array($plugs)) {
               $plugs = [$plugs];
             }
 
-            $cfg  = $test->is_configurable();
+            $cfg  = $test->isConfigurable();
 
             foreach ($plugs as $plugname) {
               $ret['name'][$i]            = $plugname;
               $ret['class'][$i]           = $class;
-              $ret['is_configurable'][$i] = $cfg;
+              $ret['isConfigurable'][$i] = $cfg;
               $ret['object'][$i]          = $test;
 
               $ret[$i]['name']            = $plugname;
               $ret[$i]['class']           = $class;
               $ret[$i]['object']          = $test;
-              $ret[$i]['is_configurable'] = $cfg;
+              $ret[$i]['isConfigurable'] = $cfg;
 
               $ret[$plugname]             = $class;
               $i++;
@@ -268,9 +268,9 @@ abstract class PasswordMethod
           }
         }
       }
-      Session::set('PasswordMethod::get_available_methods', $ret);
+      Session::set('PasswordMethod::getAvailableMethods', $ret);
     }
-    return Session::get('PasswordMethod::get_available_methods');
+    return Session::get('PasswordMethod::getAvailableMethods');
   }
 
   /*!
@@ -278,14 +278,14 @@ abstract class PasswordMethod
    */
   function checkPassword ($pwd, $hash): bool
   {
-    return ($hash == $this->generate_hash($pwd));
+    return ($hash == $this->generateHash($pwd));
   }
 
 
   /*!
    * \brief Return true if this password method provides a configuration dialog
    */
-  function is_configurable (): bool
+  function isConfigurable (): bool
   {
     return FALSE;
   }
@@ -316,9 +316,9 @@ abstract class PasswordMethod
    *
    * \param string $dn The DN
    */
-  static function get_method ($password_hash, $dn = ''): passwordMethod
+  static function getMethod ($password_hash, $dn = ''): passwordMethod
   {
-    $methods = PasswordMethod::get_available_methods();
+    $methods = PasswordMethod::getAvailableMethods();
 
     if (isset($methods['class']['PasswordMethodEmpty']) && (PasswordMethodEmpty::_extract_method($password_hash) != '')) {
       /* Test empty method first as it gets priority */
@@ -330,7 +330,7 @@ abstract class PasswordMethod
       $method = $class::_extract_method($password_hash);
       if ($method != '') {
         $test = new $class($dn);
-        $test->set_hash($method);
+        $test->setHash($method);
         return $test;
       }
     }
@@ -348,7 +348,7 @@ abstract class PasswordMethod
    */
   static function _extract_method ($password_hash): string
   {
-    $hash = static::get_hash_name();
+    $hash = static::getHashName();
     if (preg_match("/^\{$hash\}/i", $password_hash)) {
       return $hash;
     }
@@ -363,12 +363,12 @@ abstract class PasswordMethod
    *
    * \param string $hash
    */
-  static function make_hash ($password, $hash): string
+  static function makeHash ($password, $hash): string
   {
-    $methods  = PasswordMethod::get_available_methods();
+    $methods  = PasswordMethod::getAvailableMethods();
     $tmp      = new $methods[$hash]();
-    $tmp->set_hash($hash);
-    return $tmp->generate_hash($password);
+    $tmp->setHash($hash);
+    return $tmp->generateHash($password);
   }
 
   /*!
@@ -376,7 +376,7 @@ abstract class PasswordMethod
    *
    * \param string $hash
    */
-  function set_hash ($hash)
+  function setHash ($hash)
   {
     $this->hash = $hash;
   }
@@ -385,7 +385,7 @@ abstract class PasswordMethod
   /*!
    * \brief Get a hash
    */
-  function get_hash ()
+  function getHash ()
   {
     return $this->hash;
   }
@@ -397,7 +397,7 @@ abstract class PasswordMethod
    *
    * \param string $password The password
    */
-  static function is_harmless ($password): bool
+  static function isHarmless ($password): bool
   {
     global $config;
     if ($config->get_cfg_value('strictPasswordRules') == 'TRUE') {

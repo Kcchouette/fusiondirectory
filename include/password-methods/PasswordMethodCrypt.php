@@ -45,7 +45,7 @@ class PasswordMethodCrypt extends PasswordMethod
    *
    * \return TRUE if is avaibable, otherwise return false
    */
-  public function is_available (): bool
+  public function isAvailable (): bool
   {
     return function_exists('crypt');
   }
@@ -58,7 +58,7 @@ class PasswordMethodCrypt extends PasswordMethod
    *
    * \return string the password hash
    */
-  public function generate_hash (string $pwd, bool $locked = FALSE): string
+  public function generateHash (string $pwd, bool $locked = FALSE): string
   {
     $salt = '';
 
@@ -110,7 +110,7 @@ class PasswordMethodCrypt extends PasswordMethod
   /*!
    * \brief Get the hash name
    */
-  static function get_hash_name ()
+  static function getHashName ()
   {
     $hashes = [];
     if (defined('CRYPT_STD_DES')) {

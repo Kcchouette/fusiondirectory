@@ -191,7 +191,7 @@ class Management implements FusionDirectoryDialog
         $positionDN = $ui->dn;
       }
 
-      if (!preg_match('/t/', $ui->get_permissions($positionDN, $infos['aclCategory'] . '/' . $infos['mainTab']))) {
+      if (!preg_match('/t/', $ui->getPermissions($positionDN, $infos['aclCategory'] . '/' . $infos['mainTab']))) {
         $createMenu[] = new Action(
         'new_' . $type, $infos['name'], $img,
         '0', 'newEntry',
@@ -739,7 +739,7 @@ class Management implements FusionDirectoryDialog
   function enablePaste ($action, ?ListingEntry $entry = NULL): bool
   {
     if ($entry === NULL) {
-      return $this->cpHandler->entries_queued();
+      return $this->cpHandler->entriesQueued();
     } else {
       return FALSE;
     }
@@ -1019,7 +1019,7 @@ class Management implements FusionDirectoryDialog
         MsgDialog::displayChecks($msgs);
       } else {
         Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDns, 'Modifications applied');
-        $this->tabObject->re_init();
+        $this->tabObject->reInit();
         /* Avoid applying the POST a second time */
         $_POST = [];
       }
@@ -1166,15 +1166,15 @@ class Management implements FusionDirectoryDialog
 
     // Add entries to queue
     if (($action['action'] == 'copy') || ($action['action'] == 'cut')) {
-      $this->cpHandler->cleanup_queue();
+      $this->cpHandler->cleanupQueue();
       foreach ($action['targets'] as $dn) {
         $entry = $this->listing->getEntry($dn);
         if (($action['action'] == 'copy') && $entry->checkAcl('r')) {
-          $this->cpHandler->add_to_queue($dn, 'copy', $entry->getTemplatedType());
+          $this->cpHandler->addToQueue($dn, 'copy', $entry->getTemplatedType());
           Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Entry copied!');
         }
         if (($action['action'] == 'cut') && $entry->checkAcl('rd')) {
-          $this->cpHandler->add_to_queue($dn, 'cut', $entry->getTemplatedType());
+          $this->cpHandler->addToQueue($dn, 'cut', $entry->getTemplatedType());
           Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Entry cut!');
         }
       }
@@ -1186,7 +1186,7 @@ class Management implements FusionDirectoryDialog
     }
 
     // Display any c&p dialogs, eg. object modifications required before pasting.
-    if ($this->cpPastingStarted && $this->cpHandler->entries_queued()) {
+    if ($this->cpPastingStarted && $this->cpHandler->entriesQueued()) {
       $this->cpHandler->update();
       $data = $this->cpHandler->render();
       if (!empty($data)) {
@@ -1195,7 +1195,7 @@ class Management implements FusionDirectoryDialog
     }
 
     // Automatically disable pasting process since there is no entry left to paste.
-    if (!$this->cpHandler->entries_queued()) {
+    if (!$this->cpHandler->entriesQueued()) {
       $this->cpPastingStarted = FALSE;
       $this->cpHandler->resetPaste();
     }
@@ -1250,7 +1250,7 @@ class Management implements FusionDirectoryDialog
       $aclCategories = [Objects::infos($this->listing->getEntry($this->currentDn)->getTemplatedType())['aclCategory']];
     }
 
-    if ($ui->allow_snapshot_restore($this->currentDn, $aclCategories, empty($action['targets']))) {
+    if ($ui->allowSnapshotRestore($this->currentDn, $aclCategories, empty($action['targets']))) {
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Snapshot restoring initiated!');
       $this->dialogObject = new SnapshotRestoreDialog($this->currentDn, $this, empty($action['targets']), $aclCategories);
     } else {
@@ -1351,7 +1351,7 @@ class Management implements FusionDirectoryDialog
   function restoreSnapshot (string $dn)
   {
     global $ui;
-    if (!empty($dn) && $ui->allow_snapshot_restore($dn, $this->dialogObject->aclCategory, $this->dialogObject->global)) {
+    if (!empty($dn) && $ui->allowSnapshotRestore($dn, $this->dialogObject->aclCategory, $this->dialogObject->global)) {
       $dn = $this->snapHandler->restoreSnapshot($dn);
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot restored');
       $this->closeDialogs();
@@ -1379,7 +1379,7 @@ class Management implements FusionDirectoryDialog
   function removeSnapshot (string $dn)
   {
     global $ui;
-    if (!empty($dn) && $ui->allow_snapshot_delete($dn, $this->dialogObject->aclCategory)) {
+    if (!empty($dn) && $ui->allowSnapshotDelete($dn, $this->dialogObject->aclCategory)) {
       $this->snapHandler->removeSnapshot($dn);
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot deleted');
     } else {

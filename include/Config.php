@@ -128,7 +128,7 @@ class Config
    * read the last time and reloads it. It uses the file mtime to check
    * weither the file changed or not.
    */
-  function check_and_reload ($force = FALSE)
+  function checkAndReload ($force = FALSE)
   {
     /* Check if class_location.inc has changed, this is the case
         if we have installed or removed plugins. */
@@ -165,10 +165,10 @@ class Config
     $fh       = fopen($filename, 'r');
     $xmldata  = fread($fh, 100000);
     fclose($fh);
-    $this->parse_data($xmldata);
+    $this->parseData($xmldata);
   }
 
-  function parse_data ($xmldata)
+  function parseData ($xmldata)
   {
     $this->data = [
       'LOCATIONS' => [],
@@ -177,7 +177,7 @@ class Config
     ];
 
     $this->parser = xml_parser_create();
-    xml_set_element_handler($this->parser, [$this, "tag_open"], [$this, "tag_close"]);
+    xml_set_element_handler($this->parser, [$this, "tagOpen"], [$this, "tagClose"]);
 
     if (!xml_parse($this->parser, chop($xmldata))) {
       $msg = sprintf(_('XML error in fusiondirectory.conf: %s at line %d'),
@@ -197,7 +197,7 @@ class Config
    *
    * \param string $attrs
    */
-  function tag_open ($parser, $tag, $attrs)
+  function tagOpen ($parser, $tag, $attrs)
   {
     /* Save last and current tag for reference */
     $this->tags[$this->level] = $tag;
@@ -279,7 +279,7 @@ class Config
    *
    * \param string $tag
    */
-  function tag_close ($parser, $tag)
+  function tagClose ($parser, $tag)
   {
     /* Close config section */
     if ($tag == 'CONF') {
@@ -298,7 +298,7 @@ class Config
    *
    * \return string the password corresponding to the keyword
    */
-  function get_credentials ($creds)
+  function getCredentials ($creds)
   {
     if (isset($_SERVER['HTTP_FDKEY'])) {
       if (!Session::is_set('HTTP_FDKEY_CACHE')) {
@@ -332,7 +332,7 @@ class Config
    *
    * Example usage:
    * \code
-   * $ldap = $config->get_ldap_link();
+   * $ldap = $config->getLdapLink();
    * \endcode
    *
    * \param boolean $sizelimit Weither to impose a sizelimit on the LDAP object or not.
@@ -341,14 +341,14 @@ class Config
    *
    * \return ldapMultiplexer object
    */
-  function get_ldap_link (bool $sizelimit = FALSE): ldapMultiplexer
+  function getLdapLink (bool $sizelimit = FALSE): ldapMultiplexer
   {
     global $ui;
 
     if (($this->ldapLink === NULL) || ($this->ldapLink->cid === FALSE)) {
       /* Build new connection */
       $this->ldapLink = LDAP::init($this->current['SERVER'], $this->current['BASE'],
-          $this->current['ADMINDN'], $this->get_credentials($this->current['ADMINPASSWORD']));
+          $this->current['ADMINDN'], $this->getCredentials($this->current['ADMINPASSWORD']));
 
       /* Move referrals */
       if (!isset($this->current['REFERRAL'])) {
@@ -360,9 +360,9 @@ class Config
 
     $obj  = new LdapMultiplexer($this->ldapLink);
     if ($sizelimit) {
-      $obj->set_size_limit($ui->getSizeLimitHandler()->getSizeLimit());
+      $obj->setSizeLimit($ui->getSizeLimitHandler()->getSizeLimit());
     } else {
-      $obj->set_size_limit(0);
+      $obj->setSizeLimit(0);
     }
     return $obj;
   }
@@ -409,7 +409,7 @@ class Config
     }
 
     /* Load in-ldap configuration */
-    $this->load_inldap_config();
+    $this->loadInldapConfig();
 
     /* Parse management config */
     $this->loadManagementConfig();
@@ -438,7 +438,7 @@ class Config
     $dn = CONFIGRDN.$this->current['BASE'];
 
     if (!$forceReload) {
-      $ldap = $this->get_ldap_link();
+      $ldap = $this->getLdapLink();
       $ldap->cat($dn, ['fusionConfigMd5']);
       if (($attrs = $ldap->fetch()) && isset($attrs['fusionConfigMd5'][0])
         && ($attrs['fusionConfigMd5'][0] == md5_file(CACHE_DIR.'/'.CLASS_CACHE))) {
@@ -453,9 +453,9 @@ class Config
     Lock::deleteByObject($dn);
   }
 
-  function load_inldap_config ()
+  function loadInldapConfig ()
   {
-    $ldap = $this->get_ldap_link();
+    $ldap = $this->getLdapLink();
     $ldap->cat(CONFIGRDN.$this->current['BASE']);
     if ($attrs = $ldap->fetch()) {
       for ($i = 0; $i < $attrs['count']; $i++) {
@@ -570,10 +570,10 @@ class Config
         'values'  => [$prefix.':'.$managementConfig],
       ];
     }
-    $ldap = $this->get_ldap_link();
+    $ldap = $this->getLdapLink();
     $ldap->cd(CONFIGRDN.$this->current['BASE']);
-    if (!$ldap->modify_batch($changes)) {
-      return [$ldap->get_error()];
+    if (!$ldap->modifyBatch($changes)) {
+      return [$ldap->getError()];
     }
 
     if ($managementConfig !== NULL) {
@@ -675,7 +675,7 @@ class Config
     $filter = '(|'.$filter.')';
 
     /* Get list of department objects */
-    $ldap = $this->get_ldap_link();
+    $ldap = $this->getLdapLink();
     $ldap->cd($this->current['BASE']);
     $ldap->search($filter, $ldap_values);
     while ($attrs = $ldap->fetch()) {
@@ -883,7 +883,7 @@ class Config
    *  or not. If SESSIONLIFETIME is not configured in FusionDirectory it always returns
    *  TRUE.
    */
-  function check_session_lifetime ()
+  function checkSessionLifetime ()
   {
     $cfg_lifetime = $this->get_cfg_value('SESSIONLIFETIME', 0);
     if ($cfg_lifetime > 0) {

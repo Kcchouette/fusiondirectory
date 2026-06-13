@@ -66,7 +66,7 @@ class Timezone
    * deprecated
    * \param $stamp is used to detect summer or winter time.
    */
-  static public function get_default_timezone ($stamp = NULL)
+  static public function getDefaultTz ($stamp = NULL)
   {
     global $config;
 

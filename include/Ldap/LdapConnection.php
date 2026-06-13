@@ -44,6 +44,6 @@ class LdapConnection
 
     public function getCredentials($url, $referrals = NULL): array
     {
-        return $this->ldap->get_credentials($url, $referrals);
+        return $this->ldap->getCredentials($url, $referrals);
     }
 }

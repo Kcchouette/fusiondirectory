@@ -71,7 +71,7 @@ class LdapSizeLimit
     if (isset($_POST['set_size_action']) && isset($_POST['action'])) {
       switch ($_POST['action']) {
         case 'newlimit':
-          if (isset($_POST['new_limit']) && Tests::is_id($_POST['new_limit'])) {
+          if (isset($_POST['new_limit']) && Tests::isId($_POST['new_limit'])) {
             if (($error = static::checkMaxInputVars($_POST['new_limit'])) !== FALSE) {
               $error->display();
             } else {

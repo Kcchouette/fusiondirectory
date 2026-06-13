@@ -82,9 +82,9 @@ class Logging
       }
     } else {
       if (is_object($config) && preg_match('/true/i', $config->get_cfg_value('Logging', ''))) {
-        static::log_into_syslog($entry);
+        static::logIntoSyslog($entry);
         if (in_array($action, $config->get_cfg_value('auditActions', []))) {
-          static::log_into_ldap($entry);
+          static::logIntoLdap($entry);
         }
       }
     }
@@ -178,7 +178,7 @@ class Logging
    *
    * \param Array $entry Entry to be loged
    */
-  static protected function log_into_syslog ($entry)
+  static protected function logIntoSyslog ($entry)
   {
     $str = '';
     if (empty($entry['object']) && empty($entry['changes'])) {
@@ -194,7 +194,7 @@ class Logging
    *
    * \param Array $entry Entry to be logged
    */
-  static protected function log_into_ldap ($entry)
+  static protected function logIntoLdap ($entry)
   {
     global $config;
     if ($entry['objecttype'] == 'plugin/auditEvent') {

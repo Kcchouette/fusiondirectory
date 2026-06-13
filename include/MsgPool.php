@@ -596,7 +596,7 @@ class MsgPool
   /*!
    * \brief Display error when checking the base
    */
-  public static function check_base ()
+  public static function checkBase ()
   {
     return htmlescape(_('The supplied base is not valid and has been reset to the previous value!'));
   }

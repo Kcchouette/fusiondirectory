@@ -43,7 +43,7 @@ class LdapSearch
 
     public function parseResult(int $srp): array
     {
-        return $this->ldap->parse_result($srp);
+        return $this->ldap->parseResult($srp);
     }
 
     public function resetResult(int $srp): void
@@ -58,7 +58,7 @@ class LdapSearch
 
     public function setPointSizeLimit(int $size): void
     {
-        $this->ldap->set_size_limit($size);
+        $this->ldap->setSizeLimit($size);
     }
 
     public function cd(string $dir): void
@@ -73,11 +73,11 @@ class LdapSearch
 
     public function objectMatchFilter(string $dn, string $filter): bool
     {
-        return $this->ldap->object_match_filter($dn, $filter);
+        return $this->ldap->objectMatchFilter($dn, $filter);
     }
 
     public function dnExists(string $dn): bool
     {
-        return $this->ldap->dn_exists($dn);
+        return $this->ldap->dnExists($dn);
     }
 }

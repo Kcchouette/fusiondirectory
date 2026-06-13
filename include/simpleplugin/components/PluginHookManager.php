@@ -13,17 +13,17 @@ class PluginHookManager
 
     public function handleHooks(string $when, string $mode, array $addAttrs = []): array
     {
-        return $this->plugin->handle_hooks($when, $mode, $addAttrs);
+        return $this->plugin->handleHooks($when, $mode, $addAttrs);
     }
 
     public function handlePostEvents(string $mode, array $addAttrs = []): void
     {
-        $this->plugin->handle_post_events($mode, $addAttrs);
+        $this->plugin->handlePostEvents($mode, $addAttrs);
     }
 
     public function handlePreEvents(string $mode, array $addAttrs = []): array
     {
-        return $this->plugin->handle_pre_events($mode, $addAttrs);
+        return $this->plugin->handlePreEvents($mode, $addAttrs);
     }
 
     public function fillHookAttrs(array &$addAttrs): void

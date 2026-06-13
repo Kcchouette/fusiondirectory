@@ -271,7 +271,7 @@ class Template implements FusionDirectoryDialog
       if (!isset($this->attributes[$class])) {
         continue;
       }
-      if ($plugin->is_modal_dialog()) {
+      if ($plugin->isModalDialog()) {
         $this->tabObject->current = $class;
         return $plugin->render();
       }
@@ -356,7 +356,7 @@ class Template implements FusionDirectoryDialog
       $specialAttrs['caller'.strtoupper($attr)] = $ui->$attr;
     }
     $this->attrs = TemplateHandling::parseArray($this->attrs, $specialAttrs, $targetdn);
-    $this->tabObject->adapt_from_template($this->attrs, array_merge([], ...array_values($this->attributes)));
+    $this->tabObject->adaptFromTemplate($this->attrs, array_merge([], ...array_values($this->attributes)));
 
     $this->applied = TRUE;
     return $this->tabObject;

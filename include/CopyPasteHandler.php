@@ -71,9 +71,9 @@ class CopyPasteHandler implements FusionDirectoryDialog
    *
    * \param String $type the type of the object
    */
-  function add_to_queue ($dn, $action, $type)
+  function addToQueue ($dn, $action, $type)
   {
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'add_to_queue');
+    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'addToQueue');
 
     if (!in_array($action, ['cut','copy'])) {
       trigger_error(sprintf('Specified action "%s" does not exists for copy & paste.', $action));
@@ -106,7 +106,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
    *    Remove hdd dumps of current entries too.
    *    Remove entries older than 24 hours.
    */
-  function cleanup_queue ()
+  function cleanupQueue ()
   {
     $this->current        = FALSE;
     $this->require_update = TRUE;
@@ -127,7 +127,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
   /*!
    * \brief Check if there are still entries the object queue
    */
-  function entries_queued ()
+  function entriesQueued ()
   {
     return ((count($this->queue) > 0) || ($this->current !== FALSE));
   }
@@ -135,9 +135,9 @@ class CopyPasteHandler implements FusionDirectoryDialog
   /*!
    * \brief Paste one entry from LDAP
    */
-  protected function load_entry_from_ldap ($entry)
+  protected function loadEntryFromLdap ($entry)
   {
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $entry['dn'], 'load_entry_from_ldap');
+    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $entry['dn'], 'loadEntryFromLdap');
     if (!isset($entry['tab_class']) && !isset($entry['type'])) {
       return [];
     }
@@ -176,13 +176,13 @@ class CopyPasteHandler implements FusionDirectoryDialog
 
         /* Update entries on demand */
         if (!isset($entry['object'])) {
-          $entry = $this->load_entry_from_ldap($entry);
+          $entry = $this->loadEntryFromLdap($entry);
           $this->queue[$key] = $entry;
         }
 
         /* Retrieve ACL infos */
-        $copy_acl = $ui->is_copyable($entry['dn'], $entry['aclCategory']);
-        $cut_acl  = $ui->is_cutable($entry['dn'], $entry['aclCategory'], $entry['mainTab']);
+        $copy_acl = $ui->isCopyable($entry['dn'], $entry['aclCategory']);
+        $cut_acl  = $ui->isCutable($entry['dn'], $entry['aclCategory'], $entry['mainTab']);
 
         /* Check permissions */
         if ((($entry['method'] == 'copy') && !$copy_acl)
@@ -210,7 +210,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
         $errors = $this->current['object']->save();
 
         if (empty($errors)) {
-          $this->current_saved();
+          $this->currentSaved();
           /* Remove from queue -> avoid saving twice */
           unset($this->queue[$key]);
         } else {
@@ -231,7 +231,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
         $errors = $this->current['object']->save();
 
         if (empty($errors)) {
-          $this->current_saved();
+          $this->currentSaved();
         } else {
           MsgDialog::displayChecks($errors);
         }
@@ -274,7 +274,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
     return '';
   }
 
-  private function current_saved ()
+  private function currentSaved ()
   {
     $this->lastdn   = $this->current['object']->dn;
     Logging::log('copy', 'paste', $this->lastdn);
@@ -287,7 +287,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
    *
    * \return the dn of the last edited entry
    */
-  function last_entry ()
+  function lastEntry ()
   {
     return $this->lastdn;
   }
@@ -302,7 +302,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
     }
 
     if (isset($_POST['abort_all_cut-copy_operations'])) {
-      $this->cleanup_queue();
+      $this->cleanupQueue();
       $this->current = FALSE;
     }
   }
@@ -327,7 +327,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
   function generatePasteIcon ()
   {
     $Copy_Paste = "&nbsp;<img class='center' src='images/lists/seperator.png' alt='' height='16' width='1'>&nbsp;";
-    if ($this->entries_queued()) {
+    if ($this->entriesQueued()) {
       $Copy_Paste .= "<input type='image' name='editPaste' class='center'
         src='geticon.php?context=actions&amp;icon=edit-paste&amp;size=16' alt='"._("Paste")."'>&nbsp;";
     } else {

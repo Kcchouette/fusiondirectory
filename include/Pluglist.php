@@ -241,7 +241,7 @@ class Pluglist
    *
    * \return Boolean TRUE on success FALSE otherwise
    */
-  function check_access ($infos)
+  function checkAccess ($infos)
   {
     global $ui;
 
@@ -277,12 +277,12 @@ class Pluglist
       if (preg_match("/:self$/", $acl_to_check)) {
         $acl_to_check = preg_replace("/:self$/", "", $acl_to_check);
         if (strpos($acl_to_check, '/')) {
-          if ($ui->get_permissions($ui->dn, $acl_to_check, "") != "") {
+          if ($ui->getPermissions($ui->dn, $acl_to_check, "") != "") {
             $this->silly_cache[$aclname] = TRUE;
             return TRUE;
           }
         } else {
-          if ($ui->get_category_permissions($ui->dn, $acl_to_check) != '') {
+          if ($ui->getCategoryPermissions($ui->dn, $acl_to_check) != '') {
             $this->silly_cache[$aclname] = TRUE;
             return TRUE;
           }
@@ -290,7 +290,7 @@ class Pluglist
       } else {
 
         /* No self acls. Check if we have any acls for the given ACL type */
-        $deps = $ui->get_module_departments($acl_to_check, TRUE);
+        $deps = $ui->getModuleDepartments($acl_to_check, TRUE);
         if (count($deps)) {
           $this->silly_cache[$aclname] = TRUE;
           return TRUE;
@@ -305,12 +305,12 @@ class Pluglist
   /*!
    * \brief Get headline, description and icon of a plugin
    */
-  function get_infos ($cname)
+  function getInfos ($cname)
   {
     $plHeadline     = FALSE;
     $plIcon         = FALSE;
     $plDescription  = FALSE;
-    $index          = $this->get_index($cname);
+    $index          = $this->getIndex($cname);
     $href           = "main.php?plug=$index&amp;reset=1";
     if (isset($this->info[$cname])) {
       if (isset($this->info[$cname]['plShortName'])) {
@@ -360,13 +360,13 @@ class Pluglist
 
         /* Parse sub-plugins */
         foreach ($config->data['MENU'][$section] as $info) {
-          if (!$this->check_access($info)) {
+          if (!$this->checkAccess($info)) {
             continue;
           }
           if (isset($info['CLASS']) && plugin_available($info['CLASS'])) {
-            $index  = $this->get_index($info['CLASS']);
+            $index  = $this->getIndex($info['CLASS']);
             $this->allowed_plugins[$index] = $index;
-            list ($plHeadline, $plDescription, $href, ) = $this->get_infos($info['CLASS']);
+            list ($plHeadline, $plDescription, $href, ) = $this->getInfos($info['CLASS']);
             $id             = $info['CLASS'];
           } elseif (!isset($info['CLASS'])) {
             $plHeadline     = $info['TITLE'];
@@ -412,7 +412,7 @@ class Pluglist
   /*!
    * \brief Show the menu icon
    */
-  function show_iconmenu ()
+  function showIconmenu ()
   {
     global $class_mapping, $config;
     if ($this->iconmenu == "") {
@@ -424,12 +424,12 @@ class Pluglist
         $sectionMenu  .= htmlescape($section_infos['NAME'])."</h1>\n";
 
         foreach ($config->data['MENU'][$section] as $info) {
-          if (!$this->check_access($info)) {
+          if (!$this->checkAccess($info)) {
             continue;
           }
           if (isset($info['CLASS']) && plugin_available($info['CLASS'])) {
             /* Read information from class variable */
-            list ($plHeadline, $plDescription, $href, $plIcon) = $this->get_infos($info['CLASS']);
+            list ($plHeadline, $plDescription, $href, $plIcon) = $this->getInfos($info['CLASS']);
             $id             = $info['CLASS'];
           } elseif (!isset($info['CLASS'])) {
             $plHeadline     = $info['TITLE'];
@@ -469,7 +469,7 @@ class Pluglist
    *
    * \param string $index The index which we want the path
    */
-  function get_path ($index)
+  function getPath ($index)
   {
     if (!isset($this->dirlist[$index])) {
       return "";
@@ -482,7 +482,7 @@ class Pluglist
    *
    * \param string $class The name of the class
    */
-  function get_index ($class)
+  function getIndex ($class)
   {
     /* Search for plugin index (id), identify entry by class */
     if (isset($this->info[$class])) {
@@ -560,7 +560,7 @@ class Pluglist
       $plugin_dir = "$BASE_DIR/plugins/generic/welcome";
       $plugin     = $index;
     } else {
-      $plugin_dir = $plist->get_path($index);
+      $plugin_dir = $plist->getPath($index);
       $plugin     = $plist->dirlist[$index];
     }
     /* Used by get_template_path */

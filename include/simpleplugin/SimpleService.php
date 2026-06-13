@@ -67,7 +67,7 @@ class SimpleService extends SimplePlugin
     return $str;
   }
 
-  protected function acl_skip_write (): bool
+  protected function aclSkipWrite (): bool
   {
     return FALSE;
   }
@@ -83,10 +83,10 @@ class SimpleService extends SimplePlugin
 
     if (static::$showActions && is_object($this->parent->parent) && isset($this->parent->parent->by_object['argonautClient']) && $this->parent->parent->by_object['argonautClient']->is_account) {
       /* Allow/disallow some functions */
-      $fields['AllowStatus']  = ($this->status == '') && $this->acl_is_writeable('simpleServiceStatus');
-      $fields['AllowStart']   = ($this->status == 'stopped') && $this->acl_is_writeable('simpleServiceStart');
-      $fields['AllowStop']    = ($this->status == 'running') && $this->acl_is_writeable('simpleServiceStop');
-      $fields['AllowRestart'] = ($this->status == 'running') && $this->acl_is_writeable('simpleServiceRestart');
+      $fields['AllowStatus']  = ($this->status == '') && $this->aclIsWriteable('simpleServiceStatus');
+      $fields['AllowStart']   = ($this->status == 'stopped') && $this->aclIsWriteable('simpleServiceStart');
+      $fields['AllowStop']    = ($this->status == 'running') && $this->aclIsWriteable('simpleServiceStop');
+      $fields['AllowRestart'] = ($this->status == 'running') && $this->aclIsWriteable('simpleServiceRestart');
     } else {
       /* Disable some functions */
       $fields['AllowStatus']  = FALSE;
@@ -95,8 +95,8 @@ class SimpleService extends SimplePlugin
       $fields['AllowRestart'] = FALSE;
     }
 
-    $fields['AllowRemove']  = $this->acl_is_removeable();
-    $fields['AllowEdit']    = $this->acl_is_readable('');
+    $fields['AllowRemove']  = $this->aclIsRemoveable();
+    $fields['AllowEdit']    = $this->aclIsReadable('');
 
     return $fields;
   }

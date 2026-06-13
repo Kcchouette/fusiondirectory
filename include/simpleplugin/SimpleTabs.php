@@ -96,7 +96,7 @@ class SimpleTabs implements FusionDirectoryDialog
         $this->by_object[$tab['CLASS']] = new $tab['CLASS']($this->dn, $this->by_object[$this->baseclass], $this, FALSE);
       }
 
-      $this->by_object[$tab['CLASS']]->set_acl_category($this->acl_category);
+      $this->by_object[$tab['CLASS']]->setAclCategory($this->acl_category);
     }
 
     /* Initialize current */
@@ -123,7 +123,7 @@ class SimpleTabs implements FusionDirectoryDialog
    *
    * This maybe usefull if for example the apply button was pressed.
    */
-  function re_init ()
+  function reInit ()
   {
     $baseobject = NULL;
     foreach ($this->by_object as $name => $object) {
@@ -137,7 +137,7 @@ class SimpleTabs implements FusionDirectoryDialog
       } else {
         $this->by_object[$name] = new $class($this->dn, $baseobject, $this, FALSE);
       }
-      $this->by_object[$name]->set_acl_category($this->acl_category);
+      $this->by_object[$name]->setAclCategory($this->acl_category);
     }
   }
 
@@ -199,7 +199,7 @@ class SimpleTabs implements FusionDirectoryDialog
   /*!
    * \brief Save a tabs object
    */
-  function save_object ()
+  function saveObject ()
   {
     trigger_error('obsolete');
     $this->readPost();
@@ -353,7 +353,7 @@ class SimpleTabs implements FusionDirectoryDialog
    */
   public function delete (bool $checkAcl = TRUE): array
   {
-    if ($checkAcl && !$this->getBaseObject()->acl_is_removeable()) {
+    if ($checkAcl && !$this->getBaseObject()->aclIsRemoveable()) {
       return [new SimplePluginPermissionError($this, MsgPool::permDelete($this->getBaseObject()->dn))];
     }
 
@@ -377,7 +377,7 @@ class SimpleTabs implements FusionDirectoryDialog
     $messages = [];
 
     if ($this->getBaseObject()->is_template) {
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $ldap->cd($config->current['BASE']);
       $filter = '(&(objectClass=fdTemplate)(cn='.ldap_escape_f($this->getBaseObject()->_template_cn).'))';
       $ldap->search($filter, ['dn']);
@@ -430,7 +430,7 @@ class SimpleTabs implements FusionDirectoryDialog
     $baseobject = $this->getBaseObject();
     $old_dn     = $this->dn;
     try {
-      $new_dn     = $baseobject->compute_dn();
+      $new_dn     = $baseobject->computeDn();
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $new_dn, 'Saving');
     } catch (FusionDirectoryException $e) {
       return [
@@ -512,12 +512,12 @@ class SimpleTabs implements FusionDirectoryDialog
    * \param array $attrs an LDAP-like values array
    * \param array $skip Attributes to skip
    */
-  function adapt_from_template (array $attrs, array $skip = [])
+  function adaptFromTemplate (array $attrs, array $skip = [])
   {
     foreach ($this->by_object as $key => &$obj) {
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $key, "Adapting");
       $obj->parent = &$this;
-      $obj->adapt_from_template($attrs, $skip);
+      $obj->adaptFromTemplate($attrs, $skip);
     }
     unset($obj);
   }
@@ -537,7 +537,7 @@ class SimpleTabs implements FusionDirectoryDialog
       $this->by_name[$tab['CLASS']]   = $tab['NAME'];
       $this->plNotify[$tab['CLASS']]  = FALSE;
       $this->by_object[$tab['CLASS']] = new $tab['CLASS']($this->dn, $baseobject, $this, FALSE);
-      $this->by_object[$tab['CLASS']]->set_acl_category($this->acl_category);
+      $this->by_object[$tab['CLASS']]->setAclCategory($this->acl_category);
     }
   }
 
@@ -574,7 +574,7 @@ class SimpleTabs implements FusionDirectoryDialog
 
   public function dialogOpened (): bool
   {
-    return $this->by_object[$this->current]->is_modal_dialog();
+    return $this->by_object[$this->current]->isModalDialog();
   }
 
   function objectInfos ()

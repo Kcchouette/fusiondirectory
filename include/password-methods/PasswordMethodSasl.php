@@ -57,7 +57,7 @@ class PasswordMethodSasl extends PasswordMethod
     if (($userTab !== NULL) && isset($userTab->$attr)) {
       $this->uid = $userTab->$attr;
     } else {
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $ldap->cd($config->current['BASE']);
       $ldap->cat($dn, [$attr]);
       if ($ldap->count() == 1) {
@@ -75,7 +75,7 @@ class PasswordMethodSasl extends PasswordMethod
    *
    * \return TRUE if is avaibable
    */
-  public function is_available (): bool
+  public function isAvailable (): bool
   {
     if (empty($this->realm) && empty($this->exop)) {
       return FALSE;
@@ -91,7 +91,7 @@ class PasswordMethodSasl extends PasswordMethod
    *
    * \return string the password hash
    */
-  public function generate_hash (string $pwd, bool $locked = FALSE): string
+  public function generateHash (string $pwd, bool $locked = FALSE): string
   {
     if (empty($this->exop)) {
       if (empty($this->realm)) {
@@ -114,7 +114,7 @@ class PasswordMethodSasl extends PasswordMethod
   /*!
    * \brief Get the hash name
    */
-  static function get_hash_name ()
+  static function getHashName ()
   {
     return 'sasl';
   }
@@ -124,7 +124,7 @@ class PasswordMethodSasl extends PasswordMethod
    *
    * \return boolean
    */
-  function need_password (): bool
+  function needPassword (): bool
   {
     global $config;
     return ($config->get_cfg_value('forceSaslPasswordAsk', 'FALSE') == 'TRUE');

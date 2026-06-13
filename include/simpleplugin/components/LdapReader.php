@@ -18,17 +18,17 @@ class LdapReader
 
     public function isThisAccount(array $attrs): bool
     {
-        return $this->plugin->is_this_account($attrs);
+        return $this->plugin->isThisAccount($attrs);
     }
 
     public function ldapSave(): array
     {
-        return $this->plugin->ldap_save();
+        return $this->plugin->ldapSave();
     }
 
     public function ldapRemove(): array
     {
-        return $this->plugin->ldap_remove();
+        return $this->plugin->ldapRemove();
     }
 
     public function getObjectClassFilter(): string
@@ -38,6 +38,6 @@ class LdapReader
 
     public function computeDn(): string
     {
-        return $this->plugin->compute_dn();
+        return $this->plugin->computeDn();
     }
 }

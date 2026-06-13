@@ -46,7 +46,7 @@ class Tests
    *
    * \param string $nr The phone number to check
    */
-  public static function is_phone_nr ($nr)
+  public static function isPhoneNr ($nr)
   {
     if ($nr == "") {
       return TRUE;
@@ -61,7 +61,7 @@ class Tests
    *
    * \param string $str The DNS to check
    */
-  public static function is_dns_name ($str)
+  public static function isDnsName ($str)
   {
     return preg_match("/^[a-z0-9\.\-_]*$/i", $str);
   }
@@ -72,7 +72,7 @@ class Tests
    *
    * \param string $str The hostname to check
    */
-  public static function is_valid_hostname ($str)
+  public static function isValidHostname ($str)
   {
     return preg_match("/^[a-z0-9\.\-]*$/i", $str);
   }
@@ -83,7 +83,7 @@ class Tests
    *
    * \param string $url The URL to check
    */
-  public static function is_url ($url)
+  public static function isUrl ($url)
   {
     if ($url == "") {
       return TRUE;
@@ -99,7 +99,7 @@ class Tests
    *
    * \param string $dn The DN to check
    */
-  public static function is_dn ($dn)
+  public static function isDn ($dn)
   {
     if ($dn == "") {
       return TRUE;
@@ -114,7 +114,7 @@ class Tests
    *
    * \param string $uid The UID to check
    */
-  public static function is_uid ($uid)
+  public static function isUid ($uid)
   {
     if ($uid == "") {
       return TRUE;
@@ -134,7 +134,7 @@ class Tests
    *
    * \param string $ip The IP to check
    */
-  public static function is_ip ($ip)
+  public static function isIp ($ip)
   {
     return filter_var($ip, FILTER_VALIDATE_IP);
   }
@@ -165,7 +165,7 @@ class Tests
    *
    * \param string $mac The MAC address to check
    */
-  public static function is_mac ($mac)
+  public static function isMac ($mac)
   {
     return preg_match('/^([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}$/', $mac);
   }
@@ -173,11 +173,11 @@ class Tests
 
   /*!
    * \brief Checks if the given ip address doesn't match
-   *  "is_ip" because there is also a sub net mask given
+   *  "isIp" because there is also a sub net mask given
    *
    * \param string $ip The IP to check
    */
-  public static function is_ip_with_subnetmask ($ip)
+  public static function isIpWithSubnetmask ($ip)
   {
     /* Generate list of valid submasks */
     $res = [];
@@ -223,7 +223,7 @@ class Tests
    *
    * \param string $str The domain to check
    */
-  public static function is_domain ($str)
+  public static function isDomain ($str)
   {
     return preg_match("/^(([a-z0-9\-]{2,63})\.)*[a-z]{2,63}$/i", $str);
   }
@@ -234,7 +234,7 @@ class Tests
    *
    * \param string $id The id to check
    */
-  public static function is_id ($id)
+  public static function isId ($id)
   {
     if ($id == "") {
       return FALSE;
@@ -249,7 +249,7 @@ class Tests
    *
    * \param string $path The path to check
    */
-  public static function is_path ($path)
+  public static function isPath ($path)
   {
     if ($path == "") {
       return TRUE;
@@ -267,7 +267,7 @@ class Tests
    *
    * \param string $address The email address
    */
-  public static function is_email ($address)
+  public static function isEmail ($address)
   {
     /* last test is to allow addresses like example@localhost, which are refused by some PHP version */
     return (($address == '')
@@ -283,7 +283,7 @@ class Tests
    *
    * \param string $base
    */
-  public static function is_department_name_reserved ($name)
+  public static function isDepartmentNameReserved ($name)
   {
     global $config;
     $reservedNames = [];
@@ -306,7 +306,7 @@ class Tests
    *
    * \return TRUE in case of a valid range, FALSE in case of an error.
    */
-  public static function is_ip_range ($ip1, $ip2)
+  public static function isIpRange ($ip1, $ip2)
   {
     if (!Tests::is_ipv4($ip1) || !Tests::is_ipv4($ip2)) {
       return FALSE;
@@ -330,7 +330,7 @@ class Tests
    *
    * \param string $address The IPv4 address
    */
-  public static function is_in_network ($network, $netmask, $address)
+  public static function isInNetwork ($network, $netmask, $address)
   {
     $nw = array_map('intval', explode('.', $network));
     $nm = array_map('intval', explode('.', $netmask));
@@ -353,7 +353,7 @@ class Tests
   }
 
   /* \brief Check if the specified IPv4 address $address is inside the given network */
-  public static function is_in_ip_range ($from, $to, $address)
+  public static function isInIpRange ($from, $to, $address)
   {
     $from = array_map('intval', explode('.', $from));
     $to   = array_map('intval', explode('.', $to));
@@ -368,7 +368,7 @@ class Tests
   }
 
   /* \brief Check if the value is a valid orcid id */
-  public static function is_orcid ($orcid)
+  public static function isOrcid ($orcid)
   {
     /* Remove hyphens, remove last digit, convert to array */
     $baseDigits = str_split(str_replace('-', '', $orcid));

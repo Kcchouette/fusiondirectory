@@ -168,7 +168,7 @@ class MsgDialog
    *
    * \return True if is confirmed, else return false
    */
-  public function is_confirmed (): bool
+  public function isConfirmed (): bool
   {
     return isset($_POST['MSG_OK'.$this->i_ID]);
   }

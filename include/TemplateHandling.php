@@ -33,7 +33,7 @@ class TemplateHandling
   {
     global $config;
 
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     $ldap->cat($dn);
     $attrs    = $ldap->fetch(TRUE);
     $attrs    = static::fieldsFromLDAP($attrs);
@@ -243,7 +243,7 @@ class TemplateHandling
     $string = $generator->current();
 
     if (($unique !== NULL) && !empty($vars)) {
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $ldap->cd($config->current['BASE']);
       /* Return the first found unique value */
       foreach ($generator as $value) {

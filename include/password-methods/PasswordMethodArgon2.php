@@ -39,7 +39,7 @@ class PasswordMethodArgon2 extends PasswordMethod
    *
    * \return TRUE if is available, otherwise return false
    */
-  public function is_available (): bool
+  public function isAvailable (): bool
   {
     return defined('PASSWORD_ARGON2ID') && function_exists('password_hash') && function_exists('password_verify');
   }
@@ -52,7 +52,7 @@ class PasswordMethodArgon2 extends PasswordMethod
    *
    * \return string the password hash
    */
-  public function generate_hash (string $pwd, bool $locked = FALSE): string
+  public function generateHash (string $pwd, bool $locked = FALSE): string
   {
     $hash = password_hash($pwd, PASSWORD_ARGON2ID);
     return '{ARGON2}'.($locked ? '!' : '').$hash;
@@ -94,7 +94,7 @@ class PasswordMethodArgon2 extends PasswordMethod
   /*!
    * \brief Get the hash name
    */
-  static function get_hash_name ()
+  static function getHashName ()
   {
     return 'argon2';
   }
@@ -107,7 +107,7 @@ class PasswordMethodArgon2 extends PasswordMethod
   static function _extract_method ($password_hash): string
   {
     if (preg_match('/^\{ARGON2\}/i', $password_hash)) {
-      return static::get_hash_name();
+      return static::getHashName();
     }
 
     return '';

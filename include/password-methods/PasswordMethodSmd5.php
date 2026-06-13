@@ -44,7 +44,7 @@ class PasswordMethodSmd5 extends PasswordMethod
    *
    * \return TRUE if is avaibable, otherwise return false
    */
-  public function is_available (): bool
+  public function isAvailable (): bool
   {
     return function_exists('md5');
   }
@@ -57,7 +57,7 @@ class PasswordMethodSmd5 extends PasswordMethod
    *
    * \return string the password hash
    */
-  public function generate_hash (string $pwd, bool $locked = FALSE): string
+  public function generateHash (string $pwd, bool $locked = FALSE): string
   {
     $salt0  = substr(pack('h*', md5(strval(random_int(0, PHP_INT_MAX)))), 0, 8);
     $salt   = substr(pack('H*', md5($salt0 . $pwd)), 0, 4);
@@ -76,7 +76,7 @@ class PasswordMethodSmd5 extends PasswordMethod
   /*!
    * \brief Get the hash name
    */
-  static function get_hash_name ()
+  static function getHashName ()
   {
     return 'smd5';
   }

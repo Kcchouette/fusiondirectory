@@ -77,7 +77,7 @@ class UserInfo
     $this->loadLDAPInfo();
 
     /* Initialize ACL_CACHE */
-    $this->reset_acl_cache();
+    $this->resetAclCache();
 
     $this->sizeLimitHandler = new LdapSizeLimit();
   }
@@ -86,11 +86,11 @@ class UserInfo
   function loadLDAPInfo ()
   {
     global $config;
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     $ldap->cat($this->dn, ['*']);
     $attrs = $ldap->fetch(TRUE);
     if (!$ldap->success()) {
-      throw new FusionDirectoryLdapError($this->dn, LDAP_SEARCH, $ldap->get_error(), $ldap->get_errno());
+      throw new FusionDirectoryLdapError($this->dn, LDAP_SEARCH, $ldap->getError(), $ldap->getErrno());
     }
 
     $this->uid = $attrs['uid'][0];
@@ -126,7 +126,7 @@ class UserInfo
   /*!
   * \brief Reset acl cache
   */
-  public function reset_acl_cache ()
+  public function resetAclCache ()
   {
     /* Initialize ACL_CACHE */
     Session::set('ACL_CACHE', []);
@@ -143,8 +143,8 @@ class UserInfo
     $this->groups       = [];
     $this->roles        = [];
     $this->result_cache = [];
-    $this->reset_acl_cache();
-    $ldap = $config->get_ldap_link();
+    $this->resetAclCache();
+    $ldap = $config->getLdapLink();
     $ldap->cd($config->current['BASE']);
     $targetFilterLimit  = $config->get_cfg_value('AclTargetFilterLimit', 100);
 
@@ -230,14 +230,14 @@ class UserInfo
           continue;
         }
 
-        if (!empty($ACLRule['userfilter']) && !$ldap->object_match_filter($this->dn, $ACLRule['userfilter'])) {
+        if (!empty($ACLRule['userfilter']) && !$ldap->objectMatchFilter($this->dn, $ACLRule['userfilter'])) {
           /* We do not match the user filter */
           continue;
         }
 
         if (!empty($ACLRule['targetfilter'])) {
           $ldap->cd($dn);
-          $ldap->set_size_limit($targetFilterLimit);
+          $ldap->setSizeLimit($targetFilterLimit);
           $targetFilter = TemplateHandling::parseString($ACLRule['targetfilter'], $this->cachedAttrs, 'ldap_escape_f');
           $ldap->search($targetFilter, ['dn']);
           if ($ldap->hitSizeLimit()) {
@@ -253,7 +253,7 @@ class UserInfo
           while ($targetAttrs = $ldap->fetch()) {
             $targetDns[] = $targetAttrs['dn'];
           }
-          $ldap->set_size_limit(0);
+          $ldap->setSizeLimit(0);
         } else {
           $targetDns = [$dn];
         }
@@ -352,7 +352,7 @@ class UserInfo
    *
    * \return Return the next id or NULL if failed
    */
-  function get_acl_target_objects ()
+  function getAclTargetObjects ()
   {
     return array_keys($this->ACLperPath);
   }
@@ -366,9 +366,9 @@ class UserInfo
    *
    * \return all the permissions for the dn and category
    */
-  function get_category_permissions ($dn, $category)
+  function getCategoryPermissions ($dn, $category)
   {
-    return $this->get_permissions($dn, $category.'/0', '');
+    return $this->getPermissions($dn, $category.'/0', '');
   }
 
 
@@ -381,9 +381,9 @@ class UserInfo
    *
    * \return boolean TRUE if the given object is copyable else FALSE
   */
-  function is_copyable ($dn, $object): bool
+  function isCopyable ($dn, $object): bool
   {
-    return (strpos($this->get_complete_category_acls($dn, $object), 'r') !== FALSE);
+    return (strpos($this->getCompleteCategoryAcls($dn, $object), 'r') !== FALSE);
   }
 
 
@@ -398,10 +398,10 @@ class UserInfo
    *
    * \return boolean TRUE if the given object is cutable else FALSE
    */
-  function is_cutable ($dn, $object, $class): bool
+  function isCutable ($dn, $object, $class): bool
   {
-    $remove = (strpos($this->get_permissions($dn, $object.'/'.$class), 'd') !== FALSE);
-    $read   = (strpos($this->get_complete_category_acls($dn, $object), 'r') !== FALSE);
+    $remove = (strpos($this->getPermissions($dn, $object.'/'.$class), 'd') !== FALSE);
+    $read   = (strpos($this->getCompleteCategoryAcls($dn, $object), 'r') !== FALSE);
     return ($remove && $read);
   }
 
@@ -415,9 +415,9 @@ class UserInfo
    *
    * \return Boolean TRUE if we are allowed to paste an object.
    */
-  function is_pasteable ($dn, $object): bool
+  function isPasteable ($dn, $object): bool
   {
-    return (strpos($this->get_complete_category_acls($dn, $object), 'w') !== FALSE);
+    return (strpos($this->getCompleteCategoryAcls($dn, $object), 'w') !== FALSE);
   }
 
 
@@ -432,9 +432,9 @@ class UserInfo
    *
    * \return boolean TRUE if we are allowed to restore a snapshot.
    */
-  function allow_snapshot_restore ($dn, $categories, $deleted): bool
+  function allowSnapshotRestore ($dn, $categories, $deleted): bool
   {
-    $permissions = $this->get_snapshot_permissions($dn, $categories);
+    $permissions = $this->getSnapshotPermissions($dn, $categories);
     return in_array(($deleted ? 'restore_deleted' : 'restore_over'), $permissions);
   }
 
@@ -448,9 +448,9 @@ class UserInfo
    *
    * \return boolean TRUE if we are allowed to create a snapshot.
    */
-  function allow_snapshot_create ($dn, $categories): bool
+  function allowSnapshotCreate ($dn, $categories): bool
   {
-    $permissions = $this->get_snapshot_permissions($dn, $categories);
+    $permissions = $this->getSnapshotPermissions($dn, $categories);
     return in_array('c', $permissions);
   }
 
@@ -464,13 +464,13 @@ class UserInfo
    *
    * \return boolean TRUE if we are allowed to delete a snapshot.
    */
-  function allow_snapshot_delete ($dn, $categories): bool
+  function allowSnapshotDelete ($dn, $categories): bool
   {
-    $permissions = $this->get_snapshot_permissions($dn, $categories);
+    $permissions = $this->getSnapshotPermissions($dn, $categories);
     return in_array('d', $permissions);
   }
 
-  function get_snapshot_permissions ($dn, $categories)
+  function getSnapshotPermissions ($dn, $categories)
   {
     if (!is_array($categories)) {
       $categories = [$categories];
@@ -479,14 +479,14 @@ class UserInfo
     $objectPermissions    = ['r', 'c', 'd'];
     $attributePermissions = ['restore_over', 'restore_deleted'];
     foreach ($categories as $category) {
-      $acl = $this->get_permissions($dn, $category.'/SnapshotHandler');
+      $acl = $this->getPermissions($dn, $category.'/SnapshotHandler');
       foreach ($objectPermissions as $i => $perm) {
         if (strpos($acl, $perm) === FALSE) {
           unset($objectPermissions[$i]);
         }
       }
       foreach ($attributePermissions as $i => $attribute) {
-        $acl = $this->get_permissions($dn, $category.'/SnapshotHandler', $attribute);
+        $acl = $this->getPermissions($dn, $category.'/SnapshotHandler', $attribute);
         if (strpos($acl, 'w') === FALSE) {
           unset($attributePermissions[$i]);
         }
@@ -507,7 +507,7 @@ class UserInfo
    * \param bool $skip_write   Remove the write acl for this dn
    *
    */
-  function get_permissions ($dn, $object, $attribute = '', $skip_write = FALSE)
+  function getPermissions ($dn, $object, $attribute = '', $skip_write = FALSE)
   {
     global $config;
     /* If we are forced to skip ACLs checks for the current user
@@ -638,7 +638,7 @@ class UserInfo
    *
    * \return array Return all accessible departments
    */
-  function get_module_departments ($module, bool $skip_self_acls = FALSE): array
+  function getModuleDepartments ($module, bool $skip_self_acls = FALSE): array
   {
     global $config;
     /* If we are forced to skip ACLs checks for the current user
@@ -701,9 +701,9 @@ class UserInfo
         }
         $acl = '';
         if (strpos($mod, '/')) {
-          $acl .= $this->get_permissions($dn, $mod);
+          $acl .= $this->getPermissions($dn, $mod);
         } else {
-          $acl .= $this->get_category_permissions($dn, $mod);
+          $acl .= $this->getCategoryPermissions($dn, $mod);
         }
         if (!empty($acl)) {
           $deps[$dn] = $dn;
@@ -733,7 +733,7 @@ class UserInfo
    *
    * \return string return acl combined with boolean AND
    */
-  function get_complete_category_acls ($dn, $category)
+  function getCompleteCategoryAcls ($dn, $category)
   {
     global $config;
 
@@ -741,8 +741,8 @@ class UserInfo
       trigger_error('category must be string');
       return '';
     } else {
-      if (isset($this->result_cache['get_complete_category_acls'][$dn][$category])) {
-        return $this->result_cache['get_complete_category_acls'][$dn][$category];
+      if (isset($this->result_cache['getCompleteCategoryAcls'][$dn][$category])) {
+        return $this->result_cache['getCompleteCategoryAcls'][$dn][$category];
       }
       $acl = 'rwcdm';
       if (isset($config->data['CATEGORIES'][$category])) {
@@ -751,7 +751,7 @@ class UserInfo
             /* Skip objectClass '0' (e.g. user/0) */
             continue;
           }
-          $tmp = $this->get_permissions($dn, $category.'/'.$oc);
+          $tmp = $this->getPermissions($dn, $category.'/'.$oc);
           $types = $acl;
           for ($i = 0, $l = strlen($types); $i < $l; $i++) {
             if (strpos($tmp, $types[$i]) === FALSE) {
@@ -762,7 +762,7 @@ class UserInfo
       } else {
         $acl = '';
       }
-      $this->result_cache['get_complete_category_acls'][$dn][$category] = $acl;
+      $this->result_cache['getCompleteCategoryAcls'][$dn][$category] = $acl;
       return $acl;
     }
   }
@@ -809,11 +809,11 @@ class UserInfo
     }
 
     // Skip this for the admin account, we do not want to lock him out.
-    if ($this->is_user_admin()) {
+    if ($this->isUserAdmin()) {
       return 0;
     }
 
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
 
     if (class_available('ppolicyAccount')) {
       try {
@@ -925,13 +925,13 @@ class UserInfo
 
   /* \brief Check if a user is a 'user admin'
    */
-  function is_user_admin ()
+  function isUserAdmin ()
   {
     global $config;
     if (empty($this->ACLperPath)) {
       $this->loadACL();
     }
-    return ($this->get_permissions($config->current['BASE'], 'user/user') == 'rwcdm');
+    return ($this->getPermissions($config->current['BASE'], 'user/user') == 'rwcdm');
   }
 
   /* \brief Test if a plugin is blacklisted for this user (does not show up in the menu)
@@ -1040,9 +1040,9 @@ class UserInfo
     global $config;
 
     /* look through the entire ldap */
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     if (!$ldap->success()) {
-      throw new FatalError(MsgPool::ldaperror($ldap->get_error(FALSE), '', LDAP_AUTH));
+      throw new FatalError(MsgPool::ldaperror($ldap->getError(FALSE), '', LDAP_AUTH));
     }
 
     $allowed_attributes = ['uid','mail'];
@@ -1123,10 +1123,10 @@ class UserInfo
     );
     $ldap = new LdapMultiplexer($ldapObj);
     if (!$ldap->success()) {
-      if ($ldap->get_error(FALSE) == 'changeAfterReset') {
+      if ($ldap->getError(FALSE) == 'changeAfterReset') {
         $ui->forcePasswordChange = TRUE;
       } else {
-        throw new LoginFailureException($ldap->get_error(FALSE));
+        throw new LoginFailureException($ldap->getError(FALSE));
       }
     }
 

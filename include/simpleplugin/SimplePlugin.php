@@ -53,7 +53,7 @@ class SimplePlugin implements SimpleTab
     function, else the save function. Should be set to 'TRUE' if
     the construtor detects a valid LDAP object.
 
-    \sa SimplePlugin::is_this_account()
+    \sa SimplePlugin::isThisAccount()
    */
   public bool $is_account            = false;
   public bool $initially_was_account = false;
@@ -99,7 +99,7 @@ class SimplePlugin implements SimpleTab
   protected array $objectclasses = [];
 
   /*! \brief The state of the attributes when we opened the object */
-  protected array $saved_attributes = []; // Note : This is overwritten during post_save logic
+  protected array $saved_attributes = []; // Note : This is overwritten during postSave logic
   // Requiring therefore a save to threat this during logging mechanism.
   protected array $beforeLdapChangeAttributes = [];
 
@@ -126,7 +126,7 @@ class SimplePlugin implements SimpleTab
    */
   protected string $inheritance     = '';
   protected bool $member_of_group = false;
-  protected ?string $editing_group   = null;
+  protected ?string $editingGroup   = null;
   protected array $group_attrs     = [];
 
   /*! \brief Used when the entry is opened as "readonly" due to locks */
@@ -261,7 +261,7 @@ class SimplePlugin implements SimpleTab
         }
       } else {
         /* From LDAP */
-        $ldap = $config->get_ldap_link();
+        $ldap = $config->getLdapLink();
         $ldap->cat($this->dn);
         $this->attrs = $ldap->fetch(TRUE);
         if (empty($this->attrs)) {
@@ -283,7 +283,7 @@ class SimplePlugin implements SimpleTab
       }
 
       /* Is Account? */
-      if ($this->is_this_account($this->attrs)) {
+      if ($this->isThisAccount($this->attrs)) {
         $this->is_account = TRUE;
         Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, get_class($this), 'Tab active');
       }
@@ -291,7 +291,7 @@ class SimplePlugin implements SimpleTab
 
     if (is_array($this->inheritance)) {
       /* Check group membership */
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $ldap->cd($config->current['BASE']);
       foreach ($this->inheritance as $oc => $at) {
         if ($this->mainTab) {
@@ -362,12 +362,12 @@ class SimplePlugin implements SimpleTab
     unset($sectionInfo);
   }
 
-  function is_this_account ($attrs)
+  function isThisAccount ($attrs)
   {
     $result = static::isAccount($attrs);
     if ($result === NULL) {
       if (!empty($this->objectclasses)) {
-        trigger_error('Deprecated fallback was used for ' . get_called_class() . '::is_this_account');
+        trigger_error('Deprecated fallback was used for ' . get_called_class() . '::isThisAccount');
       }
       $found = TRUE;
       foreach ($this->objectclasses as $obj) {
@@ -429,7 +429,7 @@ class SimplePlugin implements SimpleTab
   protected function templateSaveAttrs ()
   {
     global $config;
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     $ldap->cat($this->dn);
     $template_attrs = $ldap->fetch(TRUE);
     if (!$template_attrs) {
@@ -508,7 +508,7 @@ class SimplePlugin implements SimpleTab
 
   /*! \brief This function returns the dn this object should have
    */
-  public function compute_dn (): string
+  public function computeDn (): string
   {
     global $config;
     if (!$this->mainTab) {
@@ -568,7 +568,7 @@ class SimplePlugin implements SimpleTab
    *
    * \return array [dn] => "..name"  // All deps. we are allowed to act on.
   */
-  function get_allowed_bases (): array
+  function getAllowedBases (): array
   {
     global $config;
     $deps = [];
@@ -577,8 +577,8 @@ class SimplePlugin implements SimpleTab
     $departmentTree = $config->getDepartmentTree();
     foreach ($departmentTree as $dn => $name) {
       if (
-        (!$this->initially_was_account && $this->acl_is_createable($dn)) ||
-        ($this->initially_was_account && $this->acl_is_moveable($dn))
+        (!$this->initially_was_account && $this->aclIsCreateable($dn)) ||
+        ($this->initially_was_account && $this->aclIsMoveable($dn))
       ) {
         $deps[$dn] = $name;
       }
@@ -598,7 +598,7 @@ class SimplePlugin implements SimpleTab
    *
    * \param string $category
    */
-  function set_acl_category (string $category)
+  function setAclCategory (string $category)
   {
     $this->acl_category = "$category/";
   }
@@ -622,18 +622,18 @@ class SimplePlugin implements SimpleTab
     }
 
     /* Try to move with ldap routines */
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     $ldap->cd($config->current['BASE']);
     try {
-      $ldap->create_missing_trees(preg_replace('/^[^,]+,/', '', $dst_dn));
+      $ldap->createMissingTrees(preg_replace('/^[^,]+,/', '', $dst_dn));
     } catch (FusionDirectoryError $error) {
       $error->display();
     }
-    if (!$ldap->rename_dn($src_dn, $dst_dn)) {
-      Logging::log('error', 'ldap', "FROM: $src_dn -- TO: $dst_dn", [], 'Ldap Protocol v3 implementation error, ldap_rename failed: ' . $ldap->get_error());
+    if (!$ldap->renameDn($src_dn, $dst_dn)) {
+      Logging::log('error', 'ldap', "FROM: $src_dn -- TO: $dst_dn", [], 'Ldap Protocol v3 implementation error, ldap_rename failed: ' . $ldap->getError());
       Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, "Rename failed FROM: $src_dn  -- TO:  $dst_dn",
-                     'Ldap Protocol v3 implementation error. Error:' . $ldap->get_error());
-      return $ldap->get_error();
+                     'Ldap Protocol v3 implementation error. Error:' . $ldap->getError());
+      return $ldap->getError();
     }
 
     /* Update userinfo if necessary */
@@ -646,7 +646,7 @@ class SimplePlugin implements SimpleTab
     $ldap->search('(objectClass=gosaDepartment)', ['dn']);
     if ($ldap->count()) {
       $config->resetDepartmentCache();
-      $ui->reset_acl_cache();
+      $ui->resetAclCache();
     }
 
     $this->handleForeignKeys($src_dn, $dst_dn);
@@ -664,16 +664,16 @@ class SimplePlugin implements SimpleTab
     return $tmp;
   }
 
-  function editing_group ()
+  function editingGroup ()
   {
-    if ($this->editing_group == NULL) {
+    if ($this->editingGroup == NULL) {
       if (isset($this->parent)) {
-        $this->editing_group = (get_class($this->parent->getBaseObject()) == 'ogroup');
+        $this->editingGroup = (get_class($this->parent->getBaseObject()) == 'ogroup');
       } else {
         return NULL;
       }
     }
-    return $this->editing_group;
+    return $this->editingGroup;
   }
 
   /*! \brief Indicates if this object is opened as read-only (because of locks) */
@@ -726,7 +726,7 @@ class SimplePlugin implements SimpleTab
       /* Show tab dialog headers */
       if ($this->parent !== NULL) {
         list($disabled, $buttonHtmlText, $htmlText) = $this->getDisplayHeaderInfos();
-        $this->header = $this->show_header(
+        $this->header = $this->showHeader(
           $buttonHtmlText,
           $htmlText,
           $this->is_account,
@@ -763,7 +763,7 @@ class SimplePlugin implements SimpleTab
   public function getDisplayHeaderInfos (): array
   {
     $plInfo   = Pluglist::pluginInfos(get_class($this));
-    $disabled = $this->acl_skip_write();
+    $disabled = $this->aclSkipWrite();
     if ($this->is_account) {
       $depends = [];
       if (isset($plInfo['plDepending'])) {
@@ -820,9 +820,9 @@ class SimplePlugin implements SimpleTab
    *
    * \param string $name The html name of the input, defaults to modify_state
    */
-  function show_header (string $buttonHtmlText, string $htmlText, bool $plugin_enabled, bool $button_disabled = FALSE, string $name = 'modify_state'): string
+  function showHeader (string $buttonHtmlText, string $htmlText, bool $plugin_enabled, bool $button_disabled = FALSE, string $name = 'modify_state'): string
   {
-    if ($button_disabled || ((!$this->acl_is_createable() && !$plugin_enabled) || (!$this->acl_is_removeable() && $plugin_enabled))) {
+    if ($button_disabled || ((!$this->aclIsCreateable() && !$plugin_enabled) || (!$this->aclIsRemoveable() && $plugin_enabled))) {
       $state = 'disabled="disabled"';
     } else {
       $state = '';
@@ -864,7 +864,7 @@ class SimplePlugin implements SimpleTab
     if ($attr->getAcl() == 'noacl') {
       return TRUE;
     }
-    return $this->acl_is_readable($attr->getAcl());
+    return $this->aclIsReadable($attr->getAcl());
   }
 
   /*! \brief Check if logged in user have enough right to write this attribute value
@@ -878,14 +878,14 @@ class SimplePlugin implements SimpleTab
     }
     if ($attr->getLdapName() == 'base') {
       return (
-        !$this->acl_skip_write() &&
-        (!$this->initially_was_account || $this->acl_is_moveable() || $this->acl_is_removeable())
+        !$this->aclSkipWrite() &&
+        (!$this->initially_was_account || $this->aclIsMoveable() || $this->aclIsRemoveable())
       );
     }
     if ($attr->getAcl() == 'noacl') {
       return FALSE;
     }
-    return $this->acl_is_writeable($attr->getAcl(), $this->acl_skip_write());
+    return $this->aclIsWriteable($attr->getAcl(), $this->aclSkipWrite());
   }
 
   /*!
@@ -914,7 +914,7 @@ class SimplePlugin implements SimpleTab
     $smarty = get_smarty();
 
     if ($this->is_template) {
-      $smarty->assign('template_cnACL', $ui->get_permissions($this->getAclBase(), $this->acl_category . 'Template', 'template_cn', $this->acl_skip_write()));
+      $smarty->assign('template_cnACL', $ui->getPermissions($this->getAclBase(), $this->acl_category . 'Template', 'template_cn', $this->aclSkipWrite()));
     }
 
     /* Handle rights to modify the base */
@@ -940,7 +940,7 @@ class SimplePlugin implements SimpleTab
       foreach ($sectionInfo['attrs'] as $attr) {
         if ($attr->getAclInfo() !== FALSE) {
           // We assign ACLs so that attributes can use them in their template code
-          $smarty->assign($attr->getAcl() . 'ACL', $this->aclGetPermissions($attr->getAcl(), NULL, $this->acl_skip_write()));
+          $smarty->assign($attr->getAcl() . 'ACL', $this->aclGetPermissions($attr->getAcl(), NULL, $this->aclSkipWrite()));
         }
         $readable = $this->attrIsReadable($attr);
         $writable = $this->attrIsWriteable($attr);
@@ -1003,13 +1003,13 @@ class SimplePlugin implements SimpleTab
     $this->needEditMode = $bool;
   }
 
-  protected function acl_skip_write (): bool
+  protected function aclSkipWrite (): bool
   {
     return ($this->needEditMode && !Session::is_set('edit'));
   }
 
   /*! \brief Can we write the attribute */
-  function acl_is_writeable ($attribute, bool $skipWrite = FALSE): bool
+  function aclIsWriteable ($attribute, bool $skipWrite = FALSE): bool
   {
     return (strpos($this->aclGetPermissions($attribute, NULL, $skipWrite), 'w') !== FALSE);
   }
@@ -1019,7 +1019,7 @@ class SimplePlugin implements SimpleTab
    *
    * \param string $attribute
    */
-  function acl_is_readable ($attribute): bool
+  function aclIsReadable ($attribute): bool
   {
     return (strpos($this->aclGetPermissions($attribute), 'r') !== FALSE);
   }
@@ -1029,7 +1029,7 @@ class SimplePlugin implements SimpleTab
    *
    * \param string $base Empty string
    */
-  function acl_is_createable (?string $base = NULL): bool
+  function aclIsCreateable (?string $base = NULL): bool
   {
     return (strpos($this->aclGetPermissions('0', $base), 'c') !== FALSE);
   }
@@ -1039,7 +1039,7 @@ class SimplePlugin implements SimpleTab
    *
    * \param string $base Empty string
    */
-  function acl_is_removeable (?string $base = NULL): bool
+  function aclIsRemoveable (?string $base = NULL): bool
   {
     return (strpos($this->aclGetPermissions('0', $base), 'd') !== FALSE);
   }
@@ -1049,7 +1049,7 @@ class SimplePlugin implements SimpleTab
    *
    * \param string $base Empty string
    */
-  function acl_is_moveable (?string $base = NULL): bool
+  function aclIsMoveable (?string $base = NULL): bool
   {
     return (strpos($this->aclGetPermissions('0', $base), 'm') !== FALSE);
   }
@@ -1073,7 +1073,7 @@ class SimplePlugin implements SimpleTab
     if ($base === NULL) {
       $base = $this->getAclBase();
     }
-    return $ui->get_permissions($base, $this->acl_category . get_class($this), $attribute, $skipWrite);
+    return $ui->getPermissions($base, $this->acl_category . get_class($this), $attribute, $skipWrite);
   }
 
   /*! \brief This function removes the object from LDAP
@@ -1084,38 +1084,38 @@ class SimplePlugin implements SimpleTab
       return [];
     }
 
-    if (!$fulldelete && !$this->acl_is_removeable()) {
+    if (!$fulldelete && !$this->aclIsRemoveable()) {
       trigger_error('remove was called on a tab without enough ACL rights');
       return [];
     }
 
-    $this->prepare_remove();
+    $this->prepareRemove();
     if ($this->is_template) {
       $this->attrs            = $this->templateSaveAttrs();
       $this->saved_attributes = [];
     }
     /* Pre hooks */
-    $errors = $this->pre_remove();
+    $errors = $this->preRemove();
     if (!empty($errors)) {
       return $errors;
     }
-    $errors = $this->ldap_remove();
+    $errors = $this->ldapRemove();
     if (!empty($errors)) {
       return $errors;
     }
-    $this->post_remove();
+    $this->postRemove();
     return [];
   }
 
   /* Remove FusionDirectory attributes */
-  protected function prepare_remove ()
+  protected function prepareRemove ()
   {
     global $config;
     $this->attrs = [];
 
     if (!$this->mainTab) {
       /* include global link_info */
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
 
       /* Get current objectClasses in order to add the required ones */
       $ldap->cat($this->dn, ['fdTemplateField', 'objectClass']);
@@ -1146,25 +1146,25 @@ class SimplePlugin implements SimpleTab
     }
   }
 
-  protected function pre_remove ()
+  protected function preRemove ()
   {
     if ($this->initially_was_account) {
-      return $this->handle_pre_events('remove', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
+      return $this->handlePreEvents('remove', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
     }
   }
 
-  protected function ldap_remove (): array
+  protected function ldapRemove (): array
   {
     global $config;
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     if ($this->mainTab) {
-      $ldap->rmdir_recursive($this->dn);
+      $ldap->rmdirRecursive($this->dn);
     } else {
       $this->cleanup();
       $ldap->cd($this->dn);
       $ldap->modify($this->attrs);
     }
-    $this->ldap_error = $ldap->get_error();
+    $this->ldap_error = $ldap->getError();
 
     if ($ldap->success()) {
       return [];
@@ -1174,19 +1174,19 @@ class SimplePlugin implements SimpleTab
           $this,
           $this->dn,
           ($this->mainTab ? LDAP_DEL : LDAP_MOD),
-          $ldap->get_error(),
-          $ldap->get_errno()
+          $ldap->getError(),
+          $ldap->getErrno()
         )
       ];
     }
   }
 
-  protected function post_remove ()
+  protected function postRemove ()
   {
     Logging::log('remove', 'plugin/' . get_class($this), $this->dn, array_keys($this->attrs), $this->ldap_error);
 
     /* Optionally execute a command after we're done */
-    $errors = $this->handle_post_events('remove', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
+    $errors = $this->handlePostEvents('remove', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
     if (!empty($errors)) {
       MsgDialog::displayChecks($errors);
     }
@@ -1194,7 +1194,7 @@ class SimplePlugin implements SimpleTab
 
   /*! \brief This function handle $_POST informations
    */
-  function save_object ()
+  function saveObject ()
   {
     trigger_error('obsolete');
     $this->readPost();
@@ -1207,9 +1207,9 @@ class SimplePlugin implements SimpleTab
     Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->dn, 'readPost');
 
     if ($this->displayHeader && isset($_POST[get_class($this) . '_modify_state'])) {
-      if ($this->is_account && $this->acl_is_removeable()) {
+      if ($this->is_account && $this->aclIsRemoveable()) {
         $this->is_account = FALSE;
-      } elseif (!$this->is_account && $this->acl_is_createable()) {
+      } elseif (!$this->is_account && $this->aclIsCreateable()) {
         $this->is_account = TRUE;
       }
     }
@@ -1330,7 +1330,7 @@ class SimplePlugin implements SimpleTab
   function save (): array
   {
     Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->dn, "save");
-    $errors = $this->prepare_save();
+    $errors = $this->prepareSave();
     if (!empty($errors)) {
       return $errors;
     }
@@ -1347,18 +1347,18 @@ class SimplePlugin implements SimpleTab
       return []; /* Nothing to do here */
     }
     /* Pre hooks */
-    $errors = $this->pre_save();
+    $errors = $this->preSave();
     if (!empty($errors)) {
       return $errors;
     }
     /* LDAP save itself */
-    $errors = $this->ldap_save();
+    $errors = $this->ldapSave();
     if (!empty($errors)) {
       return $errors;
     }
     $this->prepareNextCleanup();
     /* Post hooks and logging */
-    $this->post_save();
+    $this->postSave();
     return [];
   }
 
@@ -1370,14 +1370,14 @@ class SimplePlugin implements SimpleTab
     return !empty($this->attrs);
   }
 
-  /* Used by prepare_save and Template::apply */
+  /* Used by prepareSave and Template::apply */
   public function mergeObjectClasses (array $oc): array
   {
     return array_merge_unique($oc, $this->objectclasses);
   }
 
   /* \!brief Prepare $this->attrs */
-  protected function prepare_save (): array
+  protected function prepareSave (): array
   {
     global $config;
 
@@ -1389,7 +1389,7 @@ class SimplePlugin implements SimpleTab
 
     if (!$this->mainTab || $this->initially_was_account) {
       /* Get current objectClasses in order to add the required ones */
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $ldap->cat($this->dn, ['fdTemplateField', 'objectClass']);
 
       $tmp = $ldap->fetch();
@@ -1428,24 +1428,24 @@ class SimplePlugin implements SimpleTab
     return [];
   }
 
-  protected function pre_save (): array
+  protected function preSave (): array
   {
     if ($this->initially_was_account) {
-      return $this->handle_pre_events('modify', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
+      return $this->handlePreEvents('modify', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
     } else {
-      return $this->handle_pre_events('add', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
+      return $this->handlePreEvents('add', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
     }
   }
 
   /* Returns an array with the errors or an empty array */
-  protected function ldap_save (): array
+  protected function ldapSave (): array
   {
     global $config;
 
     /* Check if this is a new entry ... add/modify */
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     if ($this->mainTab && !$this->initially_was_account) {
-      if ($ldap->dn_exists($this->dn)) {
+      if ($ldap->dnExists($this->dn)) {
         return [
           new SimplePluginError(
             $this,
@@ -1455,13 +1455,13 @@ class SimplePlugin implements SimpleTab
       }
       $ldap->cd($config->current['BASE']);
       try {
-        $ldap->create_missing_trees(preg_replace('/^[^,]+,/', '', $this->dn));
+        $ldap->createMissingTrees(preg_replace('/^[^,]+,/', '', $this->dn));
       } catch (FusionDirectoryError $error) {
         return [$error];
       }
       $action = 'add';
     } else {
-      if (!$ldap->dn_exists($this->dn)) {
+      if (!$ldap->dnExists($this->dn)) {
         return [
           new SimplePluginError(
             $this,
@@ -1474,7 +1474,7 @@ class SimplePlugin implements SimpleTab
 
     $ldap->cd($this->dn);
     $ldap->$action($this->attrs);
-    $this->ldap_error = $ldap->get_error();
+    $this->ldap_error = $ldap->getError();
 
     /* Check for errors */
     if (!$ldap->success()) {
@@ -1483,8 +1483,8 @@ class SimplePlugin implements SimpleTab
           $this,
           $this->dn,
           ($action == 'modify' ? LDAP_MOD : LDAP_ADD),
-          $ldap->get_error(),
-          $ldap->get_errno()
+          $ldap->getError(),
+          $ldap->getErrno()
         )
       ];
     }
@@ -1495,7 +1495,7 @@ class SimplePlugin implements SimpleTab
    *
    * This function calls hooks, update foreign keys and log modification
    */
-  protected function post_save ()
+  protected function postSave ()
   {
     $auditAttributesValuesToBeHidden = $this->getAuditAttributesListFromConf();
 
@@ -1509,14 +1509,14 @@ class SimplePlugin implements SimpleTab
 
     /* Propagate and log the event */
     if ($this->initially_was_account) {
-      $errors = $this->handle_post_events('modify', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
+      $errors = $this->handlePostEvents('modify', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
 
       $modifiedAttrs = $this->getModifiedAttributesValues();
       // We log values of attributes as well if modification occur in order for notification to be aware of the change. (Json allows array to string conversion).
       Logging::log('modify', 'plugin/' . get_class($this), $this->dn, [json_encode($modifiedAttrs)], $this->ldap_error);
 
     } else {
-      $errors = $this->handle_post_events('add', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
+      $errors = $this->handlePostEvents('add', ['modifiedLdapAttrs' => array_keys($this->attrs)]);
       Logging::log('create', 'plugin/' . get_class($this), $this->dn, array_keys($this->attrs), $this->ldap_error);
     }
 
@@ -1592,7 +1592,7 @@ class SimplePlugin implements SimpleTab
    *
    * \param  array  $addAttrs
    */
-  protected function handle_hooks (string $when, string $mode, array $addAttrs = []): array
+  protected function handleHooks (string $when, string $mode, array $addAttrs = []): array
   {
     switch ($mode) {
       case 'add':
@@ -1613,7 +1613,7 @@ class SimplePlugin implements SimpleTab
   /*! \brief Forward command execution requests
    *         to the post hook execution method.
    */
-  function handle_post_events (string $mode, array $addAttrs = [])
+  function handlePostEvents (string $mode, array $addAttrs = [])
   {
     /* Update foreign keys */
     if ($mode == 'remove') {
@@ -1621,26 +1621,26 @@ class SimplePlugin implements SimpleTab
     } elseif ($mode == 'modify') {
       $this->handleForeignKeys();
     }
-    return $this->handle_hooks('POST', $mode, $addAttrs);
+    return $this->handleHooks('POST', $mode, $addAttrs);
   }
 
   /*!
    *  \brief Forward command execution requests
    *         to the pre hook execution method.
    */
-  function handle_pre_events (string $mode, array $addAttrs = []): array
+  function handlePreEvents (string $mode, array $addAttrs = []): array
   {
     global $config;
 
     $this->ldap_error = '';
     if ($this->mainTab && ($mode == 'remove')) {
       /* Store information if there was subobjects before deletion */
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $ldap->cd($this->dn);
       $ldap->search('(objectClass=*)', ['dn'], 'one');
       $this->hadSubobjects = ($ldap->count() > 0);
     }
-    return $this->handle_hooks('PRE', $mode, $addAttrs);
+    return $this->handleHooks('PRE', $mode, $addAttrs);
   }
 
   function fillHookAttrs (array &$addAttrs)
@@ -1806,7 +1806,7 @@ class SimplePlugin implements SimpleTab
         if ($newdn === NULL) {
           $subobjects = $this->hadSubobjects;
         } else {
-          $ldap = $config->get_ldap_link();
+          $ldap = $config->getLdapLink();
           $ldap->cd($newdn);
           $ldap->search('(objectClass=*)', ['dn'], 'one');
           $subobjects = ($ldap->count() > 0);
@@ -2071,15 +2071,15 @@ class SimplePlugin implements SimpleTab
    *
    * \param string $base
    */
-  function create_unique_dn (string $attribute, string $base): string
+  function createUniqueDn (string $attribute, string $base): string
   {
     global $config;
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     $base = preg_replace('/^,*/', '', $base);
 
     /* Try to use plain entry first */
     $dn = $attribute . '=' . ldap_escape_dn($this->$attribute) . ',' . $base;
-    if (($dn == $this->orig_dn) || !$ldap->dn_exists($dn)) {
+    if (($dn == $this->orig_dn) || !$ldap->dnExists($dn)) {
       return $dn;
     }
 
@@ -2097,7 +2097,7 @@ class SimplePlugin implements SimpleTab
           $dn .= '+' . $attr . '=' . ldap_escape_dn($this->$attr);
         }
         $dn .= ',' . $base;
-        if (($dn == $this->orig_dn) || !$ldap->dn_exists($dn)) {
+        if (($dn == $this->orig_dn) || !$ldap->dnExists($dn)) {
           return $dn;
         }
       }
@@ -2116,7 +2116,7 @@ class SimplePlugin implements SimpleTab
    * \param array $attrs LDAP attributes values for template-modified attributes
    * \param array $skip attributes to leave untouched
    */
-  function adapt_from_template (array $attrs, array $skip = [])
+  function adaptFromTemplate (array $attrs, array $skip = [])
   {
     $this->attrs = array_merge($this->attrs, $attrs);
 
@@ -2132,7 +2132,7 @@ class SimplePlugin implements SimpleTab
     unset($attr);
 
     /* Is Account? */
-    $this->is_account = $this->is_this_account($this->attrs);
+    $this->is_account = $this->isThisAccount($this->attrs);
   }
 
   /*!
@@ -2235,7 +2235,7 @@ class SimplePlugin implements SimpleTab
     return TRUE;
   }
 
-  function is_modal_dialog (): bool
+  function isModalDialog (): bool
   {
     return (isset($this->dialog) && $this->dialog);
   }

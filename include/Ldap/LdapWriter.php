@@ -23,7 +23,7 @@ class LdapWriter
 
     public function modifyBatch(array $changes): bool
     {
-        return $this->ldap->modify_batch($changes);
+        return $this->ldap->modifyBatch($changes);
     }
 
     public function rm(string $attrs = '', string $dn = ''): bool
@@ -33,7 +33,7 @@ class LdapWriter
 
     public function modAdd(string $attrs = '', string $dn = ''): bool
     {
-        return $this->ldap->mod_add($attrs, $dn);
+        return $this->ldap->modAdd($attrs, $dn);
     }
 
     public function rmdir(string $deletedn): bool
@@ -43,16 +43,16 @@ class LdapWriter
 
     public function rmdirRecursive(int $srp, string $deletedn): bool
     {
-        return $this->ldap->rmdir_recursive($srp, $deletedn);
+        return $this->ldap->rmdirRecursive($srp, $deletedn);
     }
 
     public function renameDn(string $source, string $dest): bool
     {
-        return $this->ldap->rename_dn($source, $dest);
+        return $this->ldap->renameDn($source, $dest);
     }
 
     public function createMissingTrees(int $srp, string $target, bool $ignoreReferralBases = true): bool
     {
-        return $this->ldap->create_missing_trees($srp, $target, $ignoreReferralBases);
+        return $this->ldap->createMissingTrees($srp, $target, $ignoreReferralBases);
     }
 }

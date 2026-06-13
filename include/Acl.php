@@ -129,7 +129,7 @@ class Acl
     $ma = explode(',', $ms);
 
     /* Decode dn's, fill with informations from LDAP */
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     foreach ($ma as $memberdn) {
       // Check for wildcard here
       $dn = base64_decode($memberdn);

@@ -44,7 +44,7 @@ class PasswordMethodSha extends PasswordMethod
    *
    * \return TRUE if is avaibable, otherwise return false
    */
-  public function is_available (): bool
+  public function isAvailable (): bool
   {
     return function_exists('sha1');
   }
@@ -57,7 +57,7 @@ class PasswordMethodSha extends PasswordMethod
    *
    * \return string the password hash
    */
-  public function generate_hash (string $pwd, bool $locked = FALSE): string
+  public function generateHash (string $pwd, bool $locked = FALSE): string
   {
     if (function_exists('sha1')) {
       $hash = '{SHA}'.($locked ? '!' : '').base64_encode(pack('H*', sha1($pwd)));
@@ -71,7 +71,7 @@ class PasswordMethodSha extends PasswordMethod
   /*!
    * \brief Get the hash name
    */
-  static function get_hash_name ()
+  static function getHashName ()
   {
     return 'sha';
   }

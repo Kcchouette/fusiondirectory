@@ -18,7 +18,7 @@ class PluginRenderer
 
     public function showHeader(string $buttonHtmlText, string $htmlText, bool $pluginEnabled, bool $buttonDisabled = false, string $name = 'modify_state'): string
     {
-        return $this->plugin->show_header($buttonHtmlText, $htmlText, $pluginEnabled, $buttonDisabled, $name);
+        return $this->plugin->showHeader($buttonHtmlText, $htmlText, $pluginEnabled, $buttonDisabled, $name);
     }
 
     public function renderAttributes(bool $readOnly = false): void

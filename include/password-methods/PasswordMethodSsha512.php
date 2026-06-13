@@ -44,7 +44,7 @@ class PasswordMethodSsha512 extends PasswordMethod
    *
    * \return TRUE if is avaibable, otherwise return false
    */
-  public function is_available (): bool
+  public function isAvailable (): bool
   {
     return function_exists('hash');
   }
@@ -57,7 +57,7 @@ class PasswordMethodSsha512 extends PasswordMethod
    *
    * \return string the password hash
    */
-  public function generate_hash (string $pwd, bool $locked = FALSE): string
+  public function generateHash (string $pwd, bool $locked = FALSE): string
   {
     if (function_exists('hash')) {
       $salt = substr(pack('h*', md5("".random_int(0, PHP_INT_MAX))), 0, 8);
@@ -87,7 +87,7 @@ class PasswordMethodSsha512 extends PasswordMethod
   /*!
    * \brief Get the hash name
    */
-  static function get_hash_name ()
+  static function getHashName ()
   {
     return 'ssha512';
   }

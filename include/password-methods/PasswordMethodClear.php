@@ -51,7 +51,7 @@ class PasswordMethodClear extends PasswordMethod
    *
    * \return string the password hash
    */
-  public function generate_hash (string $pwd, bool $locked = FALSE): string
+  public function generateHash (string $pwd, bool $locked = FALSE): string
   {
     return $pwd;
   }
@@ -59,7 +59,7 @@ class PasswordMethodClear extends PasswordMethod
   /*!
    * \brief Get the hash name
    */
-  static function get_hash_name ()
+  static function getHashName ()
   {
     return 'clear';
   }

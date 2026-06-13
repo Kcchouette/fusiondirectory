@@ -164,7 +164,7 @@ class PasswordRecovery extends standAlonePage
     $salt_temp_password = $this->salt . $temp_password . $this->salt;
     $sha1_temp_password = "{SHA}" . base64_encode(pack("H*", sha1($salt_temp_password)));
 
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
 
     // Check if token branch is here
     $token = get_ou('RecoveryTokenRDN') . $config->current['BASE'];
@@ -173,7 +173,7 @@ class PasswordRecovery extends standAlonePage
       /* It's not, let's create it */
       $ldap->cd($config->current['BASE']);
       try {
-        $ldap->create_missing_trees($token);
+        $ldap->createMissingTrees($token);
       } catch (FusionDirectoryError $error) {
         return $error;
       }
@@ -202,8 +202,8 @@ class PasswordRecovery extends standAlonePage
         NULL,
         $dn,
         ($add ? LDAP_ADD : LDAP_MOD),
-        $ldap->get_error(),
-        $ldap->get_errno()
+        $ldap->getError(),
+        $ldap->getErrno()
       );
     }
 
@@ -218,7 +218,7 @@ class PasswordRecovery extends standAlonePage
     $sha1_token = "{SHA}" . base64_encode(pack("H*", sha1($salt_token)));
 
     /* Retrieve hash from the ldap */
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
 
     $token = get_ou('RecoveryTokenRDN') . $config->current['BASE'];
     $dn    = 'ou=' . $this->login . ',' . $token;
@@ -237,7 +237,7 @@ class PasswordRecovery extends standAlonePage
   {
     global $config;
     /* Retrieve dn from the ldap */
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
 
     $objectClasses = ['gosaMailAccount'];
     if (class_available('personalInfo') && ($config->get_cfg_value('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
@@ -286,7 +286,7 @@ class PasswordRecovery extends standAlonePage
     if (class_available('supannAccount') && ($config->get_cfg_value('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
       $filter = '(|' . $filter . '(&(objectClass=supannPerson)(|(supannMailPerso=' . $address_escaped . ')(supannMailPrive={SECOURS}' . $address_escaped . '))))';
     }
-    $ldap = $config->get_ldap_link();
+    $ldap = $config->getLdapLink();
     $ldap->cd($config->current['BASE']);
     $ldap->search($filter, ['dn', 'userPassword', $this->loginAttribute]);
 
@@ -301,8 +301,8 @@ class PasswordRecovery extends standAlonePage
 
     $attrs = $ldap->fetch();
 
-    $method = PasswordMethod::get_method($attrs['userPassword'][0], $attrs['dn']);
-    if ($method->is_locked($attrs['dn'])) {
+    $method = PasswordMethod::getMethod($attrs['userPassword'][0], $attrs['dn']);
+    if ($method->isLocked($attrs['dn'])) {
       $this->message[] = new FusionDirectoryError(htmlescape(sprintf(_('The user using email "%s" is locked. Please contact your administrator.'), $this->email_address)));
       return FALSE;
     }

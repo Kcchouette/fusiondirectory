@@ -500,7 +500,7 @@ class Attribute
       if (($ldapValue === "") || ($ldapValue === [])) {
         return;
       }
-      $ldap = $config->get_ldap_link();
+      $ldap = $config->getLdapLink();
       $base = $config->current['BASE'];
       if ($this->unique !== 'whole') {
         if (isset($this->plugin->base) && !empty($this->plugin->base)) {

@@ -40,7 +40,7 @@ interface SimpleTab extends FusionDirectoryDialog
 {
   /*
    * Public methods needed in some cases:
-   * compute_dn (): string (only for main tab)
+   * computeDn (): string (only for main tab)
    * move (string $src_dn, string $dst_dn): TRUE|string (only for main tab)
    * getAclBase (): string (only for main tab)
    */
@@ -65,7 +65,7 @@ interface SimpleTab extends FusionDirectoryDialog
 
   /*! \brief Sets ACL category provided by simpleTabs
    */
-  public function set_acl_category (string $category);
+  public function setAclCategory (string $category);
 
   /*!
    * \brief Can we delete the object
@@ -74,7 +74,7 @@ interface SimpleTab extends FusionDirectoryDialog
    *
    * \param string $base
    */
-  public function acl_is_removeable (?string $base = NULL): bool;
+  public function aclIsRemoveable (?string $base = NULL): bool;
 
   /*!
    * \brief Sets whether the opened objet is a template
@@ -93,7 +93,7 @@ interface SimpleTab extends FusionDirectoryDialog
   /*!
    * \brief Is there a modal dialog opened
    */
-  public function is_modal_dialog (): bool;
+  public function isModalDialog (): bool;
 
   /*!
    * \brief Returns list of required LDAP attributes
@@ -122,7 +122,7 @@ interface SimpleTab extends FusionDirectoryDialog
   /*!
    * \brief Adapt from template
    */
-  public function adapt_from_template (array $attrs, array $skip = []);
+  public function adaptFromTemplate (array $attrs, array $skip = []);
 
   /*!
    * \brief Deserialize values
@@ -146,7 +146,7 @@ interface SimpleTab extends FusionDirectoryDialog
   /*!
    * \brief Merge in objectClasses needed by this tab
    *
-   *  Used by prepare_save and Template::apply
+   *  Used by prepareSave and Template::apply
    */
   public function mergeObjectClasses (array $oc): array;
 

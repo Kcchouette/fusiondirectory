@@ -258,7 +258,7 @@ class ManagementListing
 
       // Check if a wrong base was supplied
       if (!$this->baseSelector->checkLastBaseUpdate()) {
-        $error = new FusionDirectoryError(MsgPool::check_base());
+        $error = new FusionDirectoryError(MsgPool::checkBase());
         $error->display();
       }
 
@@ -557,7 +557,7 @@ class ManagementListing
       $categories[$i['aclCategory']] = $i['aclCategory'];
     }
 
-    $deps = $ui->get_module_departments(array_values($categories));
+    $deps = $ui->getModuleDepartments(array_values($categories));
     $departmentTree = $config->getDepartmentTree();
     foreach ($departmentTree as $key => $dep) {
       if (in_array_ics($key, $deps)) {

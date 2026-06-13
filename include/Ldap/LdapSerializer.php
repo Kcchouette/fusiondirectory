@@ -23,6 +23,6 @@ class LdapSerializer
 
     public function importCompleteLdif(int $srp, string $str_attr, bool $justModify, bool $deleteOldEntries): bool
     {
-        return $this->ldap->import_complete_ldif($srp, $str_attr, $justModify, $deleteOldEntries);
+        return $this->ldap->importCompleteLdif($srp, $str_attr, $justModify, $deleteOldEntries);
     }
 }
