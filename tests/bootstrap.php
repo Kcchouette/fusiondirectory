@@ -65,3 +65,6 @@ spl_autoload_register(function (string $className) use ($autoloaderBaseDir): voi
         }
     }
 });
+
+/* Load the global container accessor */
+require_once $autoloaderBaseDir . '/include/container.php';
