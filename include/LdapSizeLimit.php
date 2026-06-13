@@ -42,10 +42,8 @@ class LdapSizeLimit
 
   function __construct ()
   {
-    global $config;
-
-    $this->sizeLimit  = $config->get_cfg_value('LDAPSIZELIMIT', 200);
-    $this->ignore     = preg_match('/true/i', $config->get_cfg_value('LDAPSIZEIGNORE', 'TRUE'));
+    $this->sizeLimit  = config()->get_cfg_value('LDAPSIZELIMIT', 200);
+    $this->ignore     = preg_match('/true/i', config()->get_cfg_value('LDAPSIZEIGNORE', 'TRUE'));
   }
 
   function getSizeLimit ()
@@ -106,7 +104,6 @@ class LdapSizeLimit
    */
   function check ()
   {
-    global $config;
 
     /* Ignore dialog? */
     if ($this->ignore) {

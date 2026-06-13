@@ -31,9 +31,7 @@ class TemplateHandling
   /*! \brief Fetch a template from LDAP and returns its attributes and dependencies information */
   public static function fetch ($dn)
   {
-    global $config;
-
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     $ldap->cat($dn);
     $attrs    = $ldap->fetch(TRUE);
     $attrs    = static::fieldsFromLDAP($attrs);
@@ -223,7 +221,6 @@ class TemplateHandling
    */
   public static function parseString (string $string, array $attrs, $escapeMethod = NULL, ?string $unique = NULL, ?string $target = NULL): string
   {
-    global $config;
 
     if (preg_match('/^%%/', $string)) {
       /* Special case: %% at beginning of string means do not touch it. Used by binary attributes. */
@@ -243,8 +240,8 @@ class TemplateHandling
     $string = $generator->current();
 
     if (($unique !== NULL) && !empty($vars)) {
-      $ldap = $config->getLdapLink();
-      $ldap->cd($config->current['BASE']);
+      $ldap = config()->getLdapLink();
+      $ldap->cd(config()->current['BASE']);
       /* Return the first found unique value */
       foreach ($generator as $value) {
         if (class_available('archivedObject')) {
@@ -501,7 +498,6 @@ class TemplateHandling
   */
   private static function modifierIncremental (array $args): array
   {
-    global $config;
 
     if (count($args) < 1) {
       throw new FusionDirectoryException(_('Missing id parameter for incremental modifier'));
@@ -512,7 +508,7 @@ class TemplateHandling
     if (count($args) < 3) {
       $args[] = 1;
     }
-    $configDn = CONFIGRDN.$config->current['BASE'];
+    $configDn = CONFIGRDN.config()->current['BASE'];
     Lock::addOrFail($configDn);
     $tabObject = Objects::open($configDn, 'configuration');
     $json = $tabObject->getBaseObject()->fdIncrementalModifierStates;

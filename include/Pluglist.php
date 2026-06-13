@@ -351,15 +351,14 @@ class Pluglist
    */
   function gen_menu ()
   {
-    global $config;
     if ($this->menu == "") {
       $this->menu = '<ul class="menu">'."\n";
       /* Parse headlines */
-      foreach ($config->data['SECTIONS'] as $section => $section_infos) {
+      foreach (config()->data['SECTIONS'] as $section => $section_infos) {
         $entries  = '';
 
         /* Parse sub-plugins */
-        foreach ($config->data['MENU'][$section] as $info) {
+        foreach (config()->data['MENU'][$section] as $info) {
           if (!$this->checkAccess($info)) {
             continue;
           }
@@ -414,16 +413,16 @@ class Pluglist
    */
   function showIconmenu ()
   {
-    global $class_mapping, $config;
+    global $class_mapping;
     if ($this->iconmenu == "") {
 
       /* Parse headlines */
-      foreach ($config->data['SECTIONS'] as $section => $section_infos) {
+      foreach (config()->data['SECTIONS'] as $section => $section_infos) {
         $entries      = '';
         $sectionMenu  = '<div class="iconmenu-section"><h1 class="menuheader">';
         $sectionMenu  .= htmlescape($section_infos['NAME'])."</h1>\n";
 
-        foreach ($config->data['MENU'][$section] as $info) {
+        foreach (config()->data['MENU'][$section] as $info) {
           if (!$this->checkAccess($info)) {
             continue;
           }
@@ -536,15 +535,15 @@ class Pluglist
    */
   static function load ()
   {
-    global $config, $plist;
+    global $plist;
     if (!Session::is_set('plist')) {
       /* Initially load all classes */
       load_all_classes();
 
       $plist = new Pluglist();
       Session::set('plist', $plist);
-      $config->loadPlist($plist);
-      $config->resetDepartmentCache();
+      config()->loadPlist($plist);
+      config()->resetDepartmentCache();
     } else {
       $plist = Session::get('plist');
     }
@@ -554,7 +553,7 @@ class Pluglist
 
   static function runMainInc ($index, $forceCleanup = FALSE)
   {
-    global $BASE_DIR, $config, $plist, $ui, $smarty, $display, $remove_lock, $cleanup, $plug;
+    global $BASE_DIR, $plist, $ui, $smarty, $display, $remove_lock, $cleanup, $plug;
 
     if ($index == 'welcome') {
       $plugin_dir = "$BASE_DIR/plugins/generic/welcome";

@@ -98,15 +98,14 @@ abstract class PasswordMethod
    */
   function isLocked ($dn = '', $pwd = ''): bool
   {
-    global $config;
     if (!$this->lockable) {
       return FALSE;
     }
 
     /* Get current password hash */
     if (!empty($dn)) {
-      $ldap = $config->getLdapLink();
-      $ldap->cd($config->current['BASE']);
+      $ldap = config()->getLdapLink();
+      $ldap->cd(config()->current['BASE']);
       $ldap->cat($dn, ['userPassword']);
       $attrs = $ldap->fetch();
       if (isset($attrs['userPassword'][0])) {
@@ -144,7 +143,6 @@ abstract class PasswordMethod
    */
   private function genericModifyAccount ($dn, string $mode, bool $lockEverything = TRUE)
   {
-    global $config;
     if (!$this->lockable) {
       return FALSE;
     }
@@ -208,7 +206,7 @@ abstract class PasswordMethod
     }
     $modify['userPassword'] = $pwd;
 
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     $ldap->cd($dn);
     $ldap->modify($modify);
 
@@ -399,8 +397,7 @@ abstract class PasswordMethod
    */
   static function isHarmless ($password): bool
   {
-    global $config;
-    if ($config->get_cfg_value('strictPasswordRules') == 'TRUE') {
+    if (config()->get_cfg_value('strictPasswordRules') == 'TRUE') {
       // Do we have UTF8 characters in the password?
       return ($password == mb_convert_encoding($password, 'ISO-8859-1', 'UTF-8'));
     }

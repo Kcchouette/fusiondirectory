@@ -53,7 +53,7 @@ class Logging
    */
   static function log (string $action, string $objecttype, string $object, array $changes = [], string $result = '')
   {
-    global $config, $ui;
+    global $ui;
 
     /* Create data object */
     $entry = [
@@ -81,9 +81,9 @@ class Logging
         $error->display();
       }
     } else {
-      if (is_object($config) && preg_match('/true/i', $config->get_cfg_value('Logging', ''))) {
+      if (is_object(config()) && preg_match('/true/i', config()->get_cfg_value('Logging', ''))) {
         static::logIntoSyslog($entry);
-        if (in_array($action, $config->get_cfg_value('auditActions', []))) {
+        if (in_array($action, config()->get_cfg_value('auditActions', []))) {
           static::logIntoLdap($entry);
         }
       }
@@ -110,7 +110,6 @@ class Logging
    */
   static function debug (int $level, int $line, string $function, string $file, $data, string $info = '')
   {
-    global $config;
 
     static $first = TRUE;
 
@@ -141,7 +140,7 @@ class Logging
       }
       $output .= "</div>\n";
 
-      if (is_object($config) && preg_match('/true/i', $config->get_cfg_value('debugLogging', ''))) {
+      if (is_object(config()) && preg_match('/true/i', config()->get_cfg_value('debugLogging', ''))) {
         fusiondirectory_log($logline);
       }
 
@@ -196,7 +195,6 @@ class Logging
    */
   static protected function logIntoLdap ($entry)
   {
-    global $config;
     if ($entry['objecttype'] == 'plugin/auditEvent') {
       /* Avoid infinite loop */
       return;
@@ -214,7 +212,7 @@ class Logging
       $baseObject->fdAuditObject      = $entry['object'];
       $baseObject->fdAuditAttributes  = $entry['changes'];
       $baseObject->fdAuditResult      = $entry['result'];
-      $baseObject->base               = $config->current['BASE'];
+      $baseObject->base               = config()->current['BASE'];
       $errors = $tabObject->save();
       if (!empty($errors)) {
         MsgDialog::displayChecks($errors);

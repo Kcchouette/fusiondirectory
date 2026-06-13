@@ -33,43 +33,42 @@ class LoginCAS extends LoginMethod
   /*! \brief Initialize phpCAS library */
   static function initCAS ()
   {
-    global $config;
 
     require_once('CAS.php');
     /* Move FD autoload after CAS autoload */
     spl_autoload_unregister('fusiondirectory_autoload');
     spl_autoload_register('fusiondirectory_autoload');
 
-    if ($config->get_cfg_value('CasVerbose') == 'TRUE') {
+    if (config()->get_cfg_value('CasVerbose') == 'TRUE') {
       phpCAS::setVerbose(TRUE);
     }
 
     // Initialize CAS with proper library and call.
-    if ($config->get_cfg_value('CasLibraryBool') === 'TRUE') {
+    if (config()->get_cfg_value('CasLibraryBool') === 'TRUE') {
       phpCAS::client(
         CAS_VERSION_2_0,
-        $config->get_cfg_value('CasHost', 'localhost'),
-        (int) ($config->get_cfg_value('CasPort', 443)),
-        $config->get_cfg_value('CasContext'),
-        $config->get_cfg_value('CasClientServiceName')
+        config()->get_cfg_value('CasHost', 'localhost'),
+        (int) (config()->get_cfg_value('CasPort', 443)),
+        config()->get_cfg_value('CasContext'),
+        config()->get_cfg_value('CasClientServiceName')
       );
     } else {
       phpCAS::client(
         CAS_VERSION_2_0,
-        $config->get_cfg_value('CasHost', 'localhost'),
-        (int) ($config->get_cfg_value('CasPort', 443)),
-        $config->get_cfg_value('CasContext')
+        config()->get_cfg_value('CasHost', 'localhost'),
+        (int) (config()->get_cfg_value('CasPort', 443)),
+        config()->get_cfg_value('CasContext')
       );
     }
 
     // Set the CA certificate that is the issuer of the cert
-    phpCAS::setCasServerCACert($config->get_cfg_value('CasServerCaCertPath'));
+    phpCAS::setCasServerCACert(config()->get_cfg_value('CasServerCaCertPath'));
   }
 
   /*! \brief All login steps in the right order for CAS login */
   static function loginProcess ()
   {
-    global $config, $message, $ui;
+    global $message, $ui;
 
     static::init();
 

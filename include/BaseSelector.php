@@ -119,16 +119,15 @@ class BaseSelector
    */
   function setBases (array $bases)
   {
-    global $config;
 
     $this->pathMapping = [];
 
     foreach ($bases as $base => $dummy) {
       // Build path style display
-      $elements = explode(',', substr($base, 0, strlen($base) - strlen($config->current['BASE'])));
+      $elements = explode(',', substr($base, 0, strlen($base) - strlen(config()->current['BASE'])));
       $elements = array_reverse($elements, TRUE);
 
-      $this->pathMapping[$base] = (($base == $config->current['BASE']) ? '/' : preg_replace('/(^|,)[a-z0-9]+=/i', '/', implode(',', $elements)));
+      $this->pathMapping[$base] = (($base == config()->current['BASE']) ? '/' : preg_replace('/(^|,)[a-z0-9]+=/i', '/', implode(',', $elements)));
     }
 
     // Save bases to session for autocompletion
@@ -192,25 +191,24 @@ class BaseSelector
 
   protected function renderTree ()
   {
-    global $config;
 
     /* Build tree */
-    $departmentInfo = $config->getDepartmentInfo();
+    $departmentInfo = config()->getDepartmentInfo();
     $tree           = [];
     foreach (array_keys($this->pathMapping) as $base) {
-      if ($base == $config->current['BASE']) {
+      if ($base == config()->current['BASE']) {
         /* Skip root */
         continue;
       }
 
-      $elements     = explode(',', substr($base, 0, strlen($base) - strlen($config->current['BASE'])));
+      $elements     = explode(',', substr($base, 0, strlen($base) - strlen(config()->current['BASE'])));
       /* Remove last one */
       array_pop($elements);
       /* Remove first one */
       array_shift($elements);
 
       $array        =& $tree;
-      $elementBase  = $config->current['BASE'];
+      $elementBase  = config()->current['BASE'];
       foreach (array_reverse($elements) as $element) {
         $elementBase = $element.','.$elementBase;
         if (!isset($array[$elementBase])) {
@@ -244,8 +242,8 @@ class BaseSelector
     $smarty->assign('currentValue', $this->pathMapping[$this->base]);
     $smarty->assign('submitButton', $this->submitButton);
     $smarty->assign('height',       $this->height);
-    $smarty->assign('selected',     ($this->base == $config->current['BASE']));
-    $smarty->assign('rootBase',     $config->current['BASE']);
+    $smarty->assign('selected',     ($this->base == config()->current['BASE']));
+    $smarty->assign('rootBase',     config()->current['BASE']);
     $smarty->assign('tree',         $tree);
 
     $this->tree = $smarty->fetch(get_template_path('baseselector.tpl'));

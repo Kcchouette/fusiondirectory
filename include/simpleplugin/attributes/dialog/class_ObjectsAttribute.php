@@ -118,8 +118,7 @@ class ObjectsAttribute extends GenericDialogAttribute
 
   protected function fillDisplayValueFrom ($i, $attrs)
   {
-    global $config;
-    $defaultDn = 'uid=default,ou=nonexistent,' . $config->current['BASE'];
+    $defaultDn = 'uid=default,ou=nonexistent,' . config()->current['BASE'];
 
     $objectType = NULL; // <-- Add this line
 
@@ -202,7 +201,6 @@ class ObjectsAttribute extends GenericDialogAttribute
 
   function setValue ($value)
   {
-    global $config; // Needed for defaultDn comparison
 
     // Reset types and let parent handle initial population and display filling
     $this->types = [];
@@ -210,7 +208,7 @@ class ObjectsAttribute extends GenericDialogAttribute
 
     // Now, filter out entries that are marked as non-existent (type === FALSE)
     // unless it's the special default user placeholder.
-    $defaultDn = 'uid=default,ou=nonexistent,' . $config->current['BASE'];
+    $defaultDn = 'uid=default,ou=nonexistent,' . config()->current['BASE'];
     $filteredValue = [];
     $filteredDisplays = [];
     $filteredTypes = [];

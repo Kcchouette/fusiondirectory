@@ -98,7 +98,6 @@ class LDAP
    */
    function __construct ($binddn, $bindpw, $hostname, $follow_referral = FALSE, $tls = FALSE)
    {
-    global $config;
     $this->follow_referral  = $follow_referral;
     $this->tls              = $tls;
     $this->binddn           = $binddn;
@@ -112,8 +111,8 @@ class LDAP
     $this->serializer  = new LdapSerializer($this);
 
     /* Check if MAX_LDAP_QUERY_TIME is defined */
-    if (is_object($config) && ($config->get_cfg_value("ldapMaxQueryTime") != "")) {
-      $str = $config->get_cfg_value("ldapMaxQueryTime");
+    if (is_object(config()) && (config()->get_cfg_value("ldapMaxQueryTime") != "")) {
+      $str = config()->get_cfg_value("ldapMaxQueryTime");
       $this->max_ldap_query_time = (float)($str);
     }
 
@@ -145,11 +144,10 @@ class LDAP
    */
   public static function init (string $server, string $base, string $binddn = '', string $pass = ''): LDAP
   {
-    global $config;
 
     $ldap = new LDAP($binddn, $pass, $server,
-        isset($config->current['LDAPFOLLOWREFERRALS']) && $config->current['LDAPFOLLOWREFERRALS'] == 'TRUE',
-        isset($config->current['LDAPTLS']) && $config->current['LDAPTLS'] == 'TRUE');
+        isset(config()->current['LDAPFOLLOWREFERRALS']) && config()->current['LDAPFOLLOWREFERRALS'] == 'TRUE',
+        isset(config()->current['LDAPTLS']) && config()->current['LDAPTLS'] == 'TRUE');
 
     /* Sadly we've no proper return values here. Use the error message instead. */
     if (!$ldap->success()) {
@@ -1358,9 +1356,8 @@ class LDAP
    */
   protected function importSingleEntry ($srp, $data, $modify, $delete)
   {
-    global $config;
 
-    if (!$config) {
+    if (!config()) {
       trigger_error("Can't import ldif, can't read config object.");
     }
 
@@ -1393,7 +1390,7 @@ class LDAP
       }
 
       /* Create missing trees */
-      $this->cd($config->current['BASE']);
+      $this->cd(config()->current['BASE']);
       try {
         $this->createMissingTrees($srp, preg_replace('/^[^,]+,/', '', $dn));
       } catch (FusionDirectoryError $error) {
