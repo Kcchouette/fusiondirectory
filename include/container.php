@@ -28,13 +28,9 @@ function container(): FusionDirectory\Container\Container
  */
 function config(): Config
 {
-    static $config = null;
+    global $config;
 
-    if ($config === null) {
-        global $config;
-        if (is_object($config)) {
-            return $config;
-        }
+    if (!is_object($config)) {
         throw new \RuntimeException('Config not initialized');
     }
 

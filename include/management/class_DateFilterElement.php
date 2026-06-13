@@ -33,8 +33,6 @@ class DateFilterElement extends FilterElement
 
   public function __construct (ManagementFilter $parent, string $attribute, string $label, ?string $defaultMin = NULL, ?string $defaultMax = NULL, array $types = [])
   {
-    global $config;
-
     parent::__construct($parent);
 
     $this->attribute  = $attribute;

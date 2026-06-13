@@ -60,8 +60,6 @@ class FatalError extends Error
    */
   protected function renderFatalErrorDialog ()
   {
-    global $config;
-
     $display =
       '<!DOCTYPE html>
       <html><head>
@@ -81,8 +79,7 @@ class FatalError extends Error
         </tr>
       </table>';
 
-    if (isset($config) && is_object($config) &&
-      $config->get_cfg_value('displayerrors') == 'TRUE') {
+    if (config()->get_cfg_value('displayerrors') == 'TRUE') {
       $trace    = FusionDirectoryError::formatTrace($this);
       $display  .= print_a($trace, TRUE);
     }

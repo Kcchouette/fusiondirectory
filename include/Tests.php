@@ -285,9 +285,8 @@ class Tests
    */
   public static function isDepartmentNameReserved ($name)
   {
-    global $config;
     $reservedNames = [];
-    foreach ($config->data['OBJECTS'] as $infos) {
+    foreach (config()->data['OBJECTS'] as $infos) {
       if (isset($infos['ou']) && preg_match('/ou=([^,]+),$/', $infos['ou'], $m)) {
         $reservedNames[] = $m[1];
       }

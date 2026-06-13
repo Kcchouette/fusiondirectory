@@ -122,14 +122,13 @@ class Acl
    */
   static function extractMembers (string $ms)
   {
-    global $config;
     $a = [];
 
     /* Seperate by ',' and place it in an array */
     $ma = explode(',', $ms);
 
     /* Decode dn's, fill with informations from LDAP */
-    $ldap = $config->getLdapLink();
+    $ldap = config()->getLdapLink();
     foreach ($ma as $memberdn) {
       // Check for wildcard here
       $dn = base64_decode($memberdn);

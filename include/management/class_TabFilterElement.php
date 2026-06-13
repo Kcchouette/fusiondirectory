@@ -26,14 +26,12 @@ class TabFilterElement extends FilterElement
 
   public function __construct (ManagementFilter $parent)
   {
-    global $config;
-
     parent::__construct($parent);
 
     $this->tabs = [];
     foreach ($this->parent->parent->objectTypes as $type) {
       $infos = Objects::infos($type);
-      foreach ($config->data['TABS'][$infos['tabGroup']] as $plug) {
+      foreach (config()->data['TABS'][$infos['tabGroup']] as $plug) {
         $class = $plug['CLASS'];
         if ($class == $infos['mainTab']) {
           continue;

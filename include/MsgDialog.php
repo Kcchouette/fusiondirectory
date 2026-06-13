@@ -71,8 +71,6 @@ class MsgDialog
 
   protected function show ()
   {
-    global $config;
-
     if (empty($this->s_Message)) {
       return;
     }
@@ -95,8 +93,7 @@ class MsgDialog
     }
 
     /* Append trace information, only if error messages are enabled */
-    if (isset($config) && is_object($config) &&
-      $config->get_cfg_value('displayerrors') == 'TRUE') {
+    if (config()->get_cfg_value('displayerrors') == 'TRUE') {
       if (empty($this->a_Trace)) {
         $this->a_Trace = debug_backtrace();
       }

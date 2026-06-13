@@ -28,8 +28,6 @@ class PropertiesColumn extends Column
 
   function __construct (ManagementListing $parent, ?array $attributes = NULL, ?string $label = NULL)
   {
-    global $config;
-
     parent::__construct($parent, NULL, $label);
 
     $this->tabs = [];
@@ -37,7 +35,7 @@ class PropertiesColumn extends Column
     foreach ($this->parent->parent->objectTypes as $type) {
       $infos = Objects::infos($type);
       $this->tabs[$type] = [];
-      foreach ($config->data['TABS'][$infos['tabGroup']] as $plug) {
+      foreach (config()->data['TABS'][$infos['tabGroup']] as $plug) {
         if ($plug['CLASS'] == $infos['mainTab']) {
           continue;
         }

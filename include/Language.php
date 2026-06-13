@@ -98,8 +98,6 @@ class Language
    */
   public static function detect ()
   {
-    global $config;
-
     /* Try to use users primary language */
     $ui = get_userinfo();
     if (isset($ui) && ($ui->language != '')) {
@@ -107,8 +105,8 @@ class Language
     }
 
     /* Check for global language settings in configuration */
-    if (isset($config) && ($config->get_cfg_value('language') != '')) {
-      $lang = $config->get_cfg_value('language');
+    if (config()->get_cfg_value('language') != '') {
+      $lang = config()->get_cfg_value('language');
       if (!preg_match('/utf/i', $lang)) {
         $lang .= '.UTF-8';
       }

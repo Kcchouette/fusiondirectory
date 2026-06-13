@@ -46,8 +46,6 @@ class UserInfoNoAuth extends UserInfo
 
   function getBase ()
   {
-    global $config;
-
-    return $config->current['BASE'];
+    return config()->current['BASE'];
   }
 }

@@ -36,8 +36,6 @@ class SubNodeColumn extends LinkColumn
 
   protected function getAttributeValues (ListingEntry $entry): array
   {
-    global $config;
-
     $attrs = $this->attributes;
     if (isset($this->templateAttributes) && $entry->isTemplate()) {
       $attrs = $this->templateAttributes;
@@ -55,7 +53,7 @@ class SubNodeColumn extends LinkColumn
 
     $values = [];
 
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
     $ldap->cd($entry->dn);
     $ldap->search('(objectClass=*)', $attrs, 'subtree');
     while ($node = $ldap->fetch(TRUE)) {

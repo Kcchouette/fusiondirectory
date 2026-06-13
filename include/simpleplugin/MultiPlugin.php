@@ -38,12 +38,10 @@ class MultiPlugin extends SimplePlugin
 
   function __construct (?string $dn = NULL, $object = NULL, $parent = NULL, bool $mainTab = FALSE)
   {
-    global $config;
-
     $attributesInfo = [];
 
     /* Load sections */
-    foreach ($config->data['TABS'][static::$tabClass] as $plug) {
+    foreach (config()->data['TABS'][static::$tabClass] as $plug) {
       if (!plugin_available($plug['CLASS'])) {
         continue;
       }
@@ -59,7 +57,7 @@ class MultiPlugin extends SimplePlugin
     parent::__construct($dn, $object, $parent, $mainTab, $attributesInfo);
 
     /* Load sections */
-    foreach ($config->data['TABS'][static::$tabClass] as $plug) {
+    foreach (config()->data['TABS'][static::$tabClass] as $plug) {
       if (!plugin_available($plug['CLASS'])) {
         continue;
       }

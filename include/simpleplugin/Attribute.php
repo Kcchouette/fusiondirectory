@@ -488,7 +488,6 @@ class Attribute
    */
   function check ()
   {
-    global $config;
     $currentValue = $this->getValue();
     if ($this->isRequired() && !$this->disabled && (($currentValue === "") || ($currentValue === []))) {
       return new \SimplePluginCheckError(
@@ -500,8 +499,8 @@ class Attribute
       if (($ldapValue === "") || ($ldapValue === [])) {
         return;
       }
-      $ldap = $config->getLdapLink();
-      $base = $config->current['BASE'];
+      $ldap = config()->getLdapLink();
+      $base = config()->current['BASE'];
       if ($this->unique !== 'whole') {
         if (isset($this->plugin->base) && !empty($this->plugin->base)) {
           $base = $this->plugin->base;
@@ -590,7 +589,7 @@ class Attribute
                 break;
               }
             }
-            if (!in_array($dn_base, $config->getDepartmentList())) {
+            if (!in_array($dn_base, config()->getDepartmentList())) {
               continue;
             }
           } else {

@@ -35,8 +35,6 @@ class CheckBoxesFilterElement extends FilterElement
    */
   public function __construct (ManagementFilter $parent, string $name, array $items, string $operator = '&')
   {
-    global $config;
-
     parent::__construct($parent);
 
     $this->name     = $name;
