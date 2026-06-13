@@ -34,42 +34,42 @@ declare(strict_types=1);
 
 class LDAP
 {
-  public $hascon         = FALSE;
-  public $reconnect      = FALSE;
-  public $tls            = FALSE;
+   public bool $hascon         = false;
+   public bool $reconnect      = false;
+   public bool $tls            = false;
 
   /**
    * Connection identifier
    *
    * @var resource|object|false
    */
-  public $cid            = FALSE;
+   public mixed $cid            = FALSE;
 
-  public $hasres         = [];
-  public $sr             = [];
-  public $re             = [];
-  public $basedn         = "";
+   public array $hasres         = [];
+   public array $sr             = [];
+   public array $re             = [];
+   public string $basedn         = '';
 
   /* 0 if we are fetching the first entry, otherwise 1 */
-  public $start          = [];
+   public array $start          = [];
 
   /* Any error messages to be returned can be put here */
-  public $error          = "";
+   public string $error          = '';
 
-  public $srp            = 0;
+   public int $srp            = 0;
 
   /* Information read from slapd.oc.conf */
-  public $objectClasses    = [];
+   public array $objectClasses    = [];
   /* the dn for the bind */
-  public $binddn           = "";
+   public string $binddn           = '';
   /* the dn's password for the bind */
-  public $bindpw           = "";
-  public $hostname         = "";
-  public $follow_referral  = FALSE;
-  public $referrals        = [];
+   public string $bindpw           = '';
+   public string $hostname         = '';
+   public bool $follow_referral  = false;
+   public array $referrals        = [];
 
   /* 0, empty or negative values will disable this check */
-  public $max_ldap_query_time  = 0;
+   public float $max_ldap_query_time  = 0;
 
   /*!
    * \brief Create a LDAP connection
