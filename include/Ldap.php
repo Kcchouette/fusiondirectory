@@ -68,11 +68,23 @@ class LDAP
    public bool $follow_referral  = false;
    public array $referrals        = [];
 
-  /* 0, empty or negative values will disable this check */
-   public float $max_ldap_query_time  = 0;
+   /* 0, empty or negative values will disable this check */
+    public float $max_ldap_query_time  = 0;
 
-  /*!
-   * \brief Create a LDAP connection
+   /** @var LdapConnection Connection lifecycle management */
+    public LdapConnection $connection;
+
+   /** @var LdapSearch Read/search operations */
+    public LdapSearch $search;
+
+   /** @var LdapWriter Write operations */
+    public LdapWriter $writer;
+
+   /** @var LdapSerializer LDIF serialization */
+    public LdapSerializer $serializer;
+
+   /*!
+    * \brief Create a LDAP connection
    *
    * \param string $binddn Bind of the DN
    *
@@ -84,14 +96,20 @@ class LDAP
    *
    * \param boolean $tls FALSE
    */
-  function __construct ($binddn, $bindpw, $hostname, $follow_referral = FALSE, $tls = FALSE)
-  {
+   function __construct ($binddn, $bindpw, $hostname, $follow_referral = FALSE, $tls = FALSE)
+   {
     global $config;
     $this->follow_referral  = $follow_referral;
     $this->tls              = $tls;
     $this->binddn           = $binddn;
     $this->bindpw           = $bindpw;
     $this->hostname         = $hostname;
+
+    /* Initialize facade components */
+    $this->connection  = new LdapConnection($this);
+    $this->search      = new LdapSearch($this);
+    $this->writer      = new LdapWriter($this);
+    $this->serializer  = new LdapSerializer($this);
 
     /* Check if MAX_LDAP_QUERY_TIME is defined */
     if (is_object($config) && ($config->get_cfg_value("ldapMaxQueryTime") != "")) {
@@ -100,7 +118,7 @@ class LDAP
     }
 
     $this->connect();
-  }
+   }
 
   /*! \brief Remove bogus resources after unserialize
    */
