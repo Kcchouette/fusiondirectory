@@ -30,9 +30,9 @@ Session::start();
 reset_errors();
 
 $theme = '';
-if (Session::is_set('Config')) {
+if (Session::isSet('Config')) {
   $config = Session::get('Config');
-  $theme  = $config->get_cfg_value('theme');
+  $theme  = $config->getCfgValue('theme');
 } else {
   header("cache-control: no-cache");
 }

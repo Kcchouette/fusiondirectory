@@ -111,8 +111,8 @@ class LDAP
     $this->serializer  = new LdapSerializer($this);
 
     /* Check if MAX_LDAP_QUERY_TIME is defined */
-    if (is_object(config()) && (config()->get_cfg_value("ldapMaxQueryTime") != "")) {
-      $str = config()->get_cfg_value("ldapMaxQueryTime");
+    if (is_object(config()) && (config()->getCfgValue("ldapMaxQueryTime") != "")) {
+      $str = config()->getCfgValue("ldapMaxQueryTime");
       $this->max_ldap_query_time = (float)($str);
     }
 
@@ -437,7 +437,7 @@ class LDAP
   function getObjectclasses ($force_reload = FALSE)
   {
     /* Return the cached results. */
-    if (class_available('Session') && Session::is_set('LDAP_CACHE::getObjectclasses') && !$force_reload) {
+    if (class_available('Session') && Session::isSet('LDAP_CACHE::getObjectclasses') && !$force_reload) {
       return Session::get('LDAP_CACHE::getObjectclasses');
     }
 
@@ -544,7 +544,7 @@ class LDAP
    */
   function log ($string)
   {
-    if (Session::is_set('Config')) {
+    if (Session::isSet('Config')) {
       $cfg = Session::get('Config');
       if (isset($cfg->current['LDAPSTATS']) && preg_match('/true/i', $cfg->current['LDAPSTATS'])) {
         syslog(LOG_INFO, $string);

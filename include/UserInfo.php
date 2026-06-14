@@ -71,7 +71,7 @@ class UserInfo
   function __construct ($userdn)
   {
     $this->dn         = $userdn;
-    $this->ignoreACL  = (config()->get_cfg_value('ignoreAcl') == $this->dn);
+    $this->ignoreACL  = (config()->getCfgValue('ignoreAcl') == $this->dn);
 
     $this->loadLDAPInfo();
 
@@ -142,7 +142,7 @@ class UserInfo
     $this->resetAclCache();
     $ldap = config()->getLdapLink();
     $ldap->cd(config()->current['BASE']);
-    $targetFilterLimit  = config()->get_cfg_value('AclTargetFilterLimit', 100);
+    $targetFilterLimit  = config()->getCfgValue('AclTargetFilterLimit', 100);
 
     /* Get member groups... */
     $ldap->search('(&(objectClass=groupOfNames)(member='.ldap_escape_f($this->dn).'))', ['dn']);
@@ -508,7 +508,7 @@ class UserInfo
     /* If we are forced to skip ACLs checks for the current user
         then return all permissions.
      */
-    if ($this->ignore_acl_for_current_user()) {
+    if ($this->ignoreAclForCurrentUser()) {
       if ($skip_write) {
         return 'r';
       }
@@ -638,7 +638,7 @@ class UserInfo
     /* If we are forced to skip ACLs checks for the current user
         then return all departments as valid.
      */
-    if ($this->ignore_acl_for_current_user()) {
+    if ($this->ignoreAclForCurrentUser()) {
       return array_values(config()->getDepartmentList());
     }
 
@@ -792,7 +792,7 @@ class UserInfo
   *                                      EXPIRED
   *
   */
-  function expired_status ()
+  function expiredStatus ()
   {
     if ($this->forcePasswordChange) {
       return POSIX_FORCE_PASSWORD_CHANGE;
@@ -829,7 +829,7 @@ class UserInfo
       }
     }
 
-    if (config()->get_cfg_value('handleExpiredAccounts') != 'TRUE') {
+    if (config()->getCfgValue('handleExpiredAccounts') != 'TRUE') {
       return 0;
     }
 
@@ -927,7 +927,7 @@ class UserInfo
    */
   function isBlacklisted ($plugin)
   {
-    $blacklist = config()->get_cfg_value('PluginsMenuBlacklist', []);
+    $blacklist = config()->getCfgValue('PluginsMenuBlacklist', []);
     foreach ($blacklist as $item) {
       list ($group, $p) = explode('|', $item, 2);
       if (($plugin == $p) && (in_array($group, $this->groups) || in_array($group, $this->roles))) {
@@ -1031,7 +1031,7 @@ class UserInfo
 
     $allowed_attributes = ['uid','mail'];
     $verify_attr = [];
-    $tmp = explode(',', config()->get_cfg_value('loginAttribute'));
+    $tmp = explode(',', config()->getCfgValue('loginAttribute'));
     foreach ($tmp as $attr) {
       if (in_array($attr, $allowed_attributes)) {
         $verify_attr[] = $attr;

@@ -47,11 +47,11 @@ Session::start();
 
 if (InputFilter::has('signout') && InputFilter::request('signout')) {
   $reason = '';
-  if (Session::is_set('connected')) {
+  if (Session::isSet('connected')) {
     $config = Session::get('Config');
     if (
-      ($config->get_cfg_value('casActivated') == 'TRUE') ||
-      ($config->get_cfg_value('LoginMethod') === 'LoginCAS')
+      ($config->getCfgValue('casActivated') == 'TRUE') ||
+      ($config->getCfgValue('LoginMethod') === 'LoginCAS')
     ) {
       LoginCAS::initCAS();
       phpCAS::logout();
@@ -99,14 +99,14 @@ if (!is_readable(CONFIG_DIR.'/'.CONFIG_FILE)) {
 /* Parse configuration file */
 $config = new Config(CONFIG_DIR.'/'.CONFIG_FILE, $BASE_DIR);
 Session::set('Config', $config);
-Session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
+Session::set('DEBUGLEVEL', $config->getCfgValue('DEBUGLEVEL'));
 Logging::debug(DEBUG_CONFIG, __LINE__, '', __FILE__, $config->data, 'Config');
 /* Configuration was reloaded, so plist needs to be as well */
-Session::un_set('plist');
+Session::unsetKey('plist');
 unset($plist);
 
 /* Set template compile directory */
-$smarty->setCompileDir($config->get_cfg_value('templateCompileDirectory', SPOOL_DIR));
+$smarty->setCompileDir($config->getCfgValue('templateCompileDirectory', SPOOL_DIR));
 
 /* Check for compile directory */
 if (!(is_dir($smarty->getCompileDir()) && is_writable($smarty->getCompileDir()))) {
@@ -128,7 +128,7 @@ if (isset($_SERVER['HTTP_X_FUSIONDIRECTORY_LOCATION'])) {
   $server = trim($_SERVER['HTTP_X_FUSIONDIRECTORY_LOCATION']);
   if (isset($config->data['LOCATIONS'][$server])) {
     // Valid location found - switch to it
-    $config->set_current($server);
+    $config->setCurrent($server);
     Logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__,
       $server, 'Switched to location via HTTP header');
   } else {
@@ -151,17 +151,17 @@ if (isset($_SERVER['HTTP_X_FUSIONDIRECTORY_LOCATION'])) {
   $server = $config->data['MAIN']['DEFAULT'];
 }
 
-$config->set_current($server);
+$config->setCurrent($server);
 if (
-  ($config->get_cfg_value('casActivated') == 'TRUE') ||
-  ($config->get_cfg_value('httpAuthActivated') == 'TRUE') ||
-  ($config->get_cfg_value('httpHeaderAuthActivated') == 'TRUE') ||
-  in_array($config->get_cfg_value('LoginMethod'), ['LoginCas', 'LoginHTTPAuth', 'LoginHTTPHeader'])) {
+  ($config->getCfgValue('casActivated') == 'TRUE') ||
+  ($config->getCfgValue('httpAuthActivated') == 'TRUE') ||
+  ($config->getCfgValue('httpHeaderAuthActivated') == 'TRUE') ||
+  in_array($config->getCfgValue('LoginMethod'), ['LoginCas', 'LoginHTTPAuth', 'LoginHTTPHeader'])) {
   Session::set('DEBUGLEVEL', 0);
 }
 
 /* If SSL is forced, just forward to the SSL enabled site */
-if (($config->get_cfg_value('forcessl') == 'TRUE') && ($ssl != '')) {
+if (($config->getCfgValue('forcessl') == 'TRUE') && ($ssl != '')) {
   header("Location: $ssl");
   exit;
 }

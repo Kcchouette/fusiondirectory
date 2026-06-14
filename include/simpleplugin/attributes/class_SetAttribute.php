@@ -820,7 +820,7 @@ class SubNodesAttribute extends OrderedArrayAttribute
         $attribute->fillLdapValue($attrs);
       }
       unset($attribute);
-      $dn = $this->compute_attribute_dn();
+      $dn = $this->computeAttributeDn();
       $ldap->cd($dn);
       foreach (array_keys($attrs) as $index) {
         if (is_array($attrs[$index]) && (count($attrs[$index]) == 0)) {

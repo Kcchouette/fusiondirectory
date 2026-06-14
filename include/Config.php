@@ -133,9 +133,9 @@ class Config
     /* Check if class_location.inc has changed, this is the case
         if we have installed or removed plugins. */
     $tmp = stat(CACHE_DIR.'/'.CLASS_CACHE);
-    if (Session::is_set('class_location.inc:timestamp')
+    if (Session::isSet('class_location.inc:timestamp')
       && ($tmp['mtime'] != Session::get('class_location.inc:timestamp'))) {
-      Session::un_set('plist');
+      Session::unsetKey('plist');
     }
     Session::set('class_location.inc:timestamp', $tmp['mtime']);
 
@@ -146,7 +146,7 @@ class Config
       $this->currentLocation  = '';
 
       $this->parse($this->filename);
-      $this->set_current($this->current['NAME']);
+      $this->setCurrent($this->current['NAME']);
     }
   }
 
@@ -301,7 +301,7 @@ class Config
   function getCredentials ($creds)
   {
     if (isset($_SERVER['HTTP_FDKEY'])) {
-      if (!Session::is_set('HTTP_FDKEY_CACHE')) {
+      if (!Session::isSet('HTTP_FDKEY_CACHE')) {
         Session::set('HTTP_FDKEY_CACHE', []);
       }
       $cache = Session::get('HTTP_FDKEY_CACHE');
@@ -405,7 +405,7 @@ class Config
     /* Parse management config */
     $this->loadManagementConfig();
 
-    $debugLevel = $this->get_cfg_value('DEBUGLEVEL');
+    $debugLevel = $this->getCfgValue('DEBUGLEVEL');
     if ($debugLevel & DEBUG_CONFIG) {
       /* Value from LDAP can't activate DEBUG_CONFIG */
       $debugLevel -= DEBUG_CONFIG;
@@ -869,7 +869,7 @@ class Config
    */
   function checkSessionLifetime ()
   {
-    $cfg_lifetime = $this->get_cfg_value('SESSIONLIFETIME', 0);
+    $cfg_lifetime = $this->getCfgValue('SESSIONLIFETIME', 0);
     if ($cfg_lifetime > 0) {
       $ini_lifetime = ini_get('session.gc_maxlifetime');
       $deb_system   = file_exists('/etc/debian_version');
@@ -886,14 +886,14 @@ class Config
    */
   function snapshotEnabled ()
   {
-    if ($this->get_cfg_value('enableSnapshots') != 'TRUE') {
+    if ($this->getCfgValue('enableSnapshots') != 'TRUE') {
       return FALSE;
     }
 
     /* Check if the snapshot_base is defined */
-    if ($this->get_cfg_value('snapshotBase') == '') {
+    if ($this->getCfgValue('snapshotBase') == '') {
       /* Send message if not done already */
-      if (!Session::is_set('snapshotFailMessageSend')) {
+      if (!Session::isSet('snapshotFailMessageSend')) {
         Session::set('snapshotFailMessageSend', TRUE);
         $error = new FusionDirectoryError(
           htmlescape(sprintf(
@@ -909,7 +909,7 @@ class Config
     /* Check if gzcompress is available */
     if (!function_exists('gzcompress')) {
       /* Send message if not done already */
-      if (!Session::is_set('snapshotFailMessageSend')) {
+      if (!Session::isSet('snapshotFailMessageSend')) {
         Session::set('snapshotFailMessageSend', TRUE);
         $error = new FusionDirectoryError(
           htmlescape(sprintf(

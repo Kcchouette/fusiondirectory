@@ -185,7 +185,7 @@ function get_template_path ($filename = '', $plugin = FALSE, $path = '')
 
   /* Set theme */
   if (config() !== NULL) {
-    $theme = config()->get_cfg_value('theme', $default_theme);
+    $theme = config()->getCfgValue('theme', $default_theme);
   } else {
     $theme = $default_theme;
   }
@@ -444,8 +444,8 @@ function get_ou ($name)
   ];
 
   /* Preset ou... */
-  if (config()->get_cfg_value($name, '_not_set_') != '_not_set_') {
-    $ou = config()->get_cfg_value($name);
+  if (config()->getCfgValue($name, '_not_set_') != '_not_set_') {
+    $ou = config()->getCfgValue($name);
   } elseif (isset($map[$name])) {
     return $map[$name];
   } else {
@@ -523,7 +523,7 @@ function get_base_from_people ($dn)
 function strict_uid_mode ()
 {
   if (config() !== NULL) {
-    return (config()->get_cfg_value('strictNamingRules') == 'TRUE');
+    return (config()->getCfgValue('strictNamingRules') == 'TRUE');
   }
   return TRUE;
 }
@@ -1320,7 +1320,7 @@ function getEntryCSN (string $dn): string
   }
 
   /* Get attribute that we should use as serial number */
-  $attr = config()->get_cfg_value('modificationDetectionAttribute');
+  $attr = config()->getCfgValue('modificationDetectionAttribute');
   if ($attr != '') {
     $ldap = config()->get_ldap_link();
     $ldap->cat($dn, [$attr]);

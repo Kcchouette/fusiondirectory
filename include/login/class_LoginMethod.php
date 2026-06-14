@@ -39,14 +39,14 @@ class LoginMethod
   /*! \brief Runs schemaCheck if activated in configuration */
   static function runSchemaCheck (): bool
   {
-    if (config()->get_cfg_value('schemaCheck') != 'TRUE') {
+    if (config()->getCfgValue('schemaCheck') != 'TRUE') {
       return TRUE;
     }
     $cfg = [];
     $cfg['admin']       = config()->current['ADMINDN'];
     $cfg['password']    = config()->current['ADMINPASSWORD'];
     $cfg['connection']  = config()->current['SERVER'];
-    $cfg['tls']         = (config()->get_cfg_value('ldapTLS') == 'TRUE');
+    $cfg['tls']         = (config()->getCfgValue('ldapTLS') == 'TRUE');
     $str = check_schema($cfg);
     foreach ($str as $tr) {
       if (!$tr['STATUS']) {
@@ -131,7 +131,7 @@ class LoginMethod
 
     /* We need a fully loaded plist and config to test account expiration */
     if (!$plistReloaded) {
-      Session::un_set('plist');
+      Session::unsetKey('plist');
     }
     Pluglist::load();
 
@@ -139,7 +139,7 @@ class LoginMethod
     config()->checkLdapConfig();
 
     /* Check account expiration */
-    $expired = user_info()->expired_status();
+    $expired = user_info()->expiredStatus();
 
     if ($expired == POSIX_ACCOUNT_EXPIRED) {
       Logging::log('security', 'account', user_info()->dn, [], 'Account for user "'.static::$username.'" has expired');
@@ -162,7 +162,7 @@ class LoginMethod
     /* Not account expired or password forced change go to main page */
     Logging::log('security', 'login', user_info()->uid, [], 'Logged in successfully');
     Session::set('connected', 1);
-    Session::set('DEBUGLEVEL', config()->get_cfg_value('DEBUGLEVEL'));
+    Session::set('DEBUGLEVEL', config()->getCfgValue('DEBUGLEVEL'));
   }
 
   /*! \brief Final step of successful login: redirect to main.php */
@@ -197,14 +197,14 @@ class LoginMethod
   /*! \brief All login steps in the right order */
   static function loginProcess ()
   {
-    $method = config()->get_cfg_value('LoginMethod', '');
+    $method = config()->getCfgValue('LoginMethod', '');
     if (empty($method)) {
       // Try to detect configurations from FD<1.4
-      if (config()->get_cfg_value('httpAuthActivated') == 'TRUE') {
+      if (config()->getCfgValue('httpAuthActivated') == 'TRUE') {
         $method = 'LoginHTTPAuth';
-      } elseif (config()->get_cfg_value('casActivated') == 'TRUE') {
+      } elseif (config()->getCfgValue('casActivated') == 'TRUE') {
         $method = 'LoginCAS';
-      } elseif (config()->get_cfg_value('httpHeaderAuthActivated') == 'TRUE') {
+      } elseif (config()->getCfgValue('httpHeaderAuthActivated') == 'TRUE') {
         $method = 'LoginHTTPHeader';
       } else {
         $method = 'LoginPost';

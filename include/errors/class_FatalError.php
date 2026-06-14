@@ -79,7 +79,7 @@ class FatalError extends Error
         </tr>
       </table>';
 
-    if (config()->get_cfg_value('displayerrors') == 'TRUE') {
+    if (config()->getCfgValue('displayerrors') == 'TRUE') {
       $trace    = FusionDirectoryError::formatTrace($this);
       $display  .= print_a($trace, TRUE);
     }

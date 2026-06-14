@@ -31,7 +31,7 @@ class UserPasswordAttribute extends CompositeAttribute
     $temp = PasswordMethod::get_available_methods();
 
     /* Create password methods array */
-    $pwd_methods        = $config->get_cfg_value('passwordAllowedHashes', $temp['name']);
+    $pwd_methods        = $config->getCfgValue('passwordAllowedHashes', $temp['name']);
     $this->needPassword = [];
     foreach ($temp['name'] as $id => $name) {
       $this->needPassword[$name] = $temp[$id]['object']->need_password();
@@ -74,9 +74,9 @@ class UserPasswordAttribute extends CompositeAttribute
     global $config;
     parent::setParent($plugin);
     if (is_object($this->plugin)) {
-      $hash = $config->get_cfg_value('passwordDefaultHash', 'ssha');
+      $hash = $config->getCfgValue('passwordDefaultHash', 'ssha');
       $this->attributes[0]->setDefaultValue($hash);
-      if ($config->get_cfg_value('forcePasswordDefaultHash', 'FALSE') == 'TRUE') {
+      if ($config->getCfgValue('forcePasswordDefaultHash', 'FALSE') == 'TRUE') {
         $this->attributes[0]->setValue($hash);
         $this->attributes[0]->setDisabled(TRUE);
       }
@@ -100,7 +100,7 @@ class UserPasswordAttribute extends CompositeAttribute
             /* Do not display confirmation field in template mode */
             continue;
           }
-          if (($key == 0) && ($config->get_cfg_value('forcePasswordDefaultHash', 'FALSE') == 'TRUE')) {
+          if (($key == 0) && ($config->getCfgValue('forcePasswordDefaultHash', 'FALSE') == 'TRUE')) {
             $attribute->setDisabled(TRUE);
           } else {
             $attribute->setDisabled($this->disabled);
@@ -184,7 +184,7 @@ class UserPasswordAttribute extends CompositeAttribute
   function readUserPasswordValues ($value, $istemplate)
   {
     global $config;
-    $pw_storage = $config->get_cfg_value('passwordDefaultHash', 'ssha');
+    $pw_storage = $config->getCfgValue('passwordDefaultHash', 'ssha');
     $locked     = FALSE;
     $password   = '';
     if (!empty($value) || ($this->plugin->initially_was_account && !$istemplate)) {

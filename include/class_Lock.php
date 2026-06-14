@@ -51,7 +51,7 @@ class Lock
 
     /* Remember which entries were opened as read only, because we
         don't need to remove any locks for them later */
-    if (!Session::is_set('LOCK_CACHE')) {
+    if (!Session::isSet('LOCK_CACHE')) {
       Session::set('LOCK_CACHE', ['']);
     }
     if (is_array($object)) {
@@ -150,7 +150,7 @@ class Lock
     /* If this object was opened in read only mode then
         skip removing the lock entry, there wasn't any lock created.
       */
-    if (Session::is_set('LOCK_CACHE')) {
+    if (Session::isSet('LOCK_CACHE')) {
       $cache = &Session::get_ref('LOCK_CACHE');
       if (isset($cache['READ_ONLY'][$object])) {
         unset($cache['READ_ONLY'][$object]);
@@ -237,7 +237,7 @@ class Lock
     }
 
     $locks = [];
-    $sessionLifetime = config()->get_cfg_value('sessionLifetime', 1800);
+    $sessionLifetime = config()->getCfgValue('sessionLifetime', 1800);
     if ($sessionLifetime > 0) {
       $expirationDate = (new DateTime())->sub(new DateInterval('PT'.$sessionLifetime.'S'));
     }
@@ -326,7 +326,7 @@ class Lock
   public static function genLockedMessage (array $locks, bool $allowReadonly = FALSE, ?string $action = NULL): string
   {
     /* Save variables from LOCK_VARS_TO_USE in session - for further editing */
-    if (Session::is_set('LOCK_VARS_TO_USE') && count(Session::get('LOCK_VARS_TO_USE'))) {
+    if (Session::isSet('LOCK_VARS_TO_USE') && count(Session::get('LOCK_VARS_TO_USE'))) {
       $LOCK_VARS_USED_GET       = [];
       $LOCK_VARS_USED_POST      = [];
       $LOCK_VARS_USED_REQUEST   = [];

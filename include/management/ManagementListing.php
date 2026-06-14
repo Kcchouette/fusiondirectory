@@ -70,7 +70,7 @@ class ManagementListing
     $this->setUpBaseSelector();
 
     // Move footer information
-    $this->showFooter = (config()->get_cfg_value('listSummary') == 'TRUE');
+    $this->showFooter = (config()->getCfgValue('listSummary') == 'TRUE');
 
     $this->reloadColumns();
   }

@@ -59,7 +59,7 @@ class SnapshotHandler
     $this->enabled = config()->snapshotEnabled();
     if ($this->enabled) {
       /* Prepare base */
-      $this->snapshotRDN = config()->get_cfg_value('snapshotBase');
+      $this->snapshotRDN = config()->getCfgValue('snapshotBase');
       $ldap = config()->get_ldap_link();
       $ldap->cd(config()->current['BASE']);
       try {
@@ -113,7 +113,7 @@ class SnapshotHandler
     $ldap = config()->get_ldap_link();
 
     // Initialize base
-    $base = $this->snapshot_dn($base);
+    $base = $this->snapshotDn($base);
 
     /* Fetch all objects with */
     $ldap->cd($base);
@@ -154,7 +154,7 @@ class SnapshotHandler
     $objectBase = preg_replace("/^[^,]*./", "", $dn);
 
     // Initialize base
-    $base = $this->snapshot_dn($objectBase);
+    $base = $this->snapshotDn($objectBase);
 
     /* Fetch all objects with  gosaSnapshotDN=$dn */
     $ldap->cd($base);
@@ -224,7 +224,7 @@ class SnapshotHandler
 
     /* Collect some infos */
     $base_of_object = preg_replace('/^[^,]+,/i', '', $dn);
-    $new_base       = $this->snapshot_dn($base_of_object);
+    $new_base       = $this->snapshotDn($base_of_object);
     /* Create object */
     $data = '';
     foreach ($dns as $tmp_dn) {
@@ -366,7 +366,7 @@ class SnapshotHandler
 
     /* Prepare bases and some other infos */
     $base_of_object = preg_replace('/^[^,]+,/i', '', $dn);
-    $new_base       = $this->snapshot_dn($base_of_object);
+    $new_base       = $this->snapshotDn($base_of_object);
     $tmp            = [];
 
     /* Fetch all objects with  gosaSnapshotDN=$dn */
@@ -402,7 +402,7 @@ class SnapshotHandler
     $ldap = config()->get_ldap_link();
 
     /* Prepare bases */
-    $new_base       = $this->snapshot_dn($base_of_object);
+    $new_base       = $this->snapshotDn($base_of_object);
     /* Fetch all objects and check if they do not exist anymore */
     $tmp  = [];
     $ldap->cd($new_base);

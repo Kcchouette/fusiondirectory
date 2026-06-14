@@ -87,7 +87,7 @@ if (InputFilter::has('lang_selected') && InputFilter::post('lang_selected') != '
   if (!preg_match('/utf(-)?8$/i', $lang)) {
     $lang .= '.UTF-8';
   }
-} elseif (Session::is_set('lang')) {
+} elseif (Session::isSet('lang')) {
   $lang = Session::get('lang');
 
   /* Append .UTF-8 to language string if necessary */
@@ -104,7 +104,7 @@ $smarty->assign('lang', preg_replace('/_.*$/', '', $lang));
 $smarty->assign('rtl',  Language::isRTL($lang));
 
 /* Minimal config */
-if (!Session::is_set('Config')) {
+if (!Session::isSet('Config')) {
   $config = new Config('');
   Session::set('Config', $config);
 }
@@ -134,7 +134,7 @@ $smarty->assign("navigation",     $setup->get_navigation_html());
 $smarty->assign("headline_image", $setup->get_header_image());
 $smarty->assign("focus",          $focus);
 $smarty->assign('CSRFtoken',      CSRFProtection::getToken());
-$smarty->assign("msg_dialogs",    MsgDialog::get_dialogs());
+$smarty->assign("msg_dialogs",    MsgDialog::getDialogs());
 
 if ($error_collector != "") {
   $smarty->assign("php_errors", preg_replace("/%BUGBODY%/", $error_collector_mailto, $error_collector)."</div>");

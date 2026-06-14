@@ -154,7 +154,7 @@ class Tests
    *
    * \param string $ip The IPv6 to check
    */
-  public static function is_ipv6 ($ip)
+  public static function isIpv6 ($ip)
   {
     return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
   }
@@ -307,7 +307,7 @@ class Tests
    */
   public static function isIpRange ($ip1, $ip2)
   {
-    if (!Tests::is_ipv4($ip1) || !Tests::is_ipv4($ip2)) {
+    if (!Tests::isIpv4($ip1) || !Tests::isIpv4($ip2)) {
       return FALSE;
     } else {
       $ar1  = array_map('intval', explode('.', $ip1));

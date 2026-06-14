@@ -535,7 +535,7 @@ class Pluglist
    */
   static function load ()
   {
-    if (!Session::is_set('plist')) {
+    if (!Session::isSet('plist')) {
       /* Initially load all classes */
       load_all_classes();
 

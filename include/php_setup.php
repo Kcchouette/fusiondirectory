@@ -212,7 +212,7 @@ function gosaRaiseError ($errno, $errstr, $errfile, $errline)
   }
 
   /* Error messages are hidden in FusionDirectory, so we only send them to the logging class and abort here */
-  if (isset(config()->data) && config()->get_cfg_value('displayerrors') != 'TRUE') {
+  if (isset(config()->data) && config()->getCfgValue('displayerrors') != 'TRUE') {
     set_error_handler('gosaRaiseError', E_WARNING | E_NOTICE | E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE);
     return;
   }

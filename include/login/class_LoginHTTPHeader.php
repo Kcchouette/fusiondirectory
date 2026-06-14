@@ -42,7 +42,7 @@ class LoginHTTPHeader extends LoginMethod
     $message = '';
 
     // Get username header configuration
-    $header = config()->get_cfg_value('httpHeaderAuthHeaderName', 'AUTH_USER');
+    $header = config()->getCfgValue('httpHeaderAuthHeaderName', 'AUTH_USER');
     // History - be aware to set the header to AUTH-USER without X and score, not underscore.
     $headerKey = 'HTTP_'.strtoupper(str_replace('-', '_', $header));
 
@@ -103,7 +103,7 @@ class LoginHTTPHeader extends LoginMethod
       /* Everything went well, redirect to main.php */
       static::redirect();
     } else {
-      echo MsgDialog::get_dialogs();
+      echo MsgDialog::getDialogs();
       throw new FatalError(
         htmlescape(sprintf(
           _('Login with user "%s" triggered error: %s (Location: %s)'),

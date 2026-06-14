@@ -38,7 +38,7 @@ class hooksConfig extends SimplePlugin
     global $config;
 
     $plugins = [];
-    if (Session::is_set('plist')) {
+    if (Session::isSet('plist')) {
       $plugins = array_keys(Session::get('plist')->info);
     }
     sort($plugins);

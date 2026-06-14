@@ -32,7 +32,7 @@ class CSRFProtection
 
     static::checkHeaders();
 
-    if (!Session::is_set('CSRFtoken')) {
+    if (!Session::isSet('CSRFtoken')) {
       throw new FusionDirectoryException('Unexpected CSRF protection token');
     }
 
@@ -43,7 +43,7 @@ class CSRFProtection
 
   public static function getToken ()
   {
-    if (!Session::is_set('CSRFtoken')) {
+    if (!Session::isSet('CSRFtoken')) {
       Session::set('CSRFtoken', standAlonePage::generateRandomHash());
     }
     return Session::get('CSRFtoken');

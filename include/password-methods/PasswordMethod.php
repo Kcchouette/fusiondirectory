@@ -237,7 +237,7 @@ abstract class PasswordMethod
     $ret  = [];
     $i    = 0;
 
-    if (!Session::is_set('PasswordMethod::getAvailableMethods')) {
+    if (!Session::isSet('PasswordMethod::getAvailableMethods')) {
       foreach (array_keys($class_mapping) as $class) {
         if (preg_match('/^passwordMethod.+/i', $class)) {
           $test = new $class('');
@@ -397,7 +397,7 @@ abstract class PasswordMethod
    */
   static function isHarmless ($password): bool
   {
-    if (config()->get_cfg_value('strictPasswordRules') == 'TRUE') {
+    if (config()->getCfgValue('strictPasswordRules') == 'TRUE') {
       // Do we have UTF8 characters in the password?
       return ($password == mb_convert_encoding($password, 'ISO-8859-1', 'UTF-8'));
     }

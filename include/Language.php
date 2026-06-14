@@ -67,13 +67,13 @@ class Language
     $ret = FALSE;
 
     /* Reset plist cache if language changed */
-    if ((!Session::is_set('lang')) || (Session::get('lang') != $lang)) {
+    if ((!Session::isSet('lang')) || (Session::get('lang') != $lang)) {
       $ret = TRUE;
-      if (Session::is_set('plist')) {
+      if (Session::isSet('plist')) {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
           Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, Session::get('lang'), 'Plist already loaded with language');
         }
-        Session::un_set('plist');
+        Session::unsetKey('plist');
         Session::set('lang', $lang);
         Pluglist::load();
       }
@@ -105,8 +105,8 @@ class Language
     }
 
     /* Check for global language settings in configuration */
-    if (config()->get_cfg_value('language') != '') {
-      $lang = config()->get_cfg_value('language');
+    if (config()->getCfgValue('language') != '') {
+      $lang = config()->getCfgValue('language');
       if (!preg_match('/utf/i', $lang)) {
         $lang .= '.UTF-8';
       }

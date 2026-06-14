@@ -143,7 +143,7 @@ class PluginHookManager
                 $str = implode("\n", $arr);
                 $str = static::passwordProtect($str);
                 Logging::debug(DEBUG_SHELL, __LINE__, __FUNCTION__, __FILE__, $command, 'Output: ' . $str);
-                if (!empty($str) && config()->get_cfg_value('displayHookOutput', 'FALSE') == 'TRUE') {
+                if (!empty($str) && config()->getCfgValue('displayHookOutput', 'FALSE') == 'TRUE') {
                     MsgDialog::display('[' . get_class($this->plugin) . ' ' . strtolower($cmd) . 'trigger] ' . $command, htmlescape($str), INFO_DIALOG);
                 }
             }

@@ -33,7 +33,7 @@ class aclAssignment extends SimplePlugin
         'mainAttr'    => FALSE
       ],
     ];
-    if ($config->get_cfg_value('aclTabOnObjects') == 'TRUE') {
+    if ($config->getCfgValue('aclTabOnObjects') == 'TRUE') {
       $oc[] = 'special';
     } else {
       $oc = array_merge($oc, departmentManagement::getDepartmentTypes());

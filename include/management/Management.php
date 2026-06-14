@@ -140,7 +140,7 @@ class Management implements FusionDirectoryDialog
     if (!$this->skipCpHandler) {
       $this->cpHandler = new CopyPasteHandler();
     }
-    if (!static::$skipSnapshots && (config()->get_cfg_value('enableSnapshots') == 'TRUE')) {
+    if (!static::$skipSnapshots && (config()->getCfgValue('enableSnapshots') == 'TRUE')) {
       $this->snapHandler = new SnapshotHandler();
     }
 
@@ -296,7 +296,7 @@ class Management implements FusionDirectoryDialog
       )
     );
 
-    if (!static::$skipSnapshots && (config()->get_cfg_value('enableSnapshots') == 'TRUE')) {
+    if (!static::$skipSnapshots && (config()->getCfgValue('enableSnapshots') == 'TRUE')) {
       $this->registerAction(
         new Action(
           'snapshot', _('Create snapshot'), 'geticon.php?context=actions&icon=snapshot&size=16',
@@ -753,16 +753,16 @@ class Management implements FusionDirectoryDialog
     }
 
     /* Remove locks */
-    if ($remove_lock && Session::is_set($classname)) {
+    if ($remove_lock && Session::isSet($classname)) {
       $macl = Session::get($classname);
       $macl->removeLocks();
     }
 
     if ($cleanup) {
       /* Clean up */
-      Session::un_set($classname);
+      Session::unsetKey($classname);
     } else {
-      if (!Session::is_set($classname) || (isset($_GET['reset']) && $_GET['reset'] == 1)) {
+      if (!Session::isSet($classname) || (isset($_GET['reset']) && $_GET['reset'] == 1)) {
         /* Create the object if missing or reset requested */
         $managementObject = new $classname($objectTypes);
       } else {

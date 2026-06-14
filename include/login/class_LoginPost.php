@@ -89,7 +89,7 @@ class LoginPost extends LoginMethod
   /*! \brief Redirect to the second factor page */
   static protected function redirectSecondFactorPage ()
   {
-    Session::un_set('connected');
+    Session::unsetKey('connected');
     header('Location: secondfactor.php');
     exit;
   }
@@ -124,7 +124,7 @@ class LoginPost extends LoginMethod
     smarty()->assign('message', $message);
 
     /* Display SSL mode warning? */
-    if (($ssl != '') && (config()->get_cfg_value('warnSSL') == 'TRUE')) {
+    if (($ssl != '') && (config()->getCfgValue('warnSSL') == 'TRUE')) {
       smarty()->assign('ssl', sprintf(htmlescape(_('Warning: %sSession is not encrypted!%s')), '<a href="'.$ssl.'">', '</a>'));
     } else {
       smarty()->assign('ssl', '');
@@ -156,7 +156,7 @@ class LoginPost extends LoginMethod
     } else {
       smarty()->assign('php_errors', '');
     }
-    smarty()->assign('msg_dialogs',  MsgDialog::get_dialogs());
+    smarty()->assign('msg_dialogs',  MsgDialog::getDialogs());
     smarty()->assign('usePrototype', 'false');
     smarty()->assign('date',         date('l, dS F Y H:i:s O'));
     smarty()->assign('lang',         preg_replace('/_.*$/', '', $lang));
@@ -205,7 +205,7 @@ class LoginPost extends LoginMethod
     } else {
       smarty()->assign('php_errors', '');
     }
-    smarty()->assign('msg_dialogs',  MsgDialog::get_dialogs());
+    smarty()->assign('msg_dialogs',  MsgDialog::getDialogs());
     smarty()->assign('usePrototype', 'false');
     smarty()->assign('date',         date('l, dS F Y H:i:s O'));
     smarty()->assign('lang',         preg_replace('/_.*$/', '', $lang));

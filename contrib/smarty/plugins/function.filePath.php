@@ -24,7 +24,7 @@ function smarty_function_filePath ($params, Smarty_Internal_Template $smarty)
 
   /* Set theme */
   if (isset($config)) {
-    $theme = $config->get_cfg_value('theme', $default_theme);
+    $theme = $config->getCfgValue('theme', $default_theme);
   } else {
     $theme = $default_theme;
   }

@@ -108,7 +108,7 @@ class mailTemplateManagement extends Management
      )
     );
 
-    if (!static::$skipSnapshots && ($config->get_cfg_value('enableSnapshots') == 'TRUE')) {
+    if (!static::$skipSnapshots && ($config->getCfgValue('enableSnapshots') == 'TRUE')) {
       $this->registerAction(
         new Action(
           'snapshot', _('Create snapshot'), 'geticon.php?context=actions&icon=snapshot&size=16',

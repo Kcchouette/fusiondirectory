@@ -41,8 +41,8 @@ class Timezone
   {
 
     /* Is there a timezone set in the fusiondirectory configuration */
-    if (config()->get_cfg_value('Timezone') != '') {
-      $tz = config()->get_cfg_value('Timezone');
+    if (config()->getCfgValue('Timezone') != '') {
+      $tz = config()->getCfgValue('Timezone');
 
       if (@date_default_timezone_set($tz)) {
         return TRUE;
@@ -75,7 +75,7 @@ class Timezone
 
     /* Is there a correct timezone set in the fusiondirectory configuration */
     if (static::setDefaultTimezoneFromConfig()) {
-      $tz       = config()->get_cfg_value('Timezone');
+      $tz       = config()->getCfgValue('Timezone');
       $tz_delta = date('Z', $stamp);
       $tz_delta = $tz_delta / 3600;
       return ['name' => $tz, 'value' => $tz_delta];

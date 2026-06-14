@@ -39,30 +39,30 @@ class LoginCAS extends LoginMethod
     spl_autoload_unregister('fusiondirectory_autoload');
     spl_autoload_register('fusiondirectory_autoload');
 
-    if (config()->get_cfg_value('CasVerbose') == 'TRUE') {
+    if (config()->getCfgValue('CasVerbose') == 'TRUE') {
       phpCAS::setVerbose(TRUE);
     }
 
     // Initialize CAS with proper library and call.
-    if (config()->get_cfg_value('CasLibraryBool') === 'TRUE') {
+    if (config()->getCfgValue('CasLibraryBool') === 'TRUE') {
       phpCAS::client(
         CAS_VERSION_2_0,
-        config()->get_cfg_value('CasHost', 'localhost'),
-        (int) (config()->get_cfg_value('CasPort', 443)),
-        config()->get_cfg_value('CasContext'),
-        config()->get_cfg_value('CasClientServiceName')
+        config()->getCfgValue('CasHost', 'localhost'),
+        (int) (config()->getCfgValue('CasPort', 443)),
+        config()->getCfgValue('CasContext'),
+        config()->getCfgValue('CasClientServiceName')
       );
     } else {
       phpCAS::client(
         CAS_VERSION_2_0,
-        config()->get_cfg_value('CasHost', 'localhost'),
-        (int) (config()->get_cfg_value('CasPort', 443)),
-        config()->get_cfg_value('CasContext')
+        config()->getCfgValue('CasHost', 'localhost'),
+        (int) (config()->getCfgValue('CasPort', 443)),
+        config()->getCfgValue('CasContext')
       );
     }
 
     // Set the CA certificate that is the issuer of the cert
-    phpCAS::setCasServerCACert(config()->get_cfg_value('CasServerCaCertPath'));
+    phpCAS::setCasServerCACert(config()->getCfgValue('CasServerCaCertPath'));
   }
 
   /*! \brief All login steps in the right order for CAS login */
@@ -116,7 +116,7 @@ class LoginCAS extends LoginMethod
       /* Everything went well, redirect to main.php */
       static::redirect();
     } else {
-      echo MsgDialog::get_dialogs();
+      echo MsgDialog::getDialogs();
       throw new FatalError(
         htmlescape(sprintf(
           _('Login with user "%s" triggered error: %s'),

@@ -286,8 +286,8 @@ class setup implements FusionDirectoryDialog
     $smarty->assign('templateCompileDirectory', SPOOL_DIR);
     $xml = $smarty->fetch(CONFIG_TEMPLATE_DIR.CONFIG_FILE);
     $config->parse_data($xml);
-    $config->set_current($config->data['MAIN']['DEFAULT']);
-    Session::un_set('plist');
+    $config->setCurrent($config->data['MAIN']['DEFAULT']);
+    Session::unsetKey('plist');
     Pluglist::load();
     $this->reBuildConfigStep();
   }
@@ -312,7 +312,7 @@ class setup implements FusionDirectoryDialog
     $display = '';
 
     /* Create a new setup class if necessary  */
-    if (!Session::is_set('setup') || (isset($_GET['reset']) && ($_GET['reset'] == 1))) {
+    if (!Session::isSet('setup') || (isset($_GET['reset']) && ($_GET['reset'] == 1))) {
       Session::set('setup', new setup());
     }
     $setup = Session::get('setup');

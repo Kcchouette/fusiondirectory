@@ -28,9 +28,9 @@ class configInLdapTabs extends SimpleTabs
     /* check_and_reload */
     $config->check_and_reload(TRUE);
     /* reload plist as well as some plInfo might use $config or get_ou */
-    Session::un_set('plist');
+    Session::unsetKey('plist');
     Pluglist::load();
-    Session::un_set('PasswordMethod::get_available_methods');
+    Session::unsetKey('PasswordMethod::get_available_methods');
 
     /* reload inldap configuration for hooks and config changes */
     $config->load_inldap_config();

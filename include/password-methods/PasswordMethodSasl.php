@@ -44,8 +44,8 @@ class PasswordMethodSasl extends PasswordMethod
    */
   function __construct ($dn = '', $userTab = NULL)
   {
-    $this->realm  = trim(config()->get_cfg_value('saslRealm', ''));
-    $this->exop   = trim(config()->get_cfg_value('saslExop', ''));
+    $this->realm  = trim(config()->getCfgValue('saslRealm', ''));
+    $this->exop   = trim(config()->getCfgValue('saslExop', ''));
 
     if ($dn == '' || $dn == 'new') {
       return;
@@ -125,6 +125,6 @@ class PasswordMethodSasl extends PasswordMethod
    */
   function needPassword (): bool
   {
-    return (config()->get_cfg_value('forceSaslPasswordAsk', 'FALSE') == 'TRUE');
+    return (config()->getCfgValue('forceSaslPasswordAsk', 'FALSE') == 'TRUE');
   }
 }

@@ -32,7 +32,7 @@ Session::start();
 reset_errors();
 
 /* Logged in? Simple security check */
-if (!Session::is_set('ui')) {
+if (!Session::isSet('ui')) {
   Logging::log('security', 'unknown', '', [], 'Error: getbin.php called without session');
   header('Location: index.php');
   exit;
@@ -49,9 +49,9 @@ if (InputFilter::has('key')) {
   $key .= InputFilter::get('key');
 }
 
-$bintype = (Session::is_set($key.'type') ? Session::get($key.'type') : 'octet-stream');
+$bintype = (Session::isSet($key.'type') ? Session::get($key.'type') : 'octet-stream');
 header('Content-type: '.$bintype);
-if (Session::is_set($key.'file')) {
+if (Session::isSet($key.'file')) {
   header('Content-disposition: attachment; filename="'.Session::get($key.'file').'"');
 }
 

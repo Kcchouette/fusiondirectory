@@ -80,7 +80,7 @@ class PasswordRecovery extends standAlonePage
 
     /* Got a formular answer, validate and try to log in */
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-      if (Session::is_set('_LAST_PAGE_REQUEST')) {
+      if (Session::isSet('_LAST_PAGE_REQUEST')) {
         Session::set('_LAST_PAGE_REQUEST', time());
       }
 
@@ -138,22 +138,22 @@ class PasswordRecovery extends standAlonePage
    */
   protected function readLdapConfig (): bool
   {
-    $this->salt          = config()->get_cfg_value('passwordRecoverySalt');
-    $this->delay_allowed = config()->get_cfg_value('passwordRecoveryValidity');
+    $this->salt          = config()->getCfgValue('passwordRecoverySalt');
+    $this->delay_allowed = config()->getCfgValue('passwordRecoveryValidity');
 
-    $this->mail_subject  = config()->get_cfg_value('passwordRecoveryMailSubject');
-    $this->mail_body     = config()->get_cfg_value('passwordRecoveryMailBody');
-    $this->mail2_subject = config()->get_cfg_value('passwordRecoveryMail2Subject');
-    $this->mail2_body    = config()->get_cfg_value('passwordRecoveryMail2Body');
+    $this->mail_subject  = config()->getCfgValue('passwordRecoveryMailSubject');
+    $this->mail_body     = config()->getCfgValue('passwordRecoveryMailBody');
+    $this->mail2_subject = config()->getCfgValue('passwordRecoveryMail2Subject');
+    $this->mail2_body    = config()->getCfgValue('passwordRecoveryMail2Body');
 
-    $this->from_mail = config()->get_cfg_value('passwordRecoveryEmail');
+    $this->from_mail = config()->getCfgValue('passwordRecoveryEmail');
 
-    $this->usealternates = config()->get_cfg_value('passwordRecoveryUseAlternate');
+    $this->usealternates = config()->getCfgValue('passwordRecoveryUseAlternate');
 
-    $this->loginAttribute = config()->get_cfg_value('passwordRecoveryLoginAttribute', 'uid');
+    $this->loginAttribute = config()->getCfgValue('passwordRecoveryLoginAttribute', 'uid');
 
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, config()->get_cfg_value('passwordRecoveryActivated'), "passwordRecoveryActivated");
-    return (config()->get_cfg_value('passwordRecoveryActivated') == "TRUE");
+    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, config()->getCfgValue('passwordRecoveryActivated'), "passwordRecoveryActivated");
+    return (config()->getCfgValue('passwordRecoveryActivated') == "TRUE");
   }
 
   function storeToken ($temp_password)
@@ -236,10 +236,10 @@ class PasswordRecovery extends standAlonePage
     $ldap = config()->getLdapLink();
 
     $objectClasses = ['gosaMailAccount'];
-    if (class_available('personalInfo') && (config()->get_cfg_value('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
+    if (class_available('personalInfo') && (config()->getCfgValue('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
       $objectClasses[] = 'fdPersonalInfo';
     }
-    if (class_available('supannAccount') && (config()->get_cfg_value('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
+    if (class_available('supannAccount') && (config()->getCfgValue('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
       $objectClasses[] = 'supannPerson';
     }
     $filter = '(&(|(objectClass=' . join(')(objectClass=', $objectClasses) . '))(' . $this->loginAttribute . '=' . ldap_escape_f($this->login) . '))';
@@ -274,10 +274,10 @@ class PasswordRecovery extends standAlonePage
     } else {
       $filter = '(&(objectClass=gosaMailAccount)(mail=' . $address_escaped . '))';
     }
-    if (class_available('personalInfo') && (config()->get_cfg_value('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
+    if (class_available('personalInfo') && (config()->getCfgValue('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
       $filter = '(|' . $filter . '(&(objectClass=fdPersonalInfo)(fdPrivateMail=' . $address_escaped . ')))';
     }
-    if (class_available('supannAccount') && (config()->get_cfg_value('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
+    if (class_available('supannAccount') && (config()->getCfgValue('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
       $filter = '(|' . $filter . '(&(objectClass=supannPerson)(|(supannMailPerso=' . $address_escaped . ')(supannMailPrive={SECOURS}' . $address_escaped . '))))';
     }
     $ldap = config()->getLdapLink();

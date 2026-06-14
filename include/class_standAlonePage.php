@@ -85,7 +85,7 @@ abstract class standAlonePage
 
     if ($this->directory != $olddirectory) {
       /* Set config to selected one */
-      config()->set_current($this->directory);
+      config()->setCurrent($this->directory);
 
       $this->activated = $this->readLdapConfig();
     }
@@ -138,7 +138,7 @@ abstract class standAlonePage
 
     /* Parse configuration file */
     $config = new Config(CONFIG_DIR.'/'.CONFIG_FILE, base_dir());
-    Session::set('DEBUGLEVEL', $config->get_cfg_value('debuglevel'));
+    Session::set('DEBUGLEVEL', $config->getCfgValue('debuglevel'));
     Logging::debug(DEBUG_CONFIG, __LINE__, __FUNCTION__, __FILE__, $config->data, 'Config');
     return $config;
   }
@@ -148,7 +148,7 @@ abstract class standAlonePage
     $smarty = get_smarty();
 
     /* Set template compile directory */
-    $smarty->compile_dir = config()->get_cfg_value('templateCompileDirectory', SPOOL_DIR);
+    $smarty->compile_dir = config()->getCfgValue('templateCompileDirectory', SPOOL_DIR);
 
     /* Check for compile directory */
     if (!(is_dir($smarty->compile_dir) && is_writable($smarty->compile_dir))) {
@@ -197,7 +197,7 @@ abstract class standAlonePage
       $smarty->assign('php_errors', '');
     }
 
-    $smarty->assign('msg_dialogs',  MsgDialog::get_dialogs());
+    $smarty->assign('msg_dialogs',  MsgDialog::getDialogs());
   }
 
   function checkForSSL ()
@@ -211,10 +211,10 @@ abstract class standAlonePage
       $ssl = URL::getSslUrl();
 
       /* If SSL is forced, just forward to the SSL enabled site */
-      if (config()->get_cfg_value('forcessl') == 'TRUE') {
+      if (config()->getCfgValue('forcessl') == 'TRUE') {
         header("Location: $ssl");
         throw new \RuntimeException('SSL forced');
-      } elseif (config()->get_cfg_value('warnssl') == 'TRUE') {
+      } elseif (config()->getCfgValue('warnssl') == 'TRUE') {
         /* Display SSL mode warning? */
         $smarty->assign('ssl', sprintf(htmlescape(_('Warning: %sSession is not encrypted!%s')), '<a href="'.$ssl.'">', '</a>'));
       }
@@ -242,7 +242,7 @@ abstract class standAlonePage
     Session::start();
 
     $class = get_called_class();
-    if (Session::is_set('standAlonePage_'.$class)) {
+    if (Session::isSet('standAlonePage_'.$class)) {
       $page = Session::get('standAlonePage_'.$class);
       $page->init();
     } else {

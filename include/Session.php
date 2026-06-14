@@ -45,7 +45,7 @@ class Session
    */
   public static function globalIsSet ($name)
   {
-    return static::is_set($name);
+    return static::isSet($name);
   }
 
   /*!
@@ -105,7 +105,7 @@ class Session
    */
   public static function delete ($name)
   {
-    return static::un_set($name);
+    return static::unsetKey($name);
   }
 
   /*!
@@ -113,7 +113,7 @@ class Session
    */
   public static function globalDelete ($name)
   {
-    return static::un_set($name);
+    return static::unsetKey($name);
   }
 
   /*!
@@ -133,7 +133,7 @@ class Session
    */
   public static function globalUnSet ($name)
   {
-    return static::un_set($name);
+    return static::unsetKey($name);
   }
 
   /*!

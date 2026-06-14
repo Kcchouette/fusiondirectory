@@ -13,7 +13,7 @@ class AclChecker
 
     public function aclSkipWrite (): bool
     {
-        return ($this->plugin->needEditMode && !Session::is_set('edit'));
+        return ($this->plugin->needEditMode && !Session::isSet('edit'));
     }
 
     /*! \brief Can we write the attribute */

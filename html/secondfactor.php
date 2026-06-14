@@ -57,13 +57,13 @@ if ($ssl != '') {
 CSRFProtection::check();
 
 /* Logged in? Redirect to FD */
-if (Session::is_set('connected')) {
+if (Session::isSet('connected')) {
   header('Location: main.php');
   exit;
 }
 
 /* Missing data? Redirect to login */
-if (!Session::is_set('ui') || !Session::is_set('Config')) {
+if (!Session::isSet('ui') || !Session::isSet('Config')) {
   header('Location: index.php');
   exit;
 }
@@ -76,7 +76,7 @@ Timezone::setDefaultTimezoneFromConfig();
 /* Check for invalid sessions */
 if (Session::get('_LAST_PAGE_REQUEST') != '') {
   /* check FusionDirectory.conf for defined session lifetime */
-  $max_life = $config->get_cfg_value('sessionLifetime', 60 * 60 * 2);
+  $max_life = $config->getCfgValue('sessionLifetime', 60 * 60 * 2);
 
   if ($max_life > 0) {
     /* get time difference between last page reload */
@@ -101,10 +101,10 @@ foreach (LoginPost::$secondFactorMethods as $secondFactorMethod) {
   $secondFactorMethod::earlyProcess();
 }
 
-Session::set('DEBUGLEVEL', $config->get_cfg_value('DEBUGLEVEL'));
+Session::set('DEBUGLEVEL', $config->getCfgValue('DEBUGLEVEL'));
 
 /* Set template compile directory */
-$smarty->setCompileDir($config->get_cfg_value('templateCompileDirectory', SPOOL_DIR));
+$smarty->setCompileDir($config->getCfgValue('templateCompileDirectory', SPOOL_DIR));
 
 Language::init();
 

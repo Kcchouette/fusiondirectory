@@ -145,7 +145,7 @@ class department extends SimplePlugin
     }
     $this->objectclasses = array_unique($this->objectclasses);
 
-    $categoriesList = $config->get_cfg_value('DepartmentCategories', []);
+    $categoriesList = $config->getCfgValue('DepartmentCategories', []);
 
     /* Insert current value to possibilities */
     if (isset($this->attributesAccess['businessCategory'])) {

@@ -117,12 +117,12 @@ class setupStepConfig extends configInLdap
         return TRUE;
       }
       /* Insert default config values, even for installed plugin */
-      Session::un_set('plist');
+      Session::unsetKey('plist');
       Pluglist::load();
       $config->loadPlist($plist);
       $config->checkLdapConfig(TRUE);
       /* Reload config from LDAP */
-      $config->set_current($config->current['NAME']);
+      $config->setCurrent($config->current['NAME']);
       /* Set as completed and reload step */
       $this->is_completed = TRUE;
       $this->parent->reBuildConfigStep(TRUE);

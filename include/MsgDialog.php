@@ -75,7 +75,7 @@ class MsgDialog
       return;
     }
 
-    if ((!Session::is_set('errorsAlreadyPosted')) || !is_array(Session::get('errorsAlreadyPosted'))) {
+    if ((!Session::isSet('errorsAlreadyPosted')) || !is_array(Session::get('errorsAlreadyPosted'))) {
       Session::set('errorsAlreadyPosted', []);
     }
 
@@ -93,14 +93,14 @@ class MsgDialog
     }
 
     /* Append trace information, only if error messages are enabled */
-    if (config()->get_cfg_value('displayerrors') == 'TRUE') {
+    if (config()->getCfgValue('displayerrors') == 'TRUE') {
       if (empty($this->a_Trace)) {
         $this->a_Trace = debug_backtrace();
       }
     } else {
       $this->a_Trace = [];
     }
-    if (Session::is_set('msg_dialogs')) {
+    if (Session::isSet('msg_dialogs')) {
       $msg_dialogs = Session::get('msg_dialogs');
     } else {
       $msg_dialogs = [];
@@ -187,9 +187,9 @@ class MsgDialog
   /*!
    * \brief Accessor of the message dialog rendered HTML
    */
-  public static function get_dialogs (): string
+  public static function getDialogs (): string
   {
-    if (Session::is_set('msg_dialogs') &&
+    if (Session::isSet('msg_dialogs') &&
         is_array(Session::get('msg_dialogs')) &&
         count(Session::get('msg_dialogs'))) {
       $smarty = get_smarty();

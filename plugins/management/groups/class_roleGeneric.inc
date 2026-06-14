@@ -25,7 +25,7 @@ class RoleMembersAttribute extends UsersAttribute
   function getFilterWhiteList ()
   {
     global $config;
-    if ($config->get_cfg_value('RestrictRoleMembers') == 'TRUE') {
+    if ($config->getCfgValue('RestrictRoleMembers') == 'TRUE') {
       if ($this->whitelistDns === NULL) {
         /* Computes a list of members of all groups within our branch */
         $groups = Objects::ls('ogroup', ['member' => '*'], $this->plugin->base);

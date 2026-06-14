@@ -240,7 +240,7 @@ class SimplePlugin implements SimpleTab
     /* Check if this entry was opened in read only mode */
     if (($this->dn != 'new') &&
       isset($_POST['open_readonly']) &&
-      Session::is_set('LOCK_CACHE')
+      Session::isSet('LOCK_CACHE')
     ) {
       $cache = Session::get('LOCK_CACHE');
       if (isset($cache['READ_ONLY'][$this->dn])) {
@@ -1193,7 +1193,7 @@ class SimplePlugin implements SimpleTab
         $filter    = $ref[2];
         $filtersub = $ref[3];
         if ($filtersub == '*') {
-          if (config()->get_cfg_value('wildcardForeignKeys', 'TRUE') == 'TRUE') {
+          if (config()->getCfgValue('wildcardForeignKeys', 'TRUE') == 'TRUE') {
             $filtersub = $ofield . '=*';
           } else {
             continue;
@@ -1724,25 +1724,25 @@ class SimplePlugin implements SimpleTab
 
     $lock_msg = "";
     if ($edit_mode
-      && ($remove_lock || (isset($_POST['edit_cancel']) && Session::is_set('edit')))
-      && Session::is_set($classname)) {
+      && ($remove_lock || (isset($_POST['edit_cancel']) && Session::isSet('edit')))
+      && Session::isSet($classname)) {
       /* Remove locks created by this plugin */
       Lock::deleteByObject($entry_dn);
     }
 
     /* Remove this plugin from session */
     if ($cleanup) {
-      Session::un_set($classname);
-      Session::un_set('edit');
+      Session::unsetKey($classname);
+      Session::unsetKey('edit');
     } else {
       /* Reset requested? */
       if ($edit_mode && isset($_POST['edit_cancel'])) {
-        Session::un_set($classname);
-        Session::un_set('edit');
+        Session::unsetKey($classname);
+        Session::unsetKey('edit');
       }
 
       /* Create tab object on demand */
-      if (!Session::is_set($classname) || (isset($_GET['reset']) && $_GET['reset'] == 1)) {
+      if (!Session::isSet($classname) || (isset($_GET['reset']) && $_GET['reset'] == 1)) {
         try {
           $tabObject = Objects::open($entry_dn, $objectType);
         } catch (NonExistingLdapNodeException $e) {
@@ -1758,7 +1758,7 @@ class SimplePlugin implements SimpleTab
       }
       $tabObject = Session::get($classname);
 
-      if (!$edit_mode || Session::is_set('edit')) {
+      if (!$edit_mode || Session::isSet('edit')) {
         /* Save changes back to object */
         $tabObject->readPost();
         $tabObject->update();
@@ -1769,7 +1769,7 @@ class SimplePlugin implements SimpleTab
 
       if ($edit_mode) {
         /* Enter edit mode? */
-        if ((isset($_POST['edit'])) && (!Session::is_set('edit'))) {
+        if ((isset($_POST['edit'])) && (!Session::isSet('edit'))) {
           /* Check locking */
           if ($locks = Lock::get($entry_dn)) {
             Session::set('LOCK_VARS_TO_USE', ['/^edit$/', '/^plug$/']);
@@ -1789,10 +1789,10 @@ class SimplePlugin implements SimpleTab
           /* No errors, save object */
           if (count($errors) == 0) {
             Lock::deleteByObject($entry_dn);
-            Session::un_set('edit');
+            Session::unsetKey('edit');
 
             /* Remove from session */
-            Session::un_set($classname);
+            Session::unsetKey($classname);
           } else {
             /* Errors found, show errors */
             MsgDialog::displayChecks($errors);
@@ -1812,7 +1812,7 @@ class SimplePlugin implements SimpleTab
       }
 
       /* Store changes  in session */
-      if (!$edit_mode || Session::is_set('edit')) {
+      if (!$edit_mode || Session::isSet('edit')) {
         Session::set($classname, $tabObject);
       }
 
@@ -1820,7 +1820,7 @@ class SimplePlugin implements SimpleTab
       $info = $entry_dn . '&nbsp;';
       if ($edit_mode && (!$tabObject->dialogOpened()) && empty($lock_msg)) {
         /* Are we in edit mode? */
-        if (Session::is_set('edit')) {
+        if (Session::isSet('edit')) {
           $display .= '<p class="plugbottom">' . "\n";
           $display .= '<input type="submit" name="edit_finish" style="width:80px" value="' . MsgPool::okButton() . '"/>' . "\n";
           $display .= '&nbsp;';

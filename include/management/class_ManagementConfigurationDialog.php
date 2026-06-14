@@ -174,7 +174,7 @@ class ManagementConfigurationDialog extends ManagementDialog
     }
   }
 
-  function handle_resetInLdapUser ()
+  function handleResetInLdapUser ()
   {
     $errors = config()->updateManagementConfig(get_class($this->parent), NULL, TRUE);
     MsgDialog::displayChecks($errors);
@@ -183,7 +183,7 @@ class ManagementConfigurationDialog extends ManagementDialog
     }
   }
 
-  function handle_resetInLdap ()
+  function handleResetInLdap ()
   {
     $errors = config()->updateManagementConfig(get_class($this->parent), NULL, FALSE);
     MsgDialog::displayChecks($errors);

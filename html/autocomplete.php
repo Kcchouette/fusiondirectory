@@ -31,7 +31,7 @@ Session::start();
 reset_errors();
 
 /* Logged in? Simple security check */
-if (!Session::is_set('ui')) {
+if (!Session::isSet('ui')) {
   Logging::log('security', 'unknown', '', [], 'Error: autocomplete.php called without session');
   header('Location: index.php');
   exit;
@@ -41,7 +41,7 @@ if (!Session::is_set('ui')) {
 if (InputFilter::has('type') && InputFilter::get('type') == "base") {
 
   // Find dn based on name and description
-  if (Session::is_set("pathMapping") && count($_POST) == 1 && InputFilter::has('search')) {
+  if (Session::isSet("pathMapping") && count($_POST) == 1 && InputFilter::has('search')) {
     $res          = "";
     $pathMapping  = Session::get("pathMapping");
     $search       = preg_replace('/&quot;/', '"', InputFilter::post('search', ''));
@@ -77,7 +77,7 @@ if (InputFilter::has('type') && InputFilter::get('type') == "base") {
   $config = Session::get('Config');
 
   /* Is there a filter object around? */
-  if (Session::is_set('autocomplete')) {
+  if (Session::isSet('autocomplete')) {
     $filter = Session::get('autocomplete');
     $filter->processAutocomplete();
   }

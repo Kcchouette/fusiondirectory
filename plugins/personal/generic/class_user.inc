@@ -97,7 +97,7 @@ class user extends SimplePlugin
           ),
           new StringAttribute(
             _('First name'), _('First name of this user'),
-            'givenName', ($config->get_cfg_value('GivenNameRequired', 'TRUE') === 'TRUE'),
+            'givenName', ($config->getCfgValue('GivenNameRequired', 'TRUE') === 'TRUE'),
             '', '', '/^[^,+"?()=<>;\\\\]+$/'
           ),
           new StringAttribute(
@@ -112,7 +112,7 @@ class user extends SimplePlugin
           new ImageAttribute(
             _('Picture'), _('The avatar for this user'),
             'jpegPhoto', FALSE,
-            $config->get_cfg_value('MaxAvatarSize', 200), $config->get_cfg_value('MaxAvatarSize', 200), 'jpeg'
+            $config->getCfgValue('MaxAvatarSize', 200), $config->getCfgValue('MaxAvatarSize', 200), 'jpeg'
           ),
         ]
       ],
@@ -237,7 +237,7 @@ class user extends SimplePlugin
         ]
       ],
     ];
-    if ($config->get_cfg_value('SplitPostalAddress') == 'TRUE') {
+    if ($config->getCfgValue('SplitPostalAddress') == 'TRUE') {
       $attributesInfo['contact']['attrs'][2]->setVisible(FALSE);
       array_splice($attributesInfo['contact']['attrs'], 3, 0, [
         new StringAttribute(
@@ -307,7 +307,7 @@ class user extends SimplePlugin
   private function update_cn ()
   {
     global $config;
-    $pattern = $config->get_cfg_value('CnPattern', '%givenName% %sn%');
+    $pattern = $config->getCfgValue('CnPattern', '%givenName% %sn%');
     $this->attributesAccess['cn']->setValue($this->applyPattern($pattern));
   }
 
@@ -344,7 +344,7 @@ class user extends SimplePlugin
     }
 
     $this->update_cn();
-    $attribute = $config->get_cfg_value('accountPrimaryAttribute', 'uid');
+    $attribute = $config->getCfgValue('accountPrimaryAttribute', 'uid');
 
     return $this->create_unique_dn($attribute, get_ou('userRDN') . $this->base);
   }
@@ -368,8 +368,8 @@ class user extends SimplePlugin
   protected function prepare_save (): array
   {
     global $config;
-    if ($config->get_cfg_value('SplitPostalAddress') == 'TRUE') {
-      $pattern = $config->get_cfg_value('PostalAddressPattern', '');
+    if ($config->getCfgValue('SplitPostalAddress') == 'TRUE') {
+      $pattern = $config->getCfgValue('PostalAddressPattern', '');
       if (!empty($pattern)) {
         $this->postalAddress = $this->applyPattern($this->attributesAccess['postalAddress']->inputValue($pattern));
       }
@@ -474,7 +474,7 @@ class user extends SimplePlugin
     if (isset($attrs['pwdPolicySubentry'][0])) {
       $ppolicydn = $attrs['pwdPolicySubentry'][0];
     } else {
-      $ppolicydn = $config->get_cfg_value('ppolicyDefaultDn', '');
+      $ppolicydn = $config->getCfgValue('ppolicyDefaultDn', '');
     }
 
     $policy = NULL;
@@ -494,15 +494,15 @@ class user extends SimplePlugin
     global $config, $ui;
 
     /* Should we check different characters in new password */
-    $check_differ = ($config->get_cfg_value('passwordMinDiffer') != '');
-    $differ       = $config->get_cfg_value('passwordMinDiffer', 0);
+    $check_differ = ($config->getCfgValue('passwordMinDiffer') != '');
+    $differ       = $config->getCfgValue('passwordMinDiffer', 0);
     if ($current_password === NULL) {
       $check_differ = FALSE;
     }
 
     /* Enable length check ? */
-    $check_length = ($config->get_cfg_value('passwordMinLength') != '');
-    $length       = $config->get_cfg_value('passwordMinLength', 0);
+    $check_length = ($config->getCfgValue('passwordMinLength') != '');
+    $length       = $config->getCfgValue('passwordMinLength', 0);
 
     try {
       list($policy, $attrs) = static::fetchPpolicy($user);

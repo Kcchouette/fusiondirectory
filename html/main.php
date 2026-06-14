@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 Logging::debug(DEBUG_SESSION, __LINE__, '', __FILE__, $_SESSION, '_SESSION');
 
 /* Logged in? Simple security check */
-if (!Session::is_set('connected')) {
+if (!Session::isSet('connected')) {
   Session::destroy('main.php called without session');
   header('Location: index.php?message=nosession');
   exit;
@@ -67,7 +67,7 @@ $ui     = Session::get('ui');
 $config = Session::get('Config');
 
 /* If SSL is forced, just forward to the SSL enabled site */
-if (($config->get_cfg_value('forcessl') == 'TRUE') && ($ssl != '')) {
+if (($config->getCfgValue('forcessl') == 'TRUE') && ($ssl != '')) {
   header("Location: $ssl");
   exit;
 }
@@ -77,7 +77,7 @@ Timezone::setDefaultTimezoneFromConfig();
 /* Check for invalid sessions */
 if (Session::get('_LAST_PAGE_REQUEST') != '') {
   /* check FusionDirectory.conf for defined session lifetime */
-  $max_life = $config->get_cfg_value('sessionLifetime', 60 * 60 * 2);
+  $max_life = $config->getCfgValue('sessionLifetime', 60 * 60 * 2);
 
   if ($max_life > 0) {
     /* get time difference between last page reload */
@@ -99,7 +99,7 @@ Session::set('_LAST_PAGE_REQUEST', time());
 Logging::debug(DEBUG_CONFIG, __LINE__, '', __FILE__, $config->data, "Config");
 
 /* Set template compile directory */
-$smarty->setCompileDir($config->get_cfg_value('templateCompileDirectory', SPOOL_DIR));
+$smarty->setCompileDir($config->getCfgValue('templateCompileDirectory', SPOOL_DIR));
 
 Language::init();
 
@@ -110,7 +110,7 @@ Pluglist::load();
  */
 
 /* Check previous plugin index */
-if (Session::is_set('plugin_index')) {
+if (Session::isSet('plugin_index')) {
   $old_plugin_index = Session::get('plugin_index');
 } else {
   $old_plugin_index = '';
@@ -120,8 +120,8 @@ $plist->gen_menu();
 
 $smarty->assign('hideMenus', FALSE);
 /* check user expiration status */
-$expired = $ui->expired_status();
-if (($expired == POSIX_WARN_ABOUT_EXPIRATION) && !Session::is_set('POSIX_WARN_ABOUT_EXPIRATION__DONE')) {
+$expired = $ui->expiredStatus();
+if (($expired == POSIX_WARN_ABOUT_EXPIRATION) && !Session::isSet('POSIX_WARN_ABOUT_EXPIRATION__DONE')) {
   Logging::debug(DEBUG_TRACE, __LINE__, '', __FILE__, $expired, 'This user account ('.$ui->uid.') is about to expire');
 
   // The users password is about to expire soon, display a warning message.
@@ -194,7 +194,7 @@ if (isset($plugin_index)) {
   $plug = "";
 }
 
-if ($ui->ignore_acl_for_current_user()) {
+if ($ui->ignoreAclForCurrentUser()) {
   $smarty->assign('username', '<div style="color:#FF0000;">'._('User ACL checks disabled').'</div>&nbsp;'.$ui->uid);
 } else {
   $smarty->assign('username', $ui->uid);
@@ -209,17 +209,17 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST')
   && (InputFilter::has('delete_lock') || InputFilter::has('open_readonly'))) {
 
   /* Set old Post data */
-  if (Session::is_set('LOCK_VARS_USED_GET')) {
+  if (Session::isSet('LOCK_VARS_USED_GET')) {
     foreach (Session::get('LOCK_VARS_USED_GET') as $name => $value) {
       $_GET[$name]  = $value;
     }
   }
-  if (Session::is_set('LOCK_VARS_USED_POST')) {
+  if (Session::isSet('LOCK_VARS_USED_POST')) {
     foreach (Session::get('LOCK_VARS_USED_POST') as $name => $value) {
       $_POST[$name] = $value;
     }
   }
-  if (Session::is_set('LOCK_VARS_USED_REQUEST')) {
+  if (Session::isSet('LOCK_VARS_USED_REQUEST')) {
     foreach (Session::get('LOCK_VARS_USED_REQUEST') as $name => $value) {
       $_REQUEST[$name] = $value;
     }
@@ -233,9 +233,9 @@ Pluglist::runMainInc($plugin_index);
  */
 
 /* Print_out last ErrorMessage repeated string. */
-$smarty->assign("msg_dialogs", MsgDialog::get_dialogs());
+$smarty->assign("msg_dialogs", MsgDialog::getDialogs());
 $smarty->assign("contents", $display);
-$smarty->assign("sessionLifetime", $config->get_cfg_value("sessionLifetime", 60 * 60 * 2));
+$smarty->assign("sessionLifetime", $config->getCfgValue("sessionLifetime", 60 * 60 * 2));
 
 /* If there's some post, take a look if everything is there... */
 if (count($_POST) && !InputFilter::has('php_c_check')) {

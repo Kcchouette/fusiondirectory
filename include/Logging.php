@@ -81,9 +81,9 @@ class Logging
         $error->display();
       }
     } else {
-      if (is_object(config()) && preg_match('/true/i', config()->get_cfg_value('Logging', ''))) {
+      if (is_object(config()) && preg_match('/true/i', config()->getCfgValue('Logging', ''))) {
         static::logIntoSyslog($entry);
-        if (in_array($action, config()->get_cfg_value('auditActions', []))) {
+        if (in_array($action, config()->getCfgValue('auditActions', []))) {
           static::logIntoLdap($entry);
         }
       }
@@ -140,7 +140,7 @@ class Logging
       }
       $output .= "</div>\n";
 
-      if (is_object(config()) && preg_match('/true/i', config()->get_cfg_value('debugLogging', ''))) {
+      if (is_object(config()) && preg_match('/true/i', config()->getCfgValue('debugLogging', ''))) {
         fusiondirectory_log($logline);
       }
 
