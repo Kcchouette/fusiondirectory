@@ -1,5 +1,8 @@
 <?php
 declare(strict_types=1);
+
+use FusionDirectory\Utility\InputFilter;
+
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2003-2010  Cajus Pollmeier
@@ -389,11 +392,7 @@ class Pluglist
     }
 
     /* Add the menucurrent class to current plugin */
-    if (isset($_GET['plug'])) {
-      $plug = $_GET['plug'];
-    } else {
-      $plug = "NOTHING";
-    }
+    $plug = InputFilter::get('plug', 'NOTHING');
     $lines  = preg_split("/\n/", $this->menu);
     foreach ($lines as &$line) {
       if (preg_match('/'.preg_quote("main.php?plug=$plug&amp;reset=1", '/').'/', $line)) {

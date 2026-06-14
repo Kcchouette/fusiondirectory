@@ -59,6 +59,7 @@ class PasswordMethodSmd5 extends PasswordMethod
    */
   public function generateHash (string $pwd, bool $locked = FALSE): string
   {
+    // TODO: deprecate SMD5 hashing, prefer Argon2id or SHA-512
     $salt0  = substr(pack('h*', md5(strval(random_int(0, PHP_INT_MAX)))), 0, 8);
     $salt   = substr(pack('H*', md5($salt0 . $pwd)), 0, 4);
     return '{SMD5}'.($locked ? '!' : '').base64_encode(pack('H*', md5($pwd . $salt)) . $salt);
@@ -70,7 +71,7 @@ class PasswordMethodSmd5 extends PasswordMethod
     $salt = substr($hash, 16);
     $hash = substr($hash, 0, 16);
     $nhash = pack('H*', md5($pwd . $salt));
-    return ($nhash == $hash);
+    return hash_equals($hash, $nhash);
   }
 
   /*!

@@ -60,6 +60,7 @@ class PasswordMethodMd5 extends PasswordMethod
    */
   public function generateHash (string $pwd, bool $locked = FALSE): string
   {
+    // TODO: deprecate MD5 hashing, prefer Argon2id or SHA-512
     return  '{MD5}'.($locked ? '!' : '').base64_encode(pack('H*', md5($pwd)));
   }
 

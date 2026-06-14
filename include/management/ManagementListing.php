@@ -1,5 +1,8 @@
 <?php
 declare(strict_types=1);
+
+use FusionDirectory\Utility\InputFilter;
+
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2003-2010  Cajus Pollmeier
@@ -168,7 +171,7 @@ class ManagementListing
 
     $smarty = get_smarty();
     $smarty->assign('PID',          $this->pid);
-    $smarty->assign('PLUG',         $_GET['plug']);
+    $smarty->assign('PLUG',         InputFilter::get('plug', ''));
     $smarty->assign('multiSelect',  $this->multiSelect);
     $smarty->assign('showFooter',   $this->showFooter);
     $smarty->assign('headers',      $this->header);
