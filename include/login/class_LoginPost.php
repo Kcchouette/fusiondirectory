@@ -49,8 +49,6 @@ class LoginPost extends LoginMethod
   /*! \brief All login steps in the right order for standard POST login */
   static function loginProcess ()
   {
-    global $config, $message;
-
     static::init();
 
     smarty()->assign('focusfield', 'username');
@@ -99,7 +97,7 @@ class LoginPost extends LoginMethod
   /*! \brief Display the login page and exit() */
   static protected function displayLogin ()
   {
-    global $message,$config,$ssl,$error_collector,$error_collector_mailto;
+    global $message,$ssl,$error_collector,$error_collector_mailto;
 
     $lang = Session::get('lang');
 
@@ -123,13 +121,13 @@ class LoginPost extends LoginMethod
     smarty()->assign('message', $message);
 
     /* Display SSL mode warning? */
-    if (($ssl != '') && ($config->get_cfg_value('warnSSL') == 'TRUE')) {
+    if (($ssl != '') && (config()->get_cfg_value('warnSSL') == 'TRUE')) {
       smarty()->assign('ssl', sprintf(htmlescape(_('Warning: %sSession is not encrypted!%s')), '<a href="'.$ssl.'">', '</a>'));
     } else {
       smarty()->assign('ssl', '');
     }
 
-    if (!$config->check_session_lifetime()) {
+    if (!config()->check_session_lifetime()) {
       smarty()->assign('lifetime', _('Warning: The session lifetime configured in your fusiondirectory.conf will be overridden by php.ini settings.'));
     } else {
       smarty()->assign('lifetime', '');
@@ -140,9 +138,9 @@ class LoginPost extends LoginMethod
     if (isset($_POST['server'])) {
       $selected = $_POST['server'];
     } else {
-      $selected = $config->data['MAIN']['DEFAULT'];
+      $selected = config()->data['MAIN']['DEFAULT'];
     }
-    foreach ($config->data['LOCATIONS'] as $key => $ignored) {
+    foreach (config()->data['LOCATIONS'] as $key => $ignored) {
       $servers[$key] = $key;
     }
     smarty()->assign('server_options', $servers);
@@ -171,7 +169,7 @@ class LoginPost extends LoginMethod
   /*! \brief Display the second factor page and exit() */
   static function displaySecondFactorPage ()
   {
-    global $message,$config,$ssl,$error_collector,$error_collector_mailto;
+    global $message,$ssl,$error_collector,$error_collector_mailto;
 
     $lang = Session::get('lang');
 

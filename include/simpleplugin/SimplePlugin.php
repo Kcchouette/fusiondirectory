@@ -2312,14 +2312,14 @@ class SimplePlugin implements SimpleTab
    */
   static function mainInc ($classname = NULL, $entry_dn = NULL, $tabs = FALSE, $edit_mode = TRUE, $objectType = FALSE)
   {
-    global $remove_lock, $cleanup, $display, $config, $plug, $ui, $smarty;
+    global $remove_lock, $cleanup, $display;
 
     if ($classname === NULL) {
       $classname = get_called_class();
     }
 
     if ($entry_dn === NULL) {
-      $entry_dn = $ui->dn;
+      $entry_dn = user_info()->dn;
     }
 
     $plInfo     = Pluglist::pluginInfos($classname);
@@ -2452,8 +2452,8 @@ class SimplePlugin implements SimpleTab
       if (!preg_match('/^geticon/', $plIcon)) {
         $plIcon = get_template_path($plIcon);
       }
-      $smarty->assign('headline', $plHeadline);
-      $smarty->assign('headline_image', $plIcon);
+      smarty()->assign('headline', $plHeadline);
+      smarty()->assign('headline_image', $plIcon);
       $display = '<div class="pluginfo">' . $info . "</div>\n" . $display;
     }
   }

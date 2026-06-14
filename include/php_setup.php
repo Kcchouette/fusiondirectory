@@ -182,7 +182,7 @@ function html_trace ($errstr = "")
  */
 function gosaRaiseError ($errno, $errstr, $errfile, $errline)
 {
-  global $error_collector, $config, $error_collector_mailto;
+  global $error_collector, $error_collector_mailto;
 
   // To avoid recursion - restore original error handler.
   restore_error_handler();
@@ -211,7 +211,7 @@ function gosaRaiseError ($errno, $errstr, $errfile, $errline)
   }
 
   /* Error messages are hidden in FusionDirectory, so we only send them to the logging class and abort here */
-  if (isset($config->data) && $config->get_cfg_value('displayerrors') != 'TRUE') {
+  if (isset(config()->data) && config()->get_cfg_value('displayerrors') != 'TRUE') {
     set_error_handler('gosaRaiseError', E_WARNING | E_NOTICE | E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE);
     return;
   }
