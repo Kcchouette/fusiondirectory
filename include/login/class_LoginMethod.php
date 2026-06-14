@@ -83,7 +83,7 @@ class LoginMethod
    * Also trims username */
   static function validateUserInput (): bool
   {
-    global $message;
+    $message = &message();
     static::$username = trim(static::$username);
     if (!preg_match('/^[@A-Za-z0-9_.-]+$/', static::$username)) {
       $message = _('Please specify a valid username!');
@@ -99,7 +99,7 @@ class LoginMethod
   /*! \brief Performs an LDAP bind with $username and $password */
   static function ldapLoginUser (): bool
   {
-    global $message;
+    $message = &message();
     /* Login as user, initialize user ACL's */
     try {
       $ui = UserInfo::loginUser(static::$username, static::$password);
@@ -118,7 +118,7 @@ class LoginMethod
   /*! \brief Called after successful login, return FALSE if account is expired */
   static function loginAndCheckExpired (): bool
   {
-    global $message;
+    $message = &message();
 
     /* Remove all locks of this user */
     Lock::deleteByUser(user_info()->dn);

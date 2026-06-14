@@ -33,7 +33,8 @@ class LoginHTTPHeader extends LoginMethod
   /*! \brief All login steps in the right order for HTTP Header login */
   static function loginProcess ()
   {
-    global $message, $ui;
+    $message = &message();
+    $ui = &user_info();
 
     static::init();
 

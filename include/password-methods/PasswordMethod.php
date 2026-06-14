@@ -233,7 +233,7 @@ abstract class PasswordMethod
    */
   static function getAvailableMethods (): array
   {
-    global $class_mapping;
+    $class_mapping = class_mapping();
     $ret  = [];
     $i    = 0;
 

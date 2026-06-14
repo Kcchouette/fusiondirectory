@@ -41,7 +41,7 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   static function getAttributesInfo (): array
   {
-    global $class_mapping;
+    $class_mapping = class_mapping();
 
     // Load column types
     $types = [];

@@ -104,8 +104,6 @@ class Management implements FusionDirectoryDialog
     ]
   )
   {
-    global $class_mapping;
-
     /* Initialize facade components */
     $this->listingComponent  = new ManagementListingComponent($this);
     $this->actionsComponent  = new ManagementActionsComponent($this);

@@ -37,7 +37,7 @@ class Language
    */
   public static function init ($lang = NULL)
   {
-    global $BASE_DIR;
+    $BASE_DIR = base_dir();
 
     if ($lang === NULL) {
       $lang = static::detect();

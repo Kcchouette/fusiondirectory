@@ -97,7 +97,10 @@ class LoginPost extends LoginMethod
   /*! \brief Display the login page and exit() */
   static protected function displayLogin ()
   {
-    global $message,$ssl,$error_collector,$error_collector_mailto;
+    global $error_collector_mailto;
+    $message = &message();
+    $ssl = ssl();
+    $error_collector = &error_collector();
 
     $lang = Session::get('lang');
 
@@ -169,7 +172,10 @@ class LoginPost extends LoginMethod
   /*! \brief Display the second factor page and exit() */
   static function displaySecondFactorPage ()
   {
-    global $message,$ssl,$error_collector,$error_collector_mailto;
+    global $error_collector_mailto;
+    $message = &message();
+    $ssl = ssl();
+    $error_collector = &error_collector();
 
     $lang = Session::get('lang');
 

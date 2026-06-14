@@ -63,7 +63,7 @@ class Pluglist
    */
   function __construct ()
   {
-    global $class_mapping;
+    $class_mapping = class_mapping();
 
     /* Fill info part of pluglist */
     $classes = get_declared_classes();
@@ -413,7 +413,7 @@ class Pluglist
    */
   function showIconmenu ()
   {
-    global $class_mapping;
+    $class_mapping = class_mapping();
     if ($this->iconmenu == "") {
 
       /* Parse headlines */
@@ -552,10 +552,10 @@ class Pluglist
 
   static function runMainInc ($index, $forceCleanup = FALSE)
   {
-    global $BASE_DIR, $ui, $display, $remove_lock, $cleanup, $plug;
+    global $display, $remove_lock, $cleanup, $plug;
 
     if ($index == 'welcome') {
-      $plugin_dir = "$BASE_DIR/plugins/generic/welcome";
+      $plugin_dir = base_dir()."/plugins/generic/welcome";
       $plugin     = $index;
     } else {
       $plugin_dir = pluglist()->getPath($index);

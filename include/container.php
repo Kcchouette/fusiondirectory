@@ -64,3 +64,48 @@ function smarty(): ?Smarty
     global $smarty;
     return $smarty ?? null;
 }
+
+/**
+ * Get the class mapping array (replaces `global $class_mapping`).
+ */
+function class_mapping(): array
+{
+    global $class_mapping;
+    return $class_mapping ?? [];
+}
+
+/**
+ * Get the base directory (replaces `global $BASE_DIR`).
+ */
+function base_dir(): string
+{
+    global $BASE_DIR;
+    return $BASE_DIR ?? '';
+}
+
+/**
+ * Get the message variable (replaces `global $message`).
+ */
+function &message(): mixed
+{
+    global $message;
+    return $message;
+}
+
+/**
+ * Get SSL status (replaces `global $ssl`).
+ */
+function ssl(): bool
+{
+    global $ssl;
+    return $ssl ?? false;
+}
+
+/**
+ * Get error collector (replaces `global $error_collector`).
+ */
+function &error_collector(): mixed
+{
+    global $error_collector;
+    return $error_collector;
+}

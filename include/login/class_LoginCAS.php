@@ -68,7 +68,8 @@ class LoginCAS extends LoginMethod
   /*! \brief All login steps in the right order for CAS login */
   static function loginProcess ()
   {
-    global $message, $ui;
+    $message = &message();
+    $ui = &user_info();
 
     static::init();
 

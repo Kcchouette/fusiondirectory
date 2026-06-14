@@ -31,8 +31,6 @@ abstract class standAlonePage
   /* Constructor */
   function __construct ($interactive = TRUE)
   {
-    global $ssl, $ui;
-
     $this->interactive = $interactive;
 
     if ($this->interactive) {
@@ -50,6 +48,7 @@ abstract class standAlonePage
         $this->directories[$key] = $key;
       }
 
+      $ui = &user_info();
       $ui = new UserInfoNoAuth(get_class($this));
       Session::set('ui', $ui);
     }
@@ -94,8 +93,6 @@ abstract class standAlonePage
 
   function init ()
   {
-    global $ssl, $ui;
-
     if (!$this->interactive) {
       $this->activated = $this->readLdapConfig();
       return;
@@ -109,6 +106,7 @@ abstract class standAlonePage
 
     CSRFProtection::check();
 
+    $ui     = &user_info();
     $ui     = Session::get('ui');
     $config = Session::get('Config');
 
@@ -118,6 +116,7 @@ abstract class standAlonePage
 
     $this->setupSmarty();
 
+    $ssl = &ssl();
     $ssl = $this->checkForSSL();
 
     /* Prepare plugin list */
@@ -126,8 +125,6 @@ abstract class standAlonePage
 
   function loadConfig ()
   {
-    global $BASE_DIR;
-
     /* Check if CONFIG_FILE is accessible */
     if (!is_readable(CONFIG_DIR.'/'.CONFIG_FILE)) {
       throw new FatalError(
@@ -140,7 +137,7 @@ abstract class standAlonePage
     }
 
     /* Parse configuration file */
-    $config = new Config(CONFIG_DIR.'/'.CONFIG_FILE, $BASE_DIR);
+    $config = new Config(CONFIG_DIR.'/'.CONFIG_FILE, base_dir());
     Session::set('DEBUGLEVEL', $config->get_cfg_value('debuglevel'));
     Logging::debug(DEBUG_CONFIG, __LINE__, __FUNCTION__, __FILE__, $config->data, 'Config');
     return $config;
@@ -189,7 +186,8 @@ abstract class standAlonePage
 
   function assignSmartyVars ()
   {
-    global $error_collector, $error_collector_mailto;
+    global $error_collector_mailto;
+    $error_collector = &error_collector();
     $smarty = get_smarty();
 
     $smarty->assign('PHPSESSID', session_id());
