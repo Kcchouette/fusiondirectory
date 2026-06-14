@@ -10,7 +10,6 @@ declare(strict_types=1);
  * Usage:
  *   $config = config();
  *   $ui = user_info();
- *   $smarty = smarty();
  *   Or: $config = container()->get(Config::class);
  */
 function container(): FusionDirectory\Container\Container
@@ -29,13 +28,19 @@ function container(): FusionDirectory\Container\Container
  */
 function config(): Config
 {
-    global $config;
+    $c = container();
 
-    if (!is_object($config)) {
-        throw new \RuntimeException('Config not initialized');
+    if ($c->has(Config::class)) {
+        return $c->get(Config::class);
     }
 
-    return $config;
+    /* Fallback during bootstrap before container is populated */
+    global $config;
+    if (is_object($config)) {
+        return $config;
+    }
+
+    throw new \RuntimeException('Config not initialized');
 }
 
 /**
@@ -43,6 +48,12 @@ function config(): Config
  */
 function user_info(): ?UserInfo
 {
+    $c = container();
+
+    if ($c->has(UserInfo::class)) {
+        return $c->get(UserInfo::class);
+    }
+
     global $ui;
     return $ui ?? null;
 }
@@ -52,6 +63,12 @@ function user_info(): ?UserInfo
  */
 function pluglist(): ?Pluglist
 {
+    $c = container();
+
+    if ($c->has(Pluglist::class)) {
+        return $c->get(Pluglist::class);
+    }
+
     global $plist;
     return $plist ?? null;
 }
@@ -61,6 +78,12 @@ function pluglist(): ?Pluglist
  */
 function smarty(): ?Smarty
 {
+    $c = container();
+
+    if ($c->has('smarty')) {
+        return $c->get('smarty');
+    }
+
     global $smarty;
     return $smarty ?? null;
 }
@@ -70,6 +93,12 @@ function smarty(): ?Smarty
  */
 function class_mapping(): array
 {
+    $c = container();
+
+    if ($c->has('class_mapping')) {
+        return $c->get('class_mapping');
+    }
+
     global $class_mapping;
     return $class_mapping ?? [];
 }
@@ -79,6 +108,12 @@ function class_mapping(): array
  */
 function base_dir(): string
 {
+    $c = container();
+
+    if ($c->has('base_dir')) {
+        return $c->get('base_dir');
+    }
+
     global $BASE_DIR;
     return $BASE_DIR ?? '';
 }
@@ -97,6 +132,12 @@ function &message(): mixed
  */
 function ssl(): bool
 {
+    $c = container();
+
+    if ($c->has('ssl')) {
+        return $c->get('ssl');
+    }
+
     global $ssl;
     return $ssl ?? false;
 }
