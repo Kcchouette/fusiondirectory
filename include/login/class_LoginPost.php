@@ -97,7 +97,7 @@ class LoginPost extends LoginMethod
   /*! \brief Display the login page and exit() */
   static protected function displayLogin ()
   {
-    global $error_collector_mailto;
+    $error_collector_mailto = &error_collector_mailto();
     $message = &message();
     $ssl = ssl();
     $error_collector = &error_collector();
@@ -172,7 +172,7 @@ class LoginPost extends LoginMethod
   /*! \brief Display the second factor page and exit() */
   static function displaySecondFactorPage ()
   {
-    global $error_collector_mailto;
+    $error_collector_mailto = &error_collector_mailto();
     $message = &message();
     $ssl = ssl();
     $error_collector = &error_collector();

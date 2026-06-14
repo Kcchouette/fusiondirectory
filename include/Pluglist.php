@@ -552,7 +552,10 @@ class Pluglist
 
   static function runMainInc ($index, $forceCleanup = FALSE)
   {
-    global $display, $remove_lock, $cleanup, $plug;
+    $display = &display();
+    $remove_lock = &remove_lock();
+    $cleanup = &cleanup();
+    global $plug;
 
     if ($index == 'welcome') {
       $plugin_dir = base_dir()."/plugins/generic/welcome";

@@ -186,7 +186,7 @@ abstract class standAlonePage
 
   function assignSmartyVars ()
   {
-    global $error_collector_mailto;
+    $error_collector_mailto = &error_collector_mailto();
     $error_collector = &error_collector();
     $smarty = get_smarty();
 

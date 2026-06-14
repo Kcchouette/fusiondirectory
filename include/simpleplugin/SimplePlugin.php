@@ -2312,7 +2312,9 @@ class SimplePlugin implements SimpleTab
    */
   static function mainInc ($classname = NULL, $entry_dn = NULL, $tabs = FALSE, $edit_mode = TRUE, $objectType = FALSE)
   {
-    global $remove_lock, $cleanup, $display;
+    $remove_lock = &remove_lock();
+    $cleanup = &cleanup();
+    $display = &display();
 
     if ($classname === NULL) {
       $classname = get_called_class();

@@ -109,3 +109,48 @@ function &error_collector(): mixed
     global $error_collector;
     return $error_collector;
 }
+
+/**
+ * Get error collector mailto (replaces `global $error_collector_mailto`).
+ */
+function &error_collector_mailto(): mixed
+{
+    global $error_collector_mailto;
+    return $error_collector_mailto;
+}
+
+/**
+ * Get position DN (replaces `global $positionDN`).
+ */
+function &position_dn(): mixed
+{
+    global $positionDN;
+    return $positionDN;
+}
+
+/**
+ * Get remove_lock flag (replaces `global $remove_lock`).
+ */
+function &remove_lock(): mixed
+{
+    global $remove_lock;
+    return $remove_lock;
+}
+
+/**
+ * Get cleanup flag (replaces `global $cleanup`).
+ */
+function &cleanup(): mixed
+{
+    global $cleanup;
+    return $cleanup;
+}
+
+/**
+ * Get display variable (replaces `global $display`).
+ */
+function &display(): mixed
+{
+    global $display;
+    return $display;
+}

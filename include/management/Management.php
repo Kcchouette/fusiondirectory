@@ -168,7 +168,7 @@ class Management implements FusionDirectoryDialog
 
   protected function configureActions ()
   {
-    global $positionDN;
+    $positionDN = &position_dn();
 
     // Register default actions
     $createMenu = [];
@@ -449,7 +449,7 @@ class Management implements FusionDirectoryDialog
         $this->listing->update();
 
         // Special from jonathan to set the positionDN
-        global $positionDN;
+        $positionDN = &position_dn();
         $positionDN = $this->listing->getBase();
         $this->configureActions();
 
@@ -1366,7 +1366,9 @@ class Management implements FusionDirectoryDialog
 
   static function mainInc ($classname = NULL, $objectTypes = FALSE)
   {
-    global $remove_lock, $cleanup, $display;
+    $remove_lock = &remove_lock();
+    $cleanup = &cleanup();
+    $display = &display();
 
     if ($classname === NULL) {
       $classname = get_called_class();

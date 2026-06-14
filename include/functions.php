@@ -44,14 +44,12 @@ require_once('accept-to-gettext.php');
 
 function fusiondirectory_autoload ($class_name)
 {
-  global $class_mapping, $BASE_DIR, $config;
-
   /* Do not try to autoload smarty classes */
   if (strpos($class_name, 'Smarty_') === 0) {
     return;
   }
 
-  if ($class_mapping === NULL) {
+  if (class_mapping() === NULL) {
     @trigger_error(
       sprintf(_('No class locations defined - please run %s to fix this'), 'fusiondirectory-configuration-manager --update-cache'),
       E_USER_ERROR
@@ -66,8 +64,8 @@ function fusiondirectory_autoload ($class_name)
   }
 
   /* Primary: lookup in class_mapping */
-  if (isset($class_mapping[$legacy_name])) {
-    require_once($BASE_DIR.'/'.$class_mapping[$legacy_name]);
+  if (isset(class_mapping()[$legacy_name])) {
+    require_once(base_dir().'/'.class_mapping()[$legacy_name]);
     return;
   }
 
@@ -75,8 +73,8 @@ function fusiondirectory_autoload ($class_name)
   if (strpos($class_name, 'FusionDirectory\\') === 0) {
     $relative = str_replace('\\', '/', substr($class_name, strlen('FusionDirectory\\')));
     $candidates = [
-      $BASE_DIR.'/src/'.$relative.'.php',
-      $BASE_DIR.'/include/'.$relative.'.php',
+      base_dir().'/src/'.$relative.'.php',
+      base_dir().'/include/'.$relative.'.php',
     ];
     foreach ($candidates as $file) {
       if (is_file($file)) {
@@ -104,8 +102,7 @@ spl_autoload_register('fusiondirectory_autoload');
  */
 function class_available ($name)
 {
-  global $class_mapping;
-  return isset($class_mapping[$name]);
+  return isset(class_mapping()[$name]);
 }
 
 
@@ -120,12 +117,10 @@ function class_available ($name)
  */
 function plugin_available ($plugin)
 {
-  global $class_mapping, $BASE_DIR;
-
-  if (!isset($class_mapping[$plugin])) {
+  if (!isset(class_mapping()[$plugin])) {
     return FALSE;
   } else {
-    return is_readable($BASE_DIR.'/'.$class_mapping[$plugin]);
+    return is_readable(base_dir().'/'.class_mapping()[$plugin]);
   }
 }
 
@@ -186,12 +181,11 @@ function copynotice ()
  */
 function get_template_path ($filename = '', $plugin = FALSE, $path = '')
 {
-  global $config, $BASE_DIR;
   $default_theme = 'breezy';
 
   /* Set theme */
-  if (isset($config)) {
-    $theme = $config->get_cfg_value('theme', $default_theme);
+  if (config() !== NULL) {
+    $theme = config()->get_cfg_value('theme', $default_theme);
   } else {
     $theme = $default_theme;
   }
@@ -205,24 +199,24 @@ function get_template_path ($filename = '', $plugin = FALSE, $path = '')
   if ($plugin) {
     if ($path == '') {
       $path = Session::get('plugin_dir');
-      $nf   = preg_replace('!^'.$BASE_DIR.'/!', '', preg_replace('/^\.\.\//', '', $path));
+      $nf   = preg_replace('!^'.base_dir().'/!', '', preg_replace('/^\.\.\//', '', $path));
     } else {
-      $nf = preg_replace('!^'.$BASE_DIR.'/!', '', $path);
+      $nf = preg_replace('!^'.base_dir().'/!', '', $path);
     }
     $paths = [
-      "$BASE_DIR/ihtml/themes/$theme/$nf/$filename",
-      "$BASE_DIR/ihtml/themes/$default_theme/$nf/$filename",
-      "$BASE_DIR/ihtml/themes/default/$nf/$filename",
+      base_dir()."/ihtml/themes/$theme/$nf/$filename",
+      base_dir()."/ihtml/themes/$default_theme/$nf/$filename",
+      base_dir()."/ihtml/themes/default/$nf/$filename",
       $path."/$filename"
     ];
   } else {
     $paths = [
       "themes/$theme/$filename",
-      "$BASE_DIR/ihtml/themes/$theme/$filename",
+      base_dir()."/ihtml/themes/$theme/$filename",
       "themes/$default_theme/$filename",
-      "$BASE_DIR/ihtml/themes/$default_theme/$filename",
+      base_dir()."/ihtml/themes/$default_theme/$filename",
       "themes/default/$filename",
-      "$BASE_DIR/ihtml/themes/default/$filename",
+      base_dir()."/ihtml/themes/default/$filename",
       $filename
     ];
   }
@@ -300,15 +294,13 @@ function array_merge_unique (array $ar1, array $ar2): array
  */
 function fusiondirectory_log ($message)
 {
-  global $ui;
-
   /* Preset to something reasonable */
   $username = '[unauthenticated]';
 
   /* Replace username if object is present */
-  if (isset($ui)) {
-    if ($ui->uid != '') {
-      $username = '['.$ui->uid.']';
+  if (user_info() !== NULL) {
+    if (user_info()->uid != '') {
+      $username = '['.user_info()->uid.']';
     } else {
       $username = '[unknown]';
     }
@@ -324,9 +316,7 @@ function fusiondirectory_log ($message)
  */
 function &get_userinfo ()
 {
-  global $ui;
-
-  return $ui;
+  return user_info();
 }
 
 /*!
@@ -336,9 +326,7 @@ function &get_userinfo ()
  */
 function &get_smarty ()
 {
-  global $smarty;
-
-  return $smarty;
+  return smarty();
 }
 
 /*!
@@ -361,10 +349,8 @@ function &get_smarty ()
  */
 function convert_department_dn ($dn, $base = NULL)
 {
-  global $config;
-
   if ($base == NULL) {
-    $base = $config->current['BASE'];
+    $base = config()->current['BASE'];
   }
 
   /* Build a sub-directory style list of the tree level
@@ -403,8 +389,6 @@ function convert_department_dn ($dn, $base = NULL)
  */
 function get_ou ($name)
 {
-  global $config;
-
   $map = [
     'fusiondirectoryRDN'      => 'ou=fusiondirectory,',
     'lockRDN'                 => 'ou=locks,',
@@ -460,8 +444,8 @@ function get_ou ($name)
   ];
 
   /* Preset ou... */
-  if ($config->get_cfg_value($name, '_not_set_') != '_not_set_') {
-    $ou = $config->get_cfg_value($name);
+  if (config()->get_cfg_value($name, '_not_set_') != '_not_set_') {
+    $ou = config()->get_cfg_value($name);
   } elseif (isset($map[$name])) {
     return $map[$name];
   } else {
@@ -475,7 +459,7 @@ function get_ou ($name)
       $ou = "$ou";
     }
 
-    if (preg_match('/'.preg_quote($config->current['BASE'], '/').'$/', $ou)) {
+    if (preg_match('/'.preg_quote(config()->current['BASE'], '/').'$/', $ou)) {
       return $ou;
     } else {
       if (preg_match('/,$/', $ou)) {
@@ -514,15 +498,13 @@ function get_people_ou ()
  */
 function get_base_from_people ($dn)
 {
-  global $config;
-
   $pattern  = "/^[^,]+,".preg_quote(get_people_ou(), '/')."/i";
   $base     = preg_replace($pattern, '', $dn);
 
   /* Set to base, if we're not on a correct subtree */
-  $departmentInfo = $config->getDepartmentInfo();
+  $departmentInfo = config()->getDepartmentInfo();
   if (!isset($departmentInfo[$base])) {
-    $base = $config->current['BASE'];
+    $base = config()->current['BASE'];
   }
 
   return $base;
@@ -540,10 +522,8 @@ function get_base_from_people ($dn)
  */
 function strict_uid_mode ()
 {
-  global $config;
-
-  if (isset($config)) {
-    return ($config->get_cfg_value('strictNamingRules') == 'TRUE');
+  if (config() !== NULL) {
+    return (config()->get_cfg_value('strictNamingRules') == 'TRUE');
   }
   return TRUE;
 }
@@ -1276,9 +1256,8 @@ function get_post ($name)
  */
 function get_correct_class_name ($cls)
 {
-  global $class_mapping;
-  if (isset($class_mapping) && is_array($class_mapping)) {
-    foreach (array_keys($class_mapping) as $class) {
+  if (class_mapping() !== NULL && is_array(class_mapping())) {
+    foreach (array_keys(class_mapping()) as $class) {
       if (preg_match("/^".$cls."$/i", $class)) {
         return $class;
       }
@@ -1336,15 +1315,14 @@ function change_password ($dn, $password, $hash = "")
  */
 function getEntryCSN (string $dn): string
 {
-  global $config;
-  if (empty($dn) || !is_object($config)) {
+  if (empty($dn) || !is_object(config())) {
     return '';
   }
 
   /* Get attribute that we should use as serial number */
-  $attr = $config->get_cfg_value('modificationDetectionAttribute');
+  $attr = config()->get_cfg_value('modificationDetectionAttribute');
   if ($attr != '') {
-    $ldap = $config->get_ldap_link();
+    $ldap = config()->get_ldap_link();
     $ldap->cat($dn, [$attr]);
     $attrs = $ldap->fetch();
     if (isset($attrs[$attr][0])) {
@@ -1505,18 +1483,18 @@ function reset_errors ()
 
 function load_all_classes ()
 {
-  global $BASE_DIR, $class_list, $class_mapping;
+  global $class_list;
   /* Initially load all classes */
   $class_list = get_declared_classes();
-  foreach ($class_mapping as $class => $path) {
+  foreach (class_mapping() as $class => $path) {
     if (!in_array($class, $class_list)) {
-      if (is_readable("$BASE_DIR/$path")) {
-        require_once("$BASE_DIR/$path");
+      if (is_readable(base_dir()."/$path")) {
+        require_once(base_dir()."/$path");
       } else {
         throw new FatalError(
           sprintf(
             htmlescape(_('Cannot locate file "%s" - please run "%s" to fix this')),
-            htmlescape("$BASE_DIR/$path"),
+            htmlescape(base_dir()."/$path"),
             '<b>fusiondirectory-configuration-manager --update-cache</b>'
           )
         );
