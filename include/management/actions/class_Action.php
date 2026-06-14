@@ -41,7 +41,7 @@ class Action
   protected bool $inline;
 
   protected mixed $callable;
-  protected ?callable $enabledCallable;
+  protected mixed $enabledCallable;
 
   protected int $minTargets;
   protected int|false $maxTargets;

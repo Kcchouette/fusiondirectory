@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 /**
  * Handles LDAP connection lifecycle.
- * Delegates to the main LDAP class for shared state.
  */
 class LdapConnection
 {
@@ -12,29 +11,118 @@ class LdapConnection
     ) {
     }
 
-    public function connect(): bool
+    function connect ()
     {
-        return $this->ldap->connect();
+        $this->ldap->hascon     = FALSE;
+        $this->ldap->reconnect  = FALSE;
+        if ($this->ldap->cid = @ldap_connect($this->ldap->hostname)) {
+            @ldap_set_option($this->ldap->cid, LDAP_OPT_PROTOCOL_VERSION, 3);
+            if ($this->ldap->follow_referral) {
+                @ldap_set_option($this->ldap->cid, LDAP_OPT_REFERRALS, 1);
+                @ldap_set_rebind_proc($this->ldap->cid, [$this, 'rebind']);
+            }
+            if ($this->ldap->tls) {
+                @ldap_start_tls($this->ldap->cid);
+            }
+
+            $this->ldap->error = 'No Error';
+            $serverctrls = [];
+            if (class_available('ppolicyAccount')) {
+                $serverctrls = [['oid' => LDAP_CONTROL_PASSWORDPOLICYREQUEST]];
+            }
+            $result = @ldap_bind_ext($this->ldap->cid, $this->ldap->binddn, $this->ldap->bindpw, $serverctrls);
+            if (@ldap_parse_result($this->ldap->cid, $result, $errcode, $matcheddn, $errmsg, $referrals, $ctrls)) {
+                if (isset($ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error'])) {
+                    $this->ldap->hascon = FALSE;
+                    switch ($ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error']) {
+                        case 0:
+                            /* passwordExpired - password has expired and must be reset */
+                            $this->ldap->error = _('It seems your user password has expired. Please use <a href="recovery.php">password recovery</a> to change it.');
+                            break;
+                        case 1:
+                            /* accountLocked */
+                            $this->ldap->error = _('Account locked. Please contact your system administrator!');
+                            break;
+                        case 2:
+                            /* changeAfterReset - password must be changed before the user will be allowed to perform any other operation */
+                            $this->ldap->error = 'changeAfterReset';
+                            break;
+                        case 3:
+                            /* passwordModNotAllowed */
+                        case 4:
+                            /* mustSupplyOldPassword */
+                        case 5:
+                            /* insufficientPasswordQuality */
+                        case 6:
+                            /* passwordTooShort */
+                        case 7:
+                            /* passwordTooYoung */
+                        case 8:
+                            /* passwordInHistory */
+                        default:
+                            $this->ldap->error = sprintf(_('Unexpected ppolicy error "%s", please contact the administrator'), $ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error']);
+                            break;
+                    }
+                    // Note: Also available: expire, grace
+                } else {
+                    $this->ldap->hascon = ($errcode == 0);
+                    if ($errcode == 49) {
+                        $this->ldap->error = LDAP::invalidCredentialsError();
+                    } elseif (empty($errmsg)) {
+                        $this->ldap->error = ldap_err2str($errcode);
+                    } else {
+                        $this->ldap->error = $errmsg;
+                    }
+                }
+            } else {
+                $this->ldap->error  = 'Parsing of LDAP result from bind failed';
+                $this->ldap->hascon = FALSE;
+            }
+        } else {
+            $this->ldap->error = 'Could not connect to LDAP server';
+        }
+
+        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'connect');
     }
 
-    public function rebind($ldap, $referral): void
+    function rebind ($ldap, $referral)
     {
-        $this->ldap->rebind($ldap, $referral);
+        $credentials = $this->getCredentials($referral);
+        if (@ldap_bind($ldap, $credentials['ADMINDN'], $credentials['ADMINPASSWORD'])) {
+            $this->ldap->error      = "Success";
+            $this->ldap->hascon     = TRUE;
+            $this->ldap->reconnect  = TRUE;
+            Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'rebind');
+            return 0;
+        } else {
+            $this->ldap->error = "Could not bind to " . $credentials['ADMINDN'];
+            Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'rebind');
+            return NULL;
+        }
     }
 
-    public function reconnect(): void
+    function reconnect ()
     {
-        $this->ldap->reconnect();
+        if ($this->ldap->reconnect) {
+            $this->unbind();
+        }
     }
 
-    public function unbind(): void
+    function unbind ()
     {
-        $this->ldap->unbind();
+        @ldap_unbind($this->ldap->cid);
+        $this->ldap->cid = FALSE;
+        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'unbind');
     }
 
-    public function disconnect(): void
+    function disconnect ()
     {
-        $this->ldap->disconnect();
+        if ($this->ldap->hascon) {
+            @ldap_close($this->ldap->cid);
+            $this->ldap->hascon = FALSE;
+            $this->ldap->cid    = FALSE;
+        }
+        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'disconnect');
     }
 
     public function isConnected(): bool
@@ -42,8 +130,23 @@ class LdapConnection
         return $this->ldap->hascon;
     }
 
-    public function getCredentials($url, $referrals = NULL): array
+    function getCredentials ($url, $referrals = NULL)
     {
-        return $this->ldap->getCredentials($url, $referrals);
+        $ret    = [];
+        $url    = preg_replace('!\?\?.*$!', '', $url);
+        $server = preg_replace('!^([^:]+://[^/]+)/.*$!', '\\1', $url);
+
+        if ($referrals === NULL) {
+            $referrals = $this->ldap->referrals;
+        }
+
+        if (isset($referrals[$server])) {
+            return $referrals[$server];
+        } else {
+            $ret['ADMINDN']       = $this->ldap->binddn;
+            $ret['ADMINPASSWORD'] = $this->ldap->bindpw;
+        }
+
+        return $ret;
     }
 }

@@ -85,17 +85,17 @@ class LDAP
 
    /*!
     * \brief Create a LDAP connection
-   *
-   * \param string $binddn Bind of the DN
-   *
-   * \param string $bindpw Bind
-   *
-   * \param string $hostname The hostname
-   *
-   * \param boolean $follow_referral FALSE
-   *
-   * \param boolean $tls FALSE
-   */
+    *
+    * \param string $binddn Bind of the DN
+    *
+    * \param string $bindpw Bind
+    *
+    * \param string $hostname The hostname
+    *
+    * \param boolean $follow_referral FALSE
+    *
+    * \param boolean $tls FALSE
+    */
    function __construct ($binddn, $bindpw, $hostname, $follow_referral = FALSE, $tls = FALSE)
    {
     $this->follow_referral  = $follow_referral;
@@ -160,26 +160,6 @@ class LDAP
   }
 
   /*!
-   * \brief Get the search ressource
-   *
-   * \return increase srp
-   */
-  function getSearchResource ()
-  {
-    $this->sr[$this->srp]     = NULL;
-    $this->start[$this->srp]  = 0;
-    $this->hasres[$this->srp] = FALSE;
-    return $this->srp++;
-  }
-
-  /*!
-   * \brief Function to fix problematic characters in DN's that are used for search requests. I.e. member=....
-   *
-   * \param string $dn The DN
-   */
-
-
-  /*!
    *  \brief Error text that must be returned for invalid user or password
    *
    *  This is useful to make sure the same error text is shown whether a user exists or not, when the password is not correct.
@@ -189,882 +169,195 @@ class LDAP
     return _(ldap_err2str(49));
   }
 
-  /*!
-   *  \brief Create a connection to LDAP server
-   *
-   *  The string $error containts result of the connection
-   */
+  /* ============================================================
+   * Delegates to LdapConnection
+   * ============================================================ */
+
   function connect ()
   {
-    $this->hascon     = FALSE;
-    $this->reconnect  = FALSE;
-    if ($this->cid = @ldap_connect($this->hostname)) {
-      @ldap_set_option($this->cid, LDAP_OPT_PROTOCOL_VERSION, 3);
-      if ($this->follow_referral) {
-        @ldap_set_option($this->cid, LDAP_OPT_REFERRALS, 1);
-        @ldap_set_rebind_proc($this->cid, [&$this, 'rebind']);
-      }
-      if ($this->tls) {
-        @ldap_start_tls($this->cid);
-      }
-
-      $this->error = 'No Error';
-      $serverctrls = [];
-      if (class_available('ppolicyAccount')) {
-        $serverctrls = [['oid' => LDAP_CONTROL_PASSWORDPOLICYREQUEST]];
-      }
-      $result = @ldap_bind_ext($this->cid, $this->binddn, $this->bindpw, $serverctrls);
-      if (@ldap_parse_result($this->cid, $result, $errcode, $matcheddn, $errmsg, $referrals, $ctrls)) {
-        if (isset($ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error'])) {
-          $this->hascon = FALSE;
-          switch ($ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error']) {
-            case 0:
-              /* passwordExpired - password has expired and must be reset */
-              $this->error = _('It seems your user password has expired. Please use <a href="recovery.php">password recovery</a> to change it.');
-              break;
-            case 1:
-              /* accountLocked */
-              $this->error = _('Account locked. Please contact your system administrator!');
-              break;
-            case 2:
-              /* changeAfterReset - password must be changed before the user will be allowed to perform any other operation */
-              $this->error = 'changeAfterReset';
-              break;
-            case 3:
-              /* passwordModNotAllowed */
-            case 4:
-              /* mustSupplyOldPassword */
-            case 5:
-              /* insufficientPasswordQuality */
-            case 6:
-              /* passwordTooShort */
-            case 7:
-              /* passwordTooYoung */
-            case 8:
-              /* passwordInHistory */
-            default:
-              $this->error = sprintf(_('Unexpected ppolicy error "%s", please contact the administrator'), $ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error']);
-              break;
-          }
-          // Note: Also available: expire, grace
-        } else {
-          $this->hascon = ($errcode == 0);
-          if ($errcode == 49) {
-            $this->error = static::invalidCredentialsError();
-          } elseif (empty($errmsg)) {
-            $this->error = ldap_err2str($errcode);
-          } else {
-            $this->error = $errmsg;
-          }
-        }
-      } else {
-        $this->error  = 'Parsing of LDAP result from bind failed';
-        $this->hascon = FALSE;
-      }
-    } else {
-      $this->error = 'Could not connect to LDAP server';
-    }
-
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'connect');
+    $this->connection->connect();
   }
 
-  /*!
-   *  \brief Rebind
-   */
   function rebind ($ldap, $referral)
   {
-    $credentials = $this->getCredentials($referral);
-    if (@ldap_bind($ldap, $credentials['ADMINDN'], $credentials['ADMINPASSWORD'])) {
-      $this->error      = "Success";
-      $this->hascon     = TRUE;
-      $this->reconnect  = TRUE;
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rebind');
-      return 0;
-    } else {
-      $this->error = "Could not bind to " . $credentials['ADMINDN'];
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rebind');
-      return NULL;
-    }
+    $this->connection->rebind($ldap, $referral);
   }
 
-  /*!
-   *  \brief Reconnect to LDAP server
-   */
   function reconnect ()
   {
-    if ($this->reconnect) {
-      $this->unbind();
-    }
+    $this->connection->reconnect();
   }
 
-  /*!
-   *  \brief Unbind to LDAP server
-   */
   function unbind ()
   {
-    @ldap_unbind($this->cid);
-    $this->cid = FALSE;
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'unbind');
+    $this->connection->unbind();
   }
 
-  /*!
-   *  \brief Disconnect to LDAP server
-   */
   function disconnect ()
   {
-    if ($this->hascon) {
-      @ldap_close($this->cid);
-      $this->hascon = FALSE;
-      $this->cid    = FALSE;
-    }
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'disconnect');
+    $this->connection->disconnect();
   }
 
-  /*!
-   * \brief Change directory
-   *
-   * \param string $dir The new directory
-   */
-  function cd ($dir)
+  function getCredentials ($url, $referrals = NULL)
   {
-    if ($dir == '..') {
-      $this->basedn = $this->getParentDir();
-    } else {
-      $this->basedn = $dir;
-    }
+    return $this->connection->getCredentials($url, $referrals);
   }
 
-  /*!
-   * \brief Accessor of the parent directory of the basedn
-   *
-   * \param string $basedn The basedn which we want the parent directory
-   *
-   * \return String, the parent directory
-   */
-  function getParentDir ($basedn = '')
+  /* ============================================================
+   * Delegates to LdapSearch
+   * ============================================================ */
+
+  function getSearchResource ()
   {
-    if ($basedn == '') {
-      $basedn = $this->basedn;
-    }
-    return preg_replace("/[^,]*[,]*[ ]*(.*)/", "$1", $basedn);
+    return $this->search->getSearchResource();
   }
 
-  /*!
-   * \brief Search about filter
-   *
-   * \param integer $srp srp
-   *
-   * \param string $filter The filter
-   *
-   * \param array $attrs
-   *
-   * \param string $scope Scope of the search: subtree/base/one
-   */
   function search ($srp, $filter, $attrs = [], $scope = 'subtree', ?array $controls = NULL)
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-
-      $startTime = microtime(TRUE);
-      $this->clearResult($srp);
-      switch (strtolower($scope)) {
-        case 'base':
-          if (isset($controls)) {
-            $this->sr[$srp] = @ldap_read($this->cid, $this->basedn, $filter, $attrs, 0, 0, 0, LDAP_DEREF_NEVER, $controls);
-          } else {
-            $this->sr[$srp] = @ldap_read($this->cid, $this->basedn, $filter, $attrs);
-          }
-          break;
-        case 'one':
-          if (isset($controls)) {
-            $this->sr[$srp] = @ldap_list($this->cid, $this->basedn, $filter, $attrs, 0, 0, 0, LDAP_DEREF_NEVER, $controls);
-          } else {
-            $this->sr[$srp] = @ldap_list($this->cid, $this->basedn, $filter, $attrs);
-          }
-          break;
-        case 'subtree':
-        default:
-          if (isset($controls)) {
-            $this->sr[$srp] = @ldap_search($this->cid, $this->basedn, $filter, $attrs, 0, 0, 0, LDAP_DEREF_NEVER, $controls);
-          } else {
-            $this->sr[$srp] = @ldap_search($this->cid, $this->basedn, $filter, $attrs);
-          }
-          break;
-      }
-      $this->error = @ldap_error($this->cid);
-      $this->resetResult($srp);
-
-      /* Set hasres to TRUE if we got a result or FALSE if $this->sr[$srp] is FALSE */
-      if ($this->sr[$srp] === FALSE) {
-        $this->hasres[$srp] = FALSE;
-      } else {
-        $this->hasres[$srp] = TRUE;
-      }
-
-      /* Check if query took longer as specified in max_ldap_query_time */
-      $diff = microtime(TRUE) - $startTime;
-      if ($this->max_ldap_query_time && ($diff > $this->max_ldap_query_time)) {
-        $warning = new FusionDirectoryWarning(htmlescape(sprintf(_('LDAP performance is poor: last query took about %.2fs!'), $diff)));
-        $warning->display();
-      }
-
-      $this->log("LDAP operation: time=".$diff." operation=search('".$this->basedn."', '$filter')");
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'search(base="'.$this->basedn.'",scope="'.$scope.'",filter="'.$filter.'")');
-      return $this->sr[$srp];
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'search(base="'.$this->basedn.'",scope="'.$scope.'",filter="'.$filter.'")');
-      return "";
-    }
+    return $this->search->search($srp, $filter, $attrs, $scope, $controls);
   }
 
-  /*!
-   * \brief Parse last result
-   *
-   * \param integer $srp srp
-   *
-   */
-  function parseResult ($srp): array
-  {
-    if ($this->hascon && $this->hasres[$srp]) {
-      if (ldap_parse_result($this->cid, $this->sr[$srp], $errcode, $matcheddn, $errmsg, $referrals, $controls)) {
-        return [$errcode, $matcheddn, $errmsg, $referrals, $controls];
-      }
-      throw new FusionDirectoryException(_('Parsing LDAP result failed'));
-    } else {
-      throw new FusionDirectoryException(_('No LDAP result to parse'));
-    }
-  }
-
-  /*
-   * \brief List
-   *
-   * \param integer $srp
-   *
-   * \param string $filter Initialized at "(objectclass=*)"
-   *
-   * \param string $basedn Empty string
-   *
-   * \param array $attrs
-   */
-
-
-  /*
-   * \brief Concatenate
-   *
-   * \param integer $srp
-   *
-   * \param string $dn The DN
-   *
-   * \param array $attrs
-   *
-   * \param string $filter Initialized at "(objectclass=*)"
-   */
   function cat ($srp, $dn, $attrs = ["*"], $filter = "(objectclass=*)")
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-
-      $this->clearResult($srp);
-      $this->sr[$srp] = @ldap_read($this->cid, $dn, $filter, $attrs);
-      $this->error    = @ldap_error($this->cid);
-      $this->resetResult($srp);
-
-      /* Set hasres to TRUE if we got a result or FALSE if $this->sr[$srp] is FALSE */
-      if ($this->sr[$srp] === FALSE) {
-        $this->hasres[$srp] = FALSE;
-      } else {
-        $this->hasres[$srp] = TRUE;
-      }
-
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'cat(dn="'.$dn.'",filter="'.$filter.'")');
-      return $this->sr[$srp];
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'cat(dn="'.$dn.'",filter="'.$filter.'")');
-      return "";
-    }
+    return $this->search->cat($srp, $dn, $attrs, $filter);
   }
 
-  /*!
-   * \brief Search object from a filter
-   *
-   * \param string $dn The DN
-   *
-   * \param string $filter The filter of the research
-   */
   function objectMatchFilter ($dn, $filter)
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      $res  = @ldap_read($this->cid, $dn, $filter, ["objectClass"]);
-      if ($res !== FALSE) {
-        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'objectMatchFilter(dn="'.$dn.'",filter="'.$filter.'")');
-        return @ldap_count_entries($this->cid, $res);
-      } else {
-        return FALSE;
-      }
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'objectMatchFilter(dn="'.$dn.'",filter="'.$filter.'")');
-      return FALSE;
-    }
+    return $this->search->objectMatchFilter($dn, $filter);
   }
 
-  /*!
-   * \brief Set a size limit
-   *
-   * \param $size The limit
-   */
   function setSizeLimit ($size)
   {
-    /* Ignore zero settings */
-    if ($size == 0) {
-      @ldap_set_option($this->cid, LDAP_OPT_SIZELIMIT, 10000000);
-    }
-    if ($this->hascon) {
-      @ldap_set_option($this->cid, LDAP_OPT_SIZELIMIT, $size);
-    } else {
-      $this->error = "Could not connect to LDAP server";
-    }
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $size, 'setSizeLimit');
+    $this->search->setSizeLimit($size);
   }
 
-  /*!
-   * \brief Fetch
-   *
-   * \param integer $srp
-   * \param bool    $cleanUpNumericIndices whether to remove numeric indices and "count" index at top level ("count" index in each attribute value is kept)
-   */
   function fetch ($srp, bool $cleanUpNumericIndices = FALSE)
   {
-    if ($this->hascon) {
-      if ($this->hasres[$srp]) {
-        if ($this->start[$srp] == 0) {
-          if ($this->sr[$srp]) {
-            $this->start[$srp]  = 1;
-            $this->re[$srp]     = @ldap_first_entry($this->cid, $this->sr[$srp]);
-          } else {
-            return [];
-          }
-        } else {
-          $this->re[$srp] = @ldap_next_entry($this->cid, $this->re[$srp]);
-        }
-        $att = [];
-        if ($this->re[$srp]) {
-          $att        = @ldap_get_attributes($this->cid, $this->re[$srp]);
-          $att['dn']  = trim(@ldap_get_dn($this->cid, $this->re[$srp]));
-          if ($cleanUpNumericIndices && isset($att['count'])) {
-            for ($i = 0; $i < $att['count']; ++$i) {
-              /* Remove numeric keys */
-              unset($att[$i]);
-            }
-            unset($att['count']);
-          }
-        }
-        $this->error = @ldap_error($this->cid);
-        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'fetch()');
-        return $att;
-      } else {
-        $this->error = "Perform a fetch with no search";
-        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'fetch()');
-        return "";
-      }
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'fetch()');
-      return "";
-    }
+    return $this->search->fetch($srp, $cleanUpNumericIndices);
   }
 
-  /*!
-   * \brief Reset the result
-   *
-   * \param integer $srp Value to be reset
-   */
   function resetResult ($srp)
   {
-    $this->start[$srp] = 0;
+    $this->search->resetResult($srp);
   }
 
-  /*!
-   * \brief Clear a result
-   *
-   * \param integer $srp The result to clear
-   */
   function clearResult ($srp)
   {
-    if ($this->hasres[$srp]) {
-      $this->hasres[$srp] = FALSE;
-      @ldap_free_result($this->sr[$srp]);
-    }
+    $this->search->clearResult($srp);
   }
 
-  /*!
-   * \brief Accessor of the DN
-   *
-   * \param $srp srp
-   */
   function getDN ($srp)
   {
-    if ($this->hascon) {
-      if ($this->hasres[$srp]) {
-        if (!$this->re[$srp]) {
-          $this->error = "Perform a Fetch with no valid Result";
-        } else {
-          $rv = @ldap_get_dn($this->cid, $this->re[$srp]);
-
-          $this->error = @ldap_error($this->cid);
-          return trim($rv);
-        }
-      } else {
-        $this->error = "Perform a Fetch with no Search";
-        return "";
-      }
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      return "";
-    }
+    return $this->search->getDN($srp);
   }
 
-  /*!
-   * \brief Return the numbers of entries
-   *
-   * \param $srp srp
-   */
   function count ($srp)
   {
-    if ($this->hascon) {
-      if ($this->hasres[$srp]) {
-        $rv = @ldap_count_entries($this->cid, $this->sr[$srp]);
-        $this->error = @ldap_error($this->cid);
-        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'count()');
-        return $rv;
-      } else {
-        $this->error = "Perform a Fetch with no Search";
-        Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'count()');
-        return "";
-      }
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'count()');
-      return "";
-    }
+    return $this->search->count($srp);
   }
 
+  function cd ($dir)
+  {
+    $this->search->cd($dir);
+  }
 
-  /*!
-   * \brief Remove
-   *
-   * \param string $attrs Empty string
-   *
-   * \param string $dn Empty string
-   */
+  function getParentDir ($basedn = '')
+  {
+    return $this->search->getParentDir($basedn);
+  }
+
+  function parseResult ($srp): array
+  {
+    return $this->search->parseResult($srp);
+  }
+
+  /* ============================================================
+   * Delegates to LdapWriter
+   * ============================================================ */
+
   function rm ($attrs = "", $dn = "")
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      if ($dn == '') {
-        $dn = $this->basedn;
-      }
-
-      $r = ldap_mod_del($this->cid, $dn, $attrs);
-      $this->error = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rm('.$dn.')');
-      return $r;
-    } else {
-      $this->error = 'Could not connect to LDAP server';
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rm('.$dn.')');
-      return '';
-    }
+    return $this->writer->rm($attrs, $dn);
   }
 
   function modAdd ($attrs = "", $dn = "")
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      if ($dn == "") {
-        $dn = $this->basedn;
-      }
-
-      $r = @ldap_mod_add($this->cid, $dn, $attrs);
-      $this->error = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modAdd('.$dn.')');
-      return $r;
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modAdd('.$dn.')');
-      return "";
-    }
+    return $this->writer->modAdd($attrs, $dn);
   }
 
-  /*!
-   * \brief Remove directory
-   *
-   * \param string $deletedn The DN to be deleted
-  */
   function rmdir ($deletedn)
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      $r = @ldap_delete($this->cid, $deletedn);
-      $this->error = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdir('.$deletedn.')');
-      return ($r ? $r : 0);
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdir('.$deletedn.')');
-      return "";
-    }
+    return $this->writer->rmdir($deletedn);
   }
 
-
-  /*!
-   * \brief Move the given Ldap entry from $source to $dest
-   *
-   * \param  String  $source The source dn.
-   *
-   * \param  String  $dest   The destination dn.
-   *
-   * \return Boolean TRUE on success else FALSE.
-   */
   function renameDn ($source, $dest)
   {
-    /* Check if source and destination are the same entry */
-    if (strtolower($source) == strtolower($dest)) {
-      trigger_error("Source and destination can't be the same entry.");
-      $this->error = "Source and destination can't be the same entry.";
-      return FALSE;
-    }
-
-    /* Check if destination entry exists */
-    if ($this->dnExists($dest)) {
-      trigger_error("Destination '$dest' already exists.");
-      $this->error = "Destination '$dest' already exists.";
-      return FALSE;
-    }
-
-    /* Extract the name and the parent part out ouf source dn.
-        e.g.  cn=herbert,ou=department,dc=...
-         parent   =>  ou=department,dc=...
-         dest_rdn =>  cn=herbert
-     */
-    $parent   = preg_replace("/^[^,]+,/", "", $dest);
-    $dest_rdn = preg_replace("/,.*$/", "", $dest);
-
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      /* We have to pass TRUE as deleteoldrdn in case the attribute is single-valued */
-      $r = ldap_rename($this->cid, $source, $dest_rdn, $parent, TRUE);
-      $this->error = ldap_error($this->cid);
-
-      /* Check if destination dn exists, if not the server may not support this operation */
-      $r &= $this->dnExists($dest);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rename("'.$source.'","'.$dest.'")');
-      return $r;
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rename("'.$source.'","'.$dest.'")');
-      return FALSE;
-    }
+    return $this->writer->renameDn($source, $dest);
   }
 
-
-  /*!
-   * \brief Function rmdirRecursive
-   *
-   * Based on recursive_remove, adding two thing: full subtree remove, and delete own node.
-   *
-   * \param $srp srp
-   *
-   * \param string $deletedn The dn to delete
-   *
-   * \return TRUE on sucessfull , 0 in error, and "" when we don't get a ldap conection
-   */
   function rmdirRecursive ($srp, $deletedn)
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      $delarray = [];
-
-      /* Get sorted list of dn's to delete */
-      $this->cd($deletedn);
-      $this->search($srp, '(objectClass=*)', ['dn']);
-      while ($attrs = $this->fetch($srp)) {
-        $delarray[$attrs['dn']] = strlen($attrs['dn']);
-      }
-      arsort($delarray);
-      reset($delarray);
-
-      /* Really Delete ALL dn's in subtree */
-      $r = TRUE;
-      foreach (array_keys($delarray) as $key) {
-        $r = @ldap_delete($this->cid, $key);
-        if ($r === FALSE) {
-          break;
-        }
-      }
-      $this->error = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdirRecursive("'.$deletedn.'")');
-      return ($r ? $r : 0);
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'rmdirRecursive("'.$deletedn.'")');
-      return "";
-    }
+    return $this->writer->rmdirRecursive($srp, $deletedn);
   }
 
   function makeReadableErrors ($error, $attrs)
   {
-    if ($this->success()) {
-      return "";
-    }
-
-    $str = "";
-    if (isset($attrs['objectClass'])
-      && preg_match("/^objectClass: value #([0-9]*) invalid per syntax$/", $this->getAdditionalError(), $m)) {
-      $ocs = $attrs['objectClass'];
-      if (!is_array($ocs)) {
-        $ocs = [$ocs];
-      }
-      if (isset($ocs[$m[1]])) {
-        $str .= " - <b>objectClass: ".$ocs[$m[1]]."</b>";
-      }
-    }
-    if ($error == "Undefined attribute type") {
-      $str = " - <b>attribute: ".preg_replace("/:.*$/", "", $this->getAdditionalError())."</b>";
-    }
-
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $attrs, "Erroneous data");
-
-    return $str;
+    return $this->writer->makeReadableErrors($error, $attrs);
   }
 
-  /*!
-   * \brief Modify a entry of the directory LDAP
-   *
-   * \param array $attrs The new entry
-   */
   function modify (array $attrs)
   {
-    if (count($attrs) == 0) {
-      return 0;
-    }
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      $r = @ldap_modify($this->cid, $this->basedn, $attrs);
-      $this->error = @ldap_error($this->cid);
-      if (!$this->success()) {
-        $this->error .= $this->makeReadableErrors($this->error, $attrs);
-      }
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modify('.$this->basedn.')');
-      return ($r ? $r : 0);
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modify('.$this->basedn.')');
-      return "";
-    }
+    return $this->writer->modify($attrs);
   }
 
-  /*!
-   * \brief Modify a entry of the directory LDAP with fine control
-   *
-   * \param array $changes The changes
-   */
   function modifyBatch (array $changes)
   {
-    if (count($changes) == 0) {
-      return TRUE;
-    }
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      $r            = @ldap_modify_batch($this->cid, $this->basedn, $changes);
-      $this->error  = @ldap_error($this->cid);
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modifyBatch('.$this->basedn.')');
-      return $r;
-    } else {
-      $this->error = 'Could not connect to LDAP server';
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'modifyBatch('.$this->basedn.')');
-      return FALSE;
-    }
+    return $this->writer->modifyBatch($changes);
   }
 
-  /*!
-   * \brief Add entry in the LDAP directory
-   *
-   * \param string $attrs The entry to add
-   */
   function add ($attrs)
   {
-    if ($this->hascon) {
-      if ($this->reconnect) {
-        $this->connect();
-      }
-      $r = @ldap_add($this->cid, $this->basedn, $attrs);
-      $this->error = @ldap_error($this->cid);
-      if (!$this->success()) {
-        $this->error .= $this->makeReadableErrors($this->error, $attrs);
-      }
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'add('.$this->basedn.')');
-      return ($r ? $r : 0);
-    } else {
-      $this->error = "Could not connect to LDAP server";
-      Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->error, 'add('.$this->basedn.')');
-      return "";
-    }
+    return $this->writer->add($attrs);
   }
 
-  /*
-   * $target is a dn, i.e. "ou=example,ou=orga,dc=base"
-   *
-   * Creates missing trees, in our example ou=orga,dc=base will get created if not existing, same thing for ou=example,ou=orga,dc=base
-   * */
   function createMissingTrees ($srp, $target, $ignoreReferralBases = TRUE)
   {
-    $real_path = substr($target, 0, strlen($target) - strlen($this->basedn) - 1);
-
-    if ($target == $this->basedn) {
-      $l = ["dummy"];
-    } else {
-      $l = array_reverse(ldap_explode_dn($real_path, 0));
-    }
-    unset($l['count']);
-    $cdn = $this->basedn;
-
-    /* Load schema if available... */
-    $classes = $this->getObjectclasses();
-
-    foreach ($l as $part) {
-      if ($part != "dummy") {
-        $cdn = "$part,$cdn";
-      }
-
-      /* Ignore referrals */
-      if ($ignoreReferralBases) {
-        $found = FALSE;
-        foreach ($this->referrals as $ref) {
-          if ($ref['BASE'] == $cdn) {
-            $found = TRUE;
-            break;
-          }
-        }
-        if ($found) {
-          continue;
-        }
-      }
-
-      /* Create missing entry? */
-      if (!$this->dnExists($cdn)) {
-        $type   = preg_replace('/^([^=]+)=.*$/', '\\1', $cdn);
-        $param  = preg_replace('/^[^=]+=([^,]+).*$/', '\\1', $cdn);
-        $param  = preg_replace(['/\\\\,/','/\\\\"/'], [',','"'], $param);
-
-        $na = [];
-
-        /* Automatic or traditional? */
-        if (count($classes)) {
-          if ($type == 'l') {
-            /* Locality has l as MAY so autodetection fails */
-            $ocname = 'locality';
-          } else {
-            /* Get name of first matching objectClass */
-            $ocname = '';
-            foreach ($classes as $class) {
-              if (isset($class['MUST']) && in_array($type, $class['MUST'])) {
-                /* Look for first classes that is structural... */
-                if (isset($class['STRUCTURAL'])) {
-                  $ocname = $class['NAME'];
-                  break;
-                }
-
-                /* Look for classes that are auxiliary... */
-                if (isset($class['AUXILIARY'])) {
-                  $ocname = $class['NAME'];
-                }
-              }
-            }
-          }
-
-          /* Bail out, if we've nothing to do... */
-          if ($ocname == '') {
-            throw new FusionDirectoryError(htmlescape(sprintf(_('Cannot automatically create subtrees with RDN "%s": no object class found!'), $type)));
-          }
-
-          /* Assemble_entry */
-          $na['objectClass'] = [$ocname];
-          if (isset($classes[$ocname]['AUXILIARY'])) {
-            $na['objectClass'][] = $classes[$ocname]['SUP'];
-          }
-          if ($type == 'dc') {
-            /* This is bad actually, but - tell me a better way? */
-            $na['objectClass'][]  = 'organization';
-            $na['o']              = $param;
-          }
-          $na[$type] = $param;
-
-          // Fill in MUST values - but do not overwrite existing ones.
-          $oc = $ocname;
-          do {
-            if (isset($classes[$oc]['MUST']) && is_array($classes[$oc]['MUST'])) {
-              foreach ($classes[$oc]['MUST'] as $attr) {
-                if (isset($na[$attr]) && !empty($na[$attr])) {
-                  continue;
-                }
-                $na[$attr] = 'filled';
-              }
-            }
-            $oc = ($classes[$oc]['SUP'] ?? NULL);
-          } while ($oc);
-        } else {
-          /* Use alternative add... */
-          switch ($type) {
-            case 'ou':
-              $na['objectClass']  = 'organizationalUnit';
-              $na['ou']           = $param;
-              break;
-            case 'dc':
-              $na['objectClass']  = ['dcObject', 'top', 'organization'];
-              $na['dc']           = $param;
-              $na['o']            = $param;
-              break;
-            default:
-              throw new FusionDirectoryError(htmlescape(sprintf(_('Cannot automatically create subtrees with RDN "%s": not supported'), $type)));
-          }
-        }
-        $this->cd($cdn);
-        $this->add($na);
-
-        if (!$this->success()) {
-          Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $cdn, 'dn');
-          Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $na, 'Content');
-          Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->getError(), 'LDAP error');
-
-          throw new FusionDirectoryLdapError($cdn, LDAP_ADD, $this->getError(), $this->getErrno());
-        }
-      }
-    }
+    $this->writer->createMissingTrees($srp, $target, $ignoreReferralBases);
   }
 
+  /* ============================================================
+   * Delegates to LdapSerializer
+   * ============================================================ */
+
+  function generateLdif (string $dn, string $filter = '(objectClass=*)', string $scope = 'sub', int $limit = 0, ?int $wrap = NULL): string
+  {
+    return $this->serializer->generateLdif($dn, $filter, $scope, $limit, $wrap);
+  }
+
+  function dnExists ($dn): bool
+  {
+    return $this->serializer->dnExists($dn);
+  }
+
+  function parseLdif (string $str_attr): array
+  {
+    return $this->serializer->parseLdif($str_attr);
+  }
+
+  function importCompleteLdif ($srp, $str_attr, $JustModify, $DeleteOldEntries)
+  {
+    return $this->serializer->importCompleteLdif($srp, $str_attr, $JustModify, $DeleteOldEntries);
+  }
+
+  protected function importSingleEntry ($srp, $data, $modify, $delete)
+  {
+    return $this->serializer->importSingleEntry($srp, $data, $modify, $delete);
+  }
+
+  /* ============================================================
+   * Utility methods kept in LDAP class
+   * ============================================================ */
 
   /*!
    * \brief Get the LDAP additional error
@@ -1134,305 +427,6 @@ class LDAP
   {
     /* LDAP_SIZELIMIT_EXCEEDED 0x04 */
     return ($this->getErrno() == 0x04);
-  }
-
-  function getCredentials ($url, $referrals = NULL)
-  {
-    $ret    = [];
-    $url    = preg_replace('!\?\?.*$!', '', $url);
-    $server = preg_replace('!^([^:]+://[^/]+)/.*$!', '\\1', $url);
-
-    if ($referrals === NULL) {
-      $referrals = $this->referrals;
-    }
-
-    if (isset($referrals[$server])) {
-      return $referrals[$server];
-    } else {
-      $ret['ADMINDN']       = $this->binddn;
-      $ret['ADMINPASSWORD'] = $this->bindpw;
-    }
-
-    return $ret;
-  }
-
-
-  /*!
-   * \brief  Generates an ldif for all entries matching the filter settings, scope and limit.
-   *
-   * \param  string $dn       The entry to export.
-   *
-   * \param  string $filter   Limit the exported object to those maching this filter.
-   *
-   * \param  string $scope    'base', 'sub' .. see manpage for 'ldapmodify' for details.
-   *
-   * \param  int $limit       Limits the result.
-   *
-   * \param  ?int $wrap       Wraps line around this length (0 to disable).
-   */
-  function generateLdif (string $dn, string $filter = '(objectClass=*)', string $scope = 'sub', int $limit = 0, ?int $wrap = NULL): string
-  {
-    $limit  = (($limit == 0) ? '' : ' -z '.$limit);
-    if ($wrap === NULL) {
-      $wrap = '';
-    } else {
-      $wrap = ' -o ldif-wrap='.($wrap ? $wrap : 'no');
-    }
-
-    // Check scope values
-    $scope = trim($scope);
-    if (!empty($scope) && !in_array($scope, ['base', 'one', 'sub', 'children'])) {
-      throw new LDIFExportException(sprintf('Invalid parameter for scope "%s", please use "base", "one", "sub" or "children".', $scope));
-    }
-    $scope = (empty($scope) ? '' : ' -s '.$scope);
-
-    // Prepare parameters to be valid for shell execution
-    $dn     = escapeshellarg($dn);
-    $pwd    = escapeshellarg($this->bindpw);
-    $host   = escapeshellarg($this->hostname);
-    $admin  = escapeshellarg($this->binddn);
-    $filter = escapeshellarg($filter);
-
-    $cmd = 'ldapsearch'.($this->tls ? ' -ZZ' : '')." -x -LLLL -D {$admin} {$filter} {$limit} {$wrap} {$scope} -H {$host} -b {$dn} -w {$pwd} ";
-
-    // Create list of process pipes
-    $descriptorspec = [
-      0 => ["pipe", "r"],  // stdin
-      1 => ["pipe", "w"],  // stdout
-      2 => ["pipe", "w"]   // stderr
-    ];
-
-    // Try to open the process
-    $process = proc_open($cmd, $descriptorspec, $pipes);
-    if ($process !== FALSE) {
-      // Write the password to stdin
-      fclose($pipes[0]);
-
-      // Get results from stdout and stderr
-      $res = stream_get_contents($pipes[1]);
-      $err = stream_get_contents($pipes[2]);
-      fclose($pipes[1]);
-
-      // Close the process and check its return value
-      if (proc_close($process) != 0) {
-        throw new LDIFExportException($err);
-      }
-    } else {
-      throw new LDIFExportException(_('proc_open failed to execute ldapsearch'));
-    }
-    return $res;
-  }
-
-  function dnExists ($dn): bool
-  {
-    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'dnExists('.$dn.')');
-    return (@ldap_read($this->cid, $dn, '(objectClass=*)', ['objectClass']) !== FALSE);
-  }
-
-  function parseLdif (string $str_attr): array
-  {
-    /* First we split the string into lines */
-    $fileLines = preg_split("/\n/", $str_attr);
-    if (end($fileLines) != '') {
-      $fileLines[] = '';
-    }
-
-    /* Joining lines */
-    $line       = NULL;
-    $entry      = [];
-    $entries    = [];
-    $entryStart = -1;
-    foreach ($fileLines as $lineNumber => $fileLine) {
-      if (preg_match('/^ /', $fileLine)) {
-        if ($line === NULL) {
-          throw new LDIFImportException(sprintf(_('Error line %s, first line of an entry cannot start with a space'), $lineNumber));
-        }
-        /* Append to current line */
-        $line .= substr($fileLine, 1);
-      } else {
-        if ($line !== NULL) {
-          if (preg_match('/^#/', $line)
-            || (preg_match('/^version:/', $line) && empty($entry))) {
-            /* Ignore comment */
-            /* Ignore version number */
-          } else {
-            /* Line has ended */
-            list ($key, $value) = explode(':', $line, 2);
-            $value = trim($value);
-            if (preg_match('/^:/', $value)) {
-              $value = base64_decode(trim(substr($value, 1)));
-            }
-            if (preg_match('/^</', $value)) {
-              throw new LDIFImportException(sprintf(_('Error line %s, references to an external file are not supported'), $lineNumber));
-            }
-            if ($value === '') {
-              throw new LDIFImportException(sprintf(_('Error line %s, attribute "%s" has no value'), $lineNumber, $key));
-            }
-            if ($key == 'dn') {
-              if (!empty($entry)) {
-                throw new LDIFImportException(sprintf(_('Error line %s, an entry bloc can only have one dn'), $lineNumber));
-              }
-              $entry['dn']  = $value;
-              $entryStart   = $lineNumber;
-            } elseif (empty($entry)) {
-              throw new LDIFImportException(sprintf(_('Error line %s, an entry bloc should start with the dn'), $lineNumber));
-            } else {
-              if (!isset($entry[$key])) {
-                $entry[$key] = [];
-              }
-              $entry[$key][] = $value;
-            }
-          }
-        }
-        /* Start new line */
-        $line = trim($fileLine);
-        if ($line == '') {
-          if (!empty($entry)) {
-            /* Entry is finished */
-            $entries[$entryStart] = $entry;
-          }
-          /* Start a new entry */
-          $entry      = [];
-          $entryStart = -1;
-          $line       = NULL;
-        }
-      }
-    }
-
-    return $entries;
-  }
-
-  /*!
-   * \brief Function to imports ldifs
-   *
-   * If DeleteOldEntries is TRUE, the destination entry will be deleted first.
-   * If JustModify is TRUE the destination entry will only be touched by the attributes specified in the ldif.
-   * if JustMofify is FALSE the destination dn will be overwritten by the new ldif.
-   *
-   * \param integer $srp
-   *
-   * \param string $str_attr
-   *
-   * \param boolean $JustModify
-   *
-   * \param boolean $DeleteOldEntries
-   */
-  function importCompleteLdif ($srp, $str_attr, $JustModify, $DeleteOldEntries)
-  {
-    $entries = $this->parseLdif($str_attr);
-
-    if ($this->reconnect) {
-      $this->connect();
-    }
-
-    foreach ($entries as $startLine => $entry) {
-      /* Delete before insert */
-      $usermdir = ($this->dnExists($entry['dn']) && $DeleteOldEntries);
-      /* Should we use Modify instead of Add */
-      $usemodify = ($this->dnExists($entry['dn']) && $JustModify);
-
-      /* If we can't Import, return with a file error */
-      if (!$this->importSingleEntry($srp, $entry, $usemodify, $usermdir)) {
-        throw new LDIFImportException(sprintf(_('Error while importing dn: "%s", please check your LDIF from line %s on!'), $entry['dn'][0], $startLine));
-      }
-    }
-
-    return count($entries);
-  }
-
-  /*! \brief Function to Imports a single entry
-   *
-   * If $delete is TRUE;  The old entry will be deleted if it exists.
-   * if $modify is TRUE;  All variables that are not touched by the new ldif will be kept.
-   * if $modify is FALSE; The new ldif overwrites the old entry, and all untouched attributes get lost.
-   *
-   * \param integer $srp
-   *
-   * \param array $data
-   *
-   * \param boolean $modify
-   *
-   * \param boolean $delete
-   */
-  protected function importSingleEntry ($srp, $data, $modify, $delete)
-  {
-
-    if (!config()) {
-      trigger_error("Can't import ldif, can't read config object.");
-    }
-
-    if ($this->reconnect) {
-      $this->connect();
-    }
-
-    $ret        = FALSE;
-    $dn         = NULL;
-    $operation  = NULL;
-
-    /* If dn is an index of data, we should try to insert the data */
-    if (isset($data['dn'])) {
-      /* Fix dn */
-      $tmp = ldap_explode_dn($data['dn'], 0);
-      unset($tmp['count']);
-      $dn = '';
-      foreach ($tmp as $tm) {
-        $dn .= trim($tm).',';
-      }
-      $dn = preg_replace('/,$/', '', $dn);
-      unset($data['dn']);
-
-      /* Creating Entry */
-      $this->cd($dn);
-
-      /* Delete existing entry */
-      if ($delete) {
-        $this->rmdirRecursive($srp, $dn);
-      }
-
-      /* Create missing trees */
-      $this->cd(config()->current['BASE']);
-      try {
-        $this->createMissingTrees($srp, preg_replace('/^[^,]+,/', '', $dn));
-      } catch (FusionDirectoryError $error) {
-        $error->display();
-      }
-      $this->cd($dn);
-
-      $operation = LDAP_MOD;
-      if (!$modify) {
-        $this->cat($srp, $dn);
-        if ($this->count($srp)) {
-          /* The destination entry exists, overwrite it with the new entry */
-          $attrs = $this->fetch($srp);
-          foreach (array_keys($attrs) as $name) {
-            if (!is_numeric($name)) {
-              if (in_array($name, ['dn','count'])) {
-                continue;
-              }
-              if (!isset($data[$name])) {
-                $data[$name] = [];
-              }
-            }
-          }
-          $ret = $this->modify($data);
-        } else {
-          /* The destination entry doesn't exists, create it */
-          $operation = LDAP_ADD;
-          $ret = $this->add($data);
-        }
-      } else {
-        /* Keep all vars that aren't touched by this ldif */
-        $ret = $this->modify($data);
-      }
-    }
-
-    if (!$this->success()) {
-      $error = new FusionDirectoryLdapError($dn, $operation, $this->getError(), $this->getErrno());
-      $error->display();
-    }
-
-
-    return $ret;
   }
 
   /*!
