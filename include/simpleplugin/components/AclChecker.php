@@ -11,53 +11,131 @@ class AclChecker
     ) {
     }
 
-    public function isWriteable(string $attribute, bool $skipWrite = false): bool
+    public function aclSkipWrite (): bool
     {
-        return $this->plugin->aclIsWriteable($attribute, $skipWrite);
+        return ($this->plugin->needEditMode && !Session::is_set('edit'));
     }
 
-    public function isReadable(string $attribute): bool
+    /*! \brief Can we write the attribute */
+    public function aclIsWriteable ($attribute, bool $skipWrite = FALSE): bool
     {
-        return $this->plugin->aclIsReadable($attribute);
+        return (strpos($this->aclGetPermissions($attribute, NULL, $skipWrite), 'w') !== FALSE);
     }
 
-    public function isCreateable(?string $base = null): bool
+    /*!
+     * \brief Can we read the acl
+     *
+     * \param string $attribute
+     */
+    public function aclIsReadable ($attribute): bool
     {
-        return $this->plugin->aclIsCreateable($base);
+        return (strpos($this->aclGetPermissions($attribute), 'r') !== FALSE);
     }
 
-    public function isRemoveable(?string $base = null): bool
+    /*!
+     * \brief Can we create the object
+     *
+     * \param string $base Empty string
+     */
+    public function aclIsCreateable (?string $base = NULL): bool
     {
-        return $this->plugin->aclIsRemoveable($base);
+        return (strpos($this->aclGetPermissions('0', $base), 'c') !== FALSE);
     }
 
-    public function isMoveable(?string $base = null): bool
+    /*!
+     * \brief Can we delete the object
+     *
+     * \param string $base Empty string
+     */
+    public function aclIsRemoveable (?string $base = NULL): bool
     {
-        return $this->plugin->aclIsMoveable($base);
+        return (strpos($this->aclGetPermissions('0', $base), 'd') !== FALSE);
     }
 
-    public function hasPermissions(): bool
+    /*!
+     * \brief Can we move the object
+     *
+     * \param string $base Empty string
+     */
+    public function aclIsMoveable (?string $base = NULL): bool
     {
-        return $this->plugin->aclHasPermissions();
+        return (strpos($this->aclGetPermissions('0', $base), 'm') !== FALSE);
     }
 
-    public function getPermissions(string $attribute = '0', ?string $base = null, bool $skipWrite = false): string
+    /*! \brief Test if there are ACLs for this plugin */
+    public function aclHasPermissions (): bool
     {
-        return $this->plugin->aclGetPermissions($attribute, $base, $skipWrite);
+        return in_array(get_class($this->plugin), config()->data['CATEGORIES'][rtrim($this->plugin->acl_category, '/')]['classes']);
     }
 
-    public function getBase(bool $callParent = true): string
+    /*! \brief Get the acl permissions for an attribute or the plugin itself */
+    public function aclGetPermissions ($attribute = '0', ?string $base = NULL, bool $skipWrite = FALSE): string
     {
-        return $this->plugin->getAclBase($callParent);
+        if (isset($this->plugin->parent) && isset($this->plugin->parent->ignoreAcls) && $this->plugin->parent->ignoreAcls) {
+            return 'cdmr' . ($skipWrite ? '' : 'w');
+        }
+        $ui        = get_userinfo();
+        $skipWrite |= $this->plugin->readOnly();
+        if ($base === NULL) {
+            $base = $this->getAclBase();
+        }
+        return $ui->getPermissions($base, $this->plugin->acl_category . get_class($this->plugin), $attribute, $skipWrite);
     }
 
-    public function attrIsReadable($attr): bool
+    /*!
+     * \brief Get LDAP base to use for ACL checks
+     */
+    public function getAclBase (bool $callParent = TRUE): string
     {
-        return $this->plugin->attrIsReadable($attr);
+        if (($this->plugin->parent instanceof SimpleTabs) && $callParent) {
+            return $this->plugin->parent->getAclBase();
+        }
+        if (isset($this->plugin->dn) && ($this->plugin->dn != 'new')) {
+            return $this->plugin->dn;
+        }
+        if (isset($this->plugin->base)) {
+            return 'new,' . $this->plugin->base;
+        }
+
+        return config()->current['BASE'];
     }
 
-    public function attrIsWriteable($attr): bool
+    /*! \brief Check if logged in user have enough right to read this attribute value
+     *
+     * \param mixed $attr Attribute object or name (in this case it will be fetched from attributesAccess)
+     */
+    public function attrIsReadable ($attr): bool
     {
-        return $this->plugin->attrIsWriteable($attr);
+        if (!is_object($attr)) {
+            $attr = $this->plugin->attributesAccess[$attr];
+        }
+        if ($attr->getLdapName() == 'base') {
+            return TRUE;
+        }
+        if ($attr->getAcl() == 'noacl') {
+            return TRUE;
+        }
+        return $this->aclIsReadable($attr->getAcl());
+    }
+
+    /*! \brief Check if logged in user have enough right to write this attribute value
+     *
+     * \param mixed $attr Attribute object or name (in this case it will be fetched from attributesAccess)
+     */
+    public function attrIsWriteable ($attr): bool
+    {
+        if (!is_object($attr)) {
+            $attr = $this->plugin->attributesAccess[$attr];
+        }
+        if ($attr->getLdapName() == 'base') {
+            return (
+                !$this->aclSkipWrite() &&
+                (!$this->plugin->initially_was_account || $this->aclIsMoveable() || $this->aclIsRemoveable())
+            );
+        }
+        if ($attr->getAcl() == 'noacl') {
+            return FALSE;
+        }
+        return $this->aclIsWriteable($attr->getAcl(), $this->aclSkipWrite());
     }
 }
