@@ -100,10 +100,8 @@ class ListingEntry implements ArrayAccess
 
   public function checkAcl (string $acls): bool
   {
-    global $ui;
-
     $infos  = Objects::infos($this->getTemplatedType());
-    $rights = $ui->get_permissions($this->aclBase, $infos['aclCategory'].'/'.($this->isTemplate() ? 'Template' : $infos['mainTab']));
+    $rights = user_info()->get_permissions($this->aclBase, $infos['aclCategory'].'/'.($this->isTemplate() ? 'Template' : $infos['mainTab']));
     foreach (str_split($acls) as $acl) {
       if (strpos($rights, $acl) === FALSE) {
         return FALSE;
@@ -115,17 +113,13 @@ class ListingEntry implements ArrayAccess
 
   public function snapshotCreationAllowed (): bool
   {
-    global $ui;
-
     $infos  = Objects::infos($this->getTemplatedType());
-    return $ui->allow_snapshot_create($this->aclBase, $infos['aclCategory']);
+    return user_info()->allow_snapshot_create($this->aclBase, $infos['aclCategory']);
   }
 
   public function snapshotRestoreAllowed (): bool
   {
-    global $ui;
-
     $infos  = Objects::infos($this->getTemplatedType());
-    return $ui->allow_snapshot_restore($this->aclBase, $infos['aclCategory'], FALSE);
+    return user_info()->allow_snapshot_restore($this->aclBase, $infos['aclCategory'], FALSE);
   }
 }

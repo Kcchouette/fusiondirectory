@@ -99,7 +99,7 @@ class LoginMethod
   /*! \brief Performs an LDAP bind with $username and $password */
   static function ldapLoginUser (): bool
   {
-    global $ui, $message, $smarty;
+    global $message, $smarty;
     /* Login as user, initialize user ACL's */
     try {
       $ui = UserInfo::loginUser(static::$username, static::$password);
@@ -118,10 +118,10 @@ class LoginMethod
   /*! \brief Called after successful login, return FALSE if account is expired */
   static function loginAndCheckExpired (): bool
   {
-    global $ui, $plist, $message, $smarty;
+    global $plist, $message, $smarty;
 
     /* Remove all locks of this user */
-    Lock::deleteByUser($ui->dn);
+    Lock::deleteByUser(user_info()->dn);
 
     /* Save userinfo and plugin structure */
     Session::set('ui', $ui);
@@ -139,10 +139,10 @@ class LoginMethod
     config()->checkLdapConfig();
 
     /* Check account expiration */
-    $expired = $ui->expired_status();
+    $expired = user_info()->expired_status();
 
     if ($expired == POSIX_ACCOUNT_EXPIRED) {
-      Logging::log('security', 'account', $ui->dn, [], 'Account for user "'.static::$username.'" has expired');
+      Logging::log('security', 'account', user_info()->dn, [], 'Account for user "'.static::$username.'" has expired');
       $message = _('Account locked. Please contact your system administrator!');
       $smarty->assign('focusfield', 'username');
       return FALSE;
@@ -154,15 +154,13 @@ class LoginMethod
   /*! \brief Connect user */
   static function connect ()
   {
-    global $ui;
-
     $ui = Session::get('ui');
 
     //Create new session ID to avoir session_fixation security issues after sucess login
     session_regenerate_id();
 
     /* Not account expired or password forced change go to main page */
-    Logging::log('security', 'login', $ui->uid, [], 'Logged in successfully');
+    Logging::log('security', 'login', user_info()->uid, [], 'Logged in successfully');
     Session::set('connected', 1);
     Session::set('DEBUGLEVEL', config()->get_cfg_value('DEBUGLEVEL'));
   }

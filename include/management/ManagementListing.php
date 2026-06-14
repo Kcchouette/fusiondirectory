@@ -77,8 +77,6 @@ class ManagementListing
 
   function setUpBaseSelector ()
   {
-    global $ui;
-
     // Set base for filter
     if ($this->baseMode) {
       $this->base = $ui->getCurrentBase();
@@ -161,10 +159,8 @@ class ManagementListing
    */
   function render (): string
   {
-    global $ui;
-
     // Check for exeeded sizelimit
-    if (($message = $ui->getSizeLimitHandler()->check()) != '') {
+    if (($message = user_info()->getSizeLimitHandler()->check()) != '') {
       return $message;
     }
 
@@ -248,8 +244,6 @@ class ManagementListing
    */
   function updateBase ()
   {
-    global $ui;
-
     // Take care of base selector
     if ($this->baseMode) {
       $this->baseSelector->update();
@@ -262,7 +256,7 @@ class ManagementListing
 
       // Save base
       $this->base = $this->baseSelector->getBase();
-      $ui->setCurrentBase($this->base);
+      user_info()->setCurrentBase($this->base);
     }
 
     // Do not do anything if this is not our PID
@@ -337,11 +331,10 @@ class ManagementListing
    */
   function setBase (string $base)
   {
-    global $ui;
     $this->base = $base;
     if ($this->baseMode) {
       $this->baseSelector->setBase($this->base);
-      $ui->setCurrentBase($this->base);
+      user_info()->setCurrentBase($this->base);
     }
   }
 
@@ -373,8 +366,6 @@ class ManagementListing
 
   function renderNavigation (bool $skipConfiguration = FALSE): array
   {
-    global $ui;
-
     if ($this->baseMode) {
       $enableBack = TRUE;
       $enableRoot = TRUE;
@@ -389,7 +380,7 @@ class ManagementListing
       }
 
       /* Check if we are in users home  department */
-      if (!count($deps) || ($this->base == $ui->getBase()) || !in_array_ics($ui->getBase(), $deps)) {
+      if (!count($deps) || ($this->base == user_info()->getBase()) || !in_array_ics(user_info()->getBase(), $deps)) {
         $enableHome = FALSE;
       }
 
@@ -603,8 +594,6 @@ class ManagementListing
 
   function fillSearchedAttributes (string $type, array &$attrs)
   {
-    global $ui;
-
     $searchedAttributes = [];
     foreach ($this->columns as $column) {
       $column->fillSearchedAttributes($searchedAttributes);
@@ -614,7 +603,7 @@ class ManagementListing
 
     foreach ($searchedAttributes as $attr) {
       if (!isset($attrs[$attr])) {
-        $category = $ui->getAttributeCategory($type, $attr);
+        $category = user_info()->getAttributeCategory($type, $attr);
         if ($category !== FALSE) {
           $attrs[$attr] = $category;
         }

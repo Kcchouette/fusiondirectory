@@ -46,8 +46,6 @@ class Objects
    */
   static function ls ($types, $attrs = NULL, ?string $ou = NULL, string $filter = '', bool $checkAcl = FALSE, string $scope = 'subtree', bool $templateSearch = FALSE, bool $sizeLimit = FALSE): array
   {
-    global $ui;
-
     if ($ou === NULL) {
       $ou = config()->current['BASE'];
     }
@@ -93,14 +91,14 @@ class Objects
       foreach ($search_attrs as $search_attr) {
         //Below str_replace allows us to remove the options, resulting in proper ACL inspection. (ACLs do not take options).
         $search_attr = preg_replace('/;x-.*/', '', $search_attr);
-        $category = $ui->getAttributeCategory($types[0], $search_attr);
+        $category = user_info()->getAttributeCategory($types[0], $search_attr);
         if ($category === FALSE) {
           throw new FusionDirectoryException('Could not find ACL for attribute "'.$search_attr.'" for type "'.$types[0].'"');
         }
         if ($category === TRUE) {
           continue;
         }
-        if (strpos($ui->getPermissions($ou, $category, $search_attr), 'r') === FALSE) {
+        if (strpos(user_info()->getPermissions($ou, $category, $search_attr), 'r') === FALSE) {
           $attrsAcls[$search_attr] = [$category, $search_attr];
         }
       }
@@ -125,11 +123,11 @@ class Objects
     while ($fetched_attrs = $ldap->fetch()) {
       $key = $fetched_attrs['dn'];
       if ($checkAcl) {
-        if (strpos($ui->getPermissions($key, $acl), 'r') === FALSE) {
+        if (strpos(user_info()->getPermissions($key, $acl), 'r') === FALSE) {
           continue;
         }
         foreach ($partialFilterAcls as $partialFilterAcl) {
-          if (strpos($ui->getPermissions($key, $partialFilterAcl[0], $partialFilterAcl[1]), 'r') === FALSE) {
+          if (strpos(user_info()->getPermissions($key, $partialFilterAcl[0], $partialFilterAcl[1]), 'r') === FALSE) {
             continue 2;
           }
         }
@@ -139,7 +137,7 @@ class Objects
         foreach ($attrs as $attr => $mode) {
           if (isset($fetched_attrs[$attr])) {
             if (isset($attrsAcls[$attr]) &&
-                (strpos($ui->getPermissions($key, $attrsAcls[$attr][0], $attrsAcls[$attr][1]), 'r') === FALSE)) {
+                (strpos(user_info()->getPermissions($key, $attrsAcls[$attr][0], $attrsAcls[$attr][1]), 'r') === FALSE)) {
               continue;
             }
             switch ($mode) {
@@ -161,7 +159,7 @@ class Objects
         if ($templateSearch) {
           if (
               isset($fetched_attrs['cn']) &&
-              (!$checkAcl || (strpos($ui->getPermissions($key, $tplAcl, 'template_cn'), 'r') !== FALSE))
+              (!$checkAcl || (strpos(user_info()->getPermissions($key, $tplAcl, 'template_cn'), 'r') !== FALSE))
             ) {
             $result[$key]['cn'] = $fetched_attrs['cn'][0];
           }
@@ -170,7 +168,7 @@ class Objects
             $attr = explode(':', $templateField, 2)[0];
             if (isset($attrs[$attr])) {
               if (isset($attrsAcls[$attr]) &&
-                  (strpos($ui->getPermissions($key, $attrsAcls[$attr][0], $attrsAcls[$attr][1]), 'r') === FALSE)) {
+                  (strpos(user_info()->getPermissions($key, $attrsAcls[$attr][0], $attrsAcls[$attr][1]), 'r') === FALSE)) {
                 continue;
               }
               $result[$key]['fdTemplateField'][] = $templateField;
@@ -187,13 +185,13 @@ class Objects
         if ($attrs == 'cn') {
           if (
               isset($fetched_attrs['cn']) &&
-              (!$checkAcl || (strpos($ui->getPermissions($key, $tplAcl, 'template_cn'), 'r') !== FALSE))
+              (!$checkAcl || (strpos(user_info()->getPermissions($key, $tplAcl, 'template_cn'), 'r') !== FALSE))
             ) {
             $result[$key] = $fetched_attrs['cn'][0];
           }
         } else {
           if (isset($attrsAcls[$attrs]) &&
-              (strpos($ui->getPermissions($key, $attrsAcls[$attrs][0], $attrsAcls[$attrs][1]), 'r') === FALSE)) {
+              (strpos(user_info()->getPermissions($key, $attrsAcls[$attrs][0], $attrsAcls[$attrs][1]), 'r') === FALSE)) {
             continue;
           }
           foreach ($fetched_attrs['fdTemplateField'] as $templateField) {
@@ -206,7 +204,7 @@ class Objects
         }
       } elseif (isset($fetched_attrs[$attrs])) {
         if (isset($attrsAcls[$attrs]) &&
-            (strpos($ui->getPermissions($key, $attrsAcls[$attrs][0], $attrsAcls[$attrs][1]), 'r') === FALSE)) {
+            (strpos(user_info()->getPermissions($key, $attrsAcls[$attrs][0], $attrsAcls[$attrs][1]), 'r') === FALSE)) {
           continue;
         }
         $result[$key] = $fetched_attrs[$attrs][0];
@@ -242,8 +240,6 @@ class Objects
 
   static function search ($types, $search_attrs, ?string $ou = NULL, string $filter = '', bool $checkAcl = FALSE, string $scope = 'subtree', bool $templateSearch = FALSE, &$partialFilterAcls = [], bool $sizeLimit = FALSE): ldapMultiplexer
   {
-    global $ui;
-
     $partialFilterAcls = [];
 
     if (!is_array($types)) {
@@ -289,14 +285,14 @@ class Objects
         $filterAttributes = $filterObject->listUsedAttributes();
         unset($filterAttributes['_template_cn']);
         foreach ($filterAttributes as $acl) {
-          $category = $ui->getAttributeCategory($types[0], $acl);
+          $category = user_info()->getAttributeCategory($types[0], $acl);
           if ($category === FALSE) {
             throw new FusionDirectoryException('Could not find ACL for attribute "'.$acl.'" for type "'.$types[0].'"');
           }
           if ($category === TRUE) {
             continue;
           }
-          if (strpos($ui->getPermissions($ou, $category, $acl), 'r') === FALSE) {
+          if (strpos(user_info()->getPermissions($ou, $category, $acl), 'r') === FALSE) {
             $partialFilterAcls[] = [$category, $acl];
           }
         }
@@ -324,7 +320,7 @@ class Objects
     if (!$ldap->success()) {
       if ($sizeLimit && $ldap->hitSizeLimit()) {
         // Check for size limit exceeded messages for GUI feedback
-        $ui->getSizeLimitHandler()->setLimitExceeded();
+        user_info()->getSizeLimitHandler()->setLimitExceeded();
       } else {
         throw new LDAPFailureException($ldap->getError());
       }
@@ -514,8 +510,6 @@ class Objects
    */
   static function getTemplates (string $type, string $requiredPermissions = 'r', string $filter = ''): array
   {
-    global $ui;
-
     $infos = static::infos($type);
 
     $templates    = [];
@@ -531,7 +525,7 @@ class Objects
         while ($attrs = $ldap->fetch()) {
           $dn = $attrs['dn'];
           if (($requiredPermissions != '')
-            && !preg_match('/'.$requiredPermissions.'/', $ui->getPermissions($dn, $infos['aclCategory'].'/'.'Template'))) {
+            && !preg_match('/'.$requiredPermissions.'/', user_info()->getPermissions($dn, $infos['aclCategory'].'/'.'Template'))) {
             continue;
           }
           $templates[$dn] = $attrs['cn'][0].' - '.$key;

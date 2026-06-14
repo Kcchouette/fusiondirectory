@@ -170,7 +170,7 @@ class Management implements FusionDirectoryDialog
 
   protected function configureActions ()
   {
-    global $ui, $positionDN;
+    global $positionDN;
 
     // Register default actions
     $createMenu = [];
@@ -188,10 +188,10 @@ class Management implements FusionDirectoryDialog
       }
 
       if (!isset($positionDN)) {
-        $positionDN = $ui->dn;
+        $positionDN = user_info()->dn;
       }
 
-      if (!preg_match('/t/', $ui->getPermissions($positionDN, $infos['aclCategory'] . '/' . $infos['mainTab']))) {
+      if (!preg_match('/t/', user_info()->getPermissions($positionDN, $infos['aclCategory'] . '/' . $infos['mainTab']))) {
         $createMenu[] = new Action(
         'new_' . $type, $infos['name'], $img,
         '0', 'newEntry',
@@ -540,8 +540,6 @@ class Management implements FusionDirectoryDialog
 
   function renderList (): string
   {
-    global $ui;
-
     // Rendering things using smarty themselves first
     $listRender   = $this->listing->render();
     $filterRender = $this->renderFilter();
@@ -552,7 +550,7 @@ class Management implements FusionDirectoryDialog
     $smarty->assign('LIST', $listRender);
     $smarty->assign('FILTER', $filterRender);
     $smarty->assign('ACTIONS', $actionMenu);
-    $smarty->assign('SIZELIMIT', $ui->getSizeLimitHandler()->renderWarning());
+    $smarty->assign('SIZELIMIT', user_info()->getSizeLimitHandler()->renderWarning());
     $smarty->assign('NAVIGATION', $this->listing->renderNavigation($this->skipConfiguration));
     $smarty->assign('BASE', $this->listing->renderBase());
     $smarty->assign('HEADLINE', $this->headline);
@@ -800,7 +798,6 @@ class Management implements FusionDirectoryDialog
 
   function applyTemplateToEntry (array $action)
   {
-    global $ui;
     if (static::$skipTemplates) {
       return;
     }
@@ -855,8 +852,6 @@ class Management implements FusionDirectoryDialog
    */
   public function archiveRequested (array $action)
   {
-    global $ui;
-
     if (empty($action['targets'])) {
       return;
     }
@@ -933,8 +928,6 @@ class Management implements FusionDirectoryDialog
    */
   function editEntry (array $action)
   {
-    global $ui;
-
     // Do not create a new tabObject while there is already one opened,
     //  the user may have just pressed F5 to reload the page.
     if (is_object($this->tabObject)) {
@@ -1029,7 +1022,6 @@ class Management implements FusionDirectoryDialog
    */
   function removeRequested (array $action)
   {
-    global $ui;
     $disallowed       = [];
     $this->currentDns = [];
 
@@ -1097,7 +1089,6 @@ class Management implements FusionDirectoryDialog
    */
   function removeConfirmed (array $action)
   {
-    global $ui;
     Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDns, 'Entry deletion confirmed');
 
     $snapshotHandler = new SnapshotHandler();
@@ -1152,8 +1143,6 @@ class Management implements FusionDirectoryDialog
    */
   function copyPasteHandler (array $action = ['action' => ''])
   {
-    global $ui;
-
     // Exit if copy&paste handler is disabled.
     if (!is_object($this->cpHandler)) {
       return FALSE;
@@ -1206,7 +1195,6 @@ class Management implements FusionDirectoryDialog
    */
   function createSnapshotDialog (array $action)
   {
-    global $ui;
     Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action['targets'], 'Snapshot creation initiated!');
 
     $this->currentDn = array_pop($action['targets']);
@@ -1233,8 +1221,6 @@ class Management implements FusionDirectoryDialog
    */
   function restoreSnapshotDialog (array $action)
   {
-    global $ui;
-
     if (empty($action['targets'])) {
       // No target, open the restore removed object dialog.
       $this->currentDn = $this->listing->getBase();
@@ -1248,7 +1234,7 @@ class Management implements FusionDirectoryDialog
       $aclCategories = [Objects::infos($this->listing->getEntry($this->currentDn)->getTemplatedType())['aclCategory']];
     }
 
-    if ($ui->allowSnapshotRestore($this->currentDn, $aclCategories, empty($action['targets']))) {
+    if (user_info()->allowSnapshotRestore($this->currentDn, $aclCategories, empty($action['targets']))) {
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Snapshot restoring initiated!');
       $this->dialogObject = new SnapshotRestoreDialog($this->currentDn, $this, empty($action['targets']), $aclCategories);
     } else {
@@ -1325,8 +1311,6 @@ class Management implements FusionDirectoryDialog
    */
   function createSnapshot (string $dn, string $description, string $snapshotSource = 'FD')
   {
-    global $ui;
-
     if (empty($dn) || ($this->currentDn !== $dn)) {
       trigger_error('There was a problem with the snapshot workflow');
       return;
@@ -1348,8 +1332,7 @@ class Management implements FusionDirectoryDialog
    */
   function restoreSnapshot (string $dn)
   {
-    global $ui;
-    if (!empty($dn) && $ui->allowSnapshotRestore($dn, $this->dialogObject->aclCategory, $this->dialogObject->global)) {
+    if (!empty($dn) && user_info()->allowSnapshotRestore($dn, $this->dialogObject->aclCategory, $this->dialogObject->global)) {
       $dn = $this->snapHandler->restoreSnapshot($dn);
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot restored');
       $this->closeDialogs();
@@ -1376,8 +1359,7 @@ class Management implements FusionDirectoryDialog
    */
   function removeSnapshot (string $dn)
   {
-    global $ui;
-    if (!empty($dn) && $ui->allowSnapshotDelete($dn, $this->dialogObject->aclCategory)) {
+    if (!empty($dn) && user_info()->allowSnapshotDelete($dn, $this->dialogObject->aclCategory)) {
       $this->snapHandler->removeSnapshot($dn);
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot deleted');
     } else {

@@ -343,8 +343,6 @@ class Config
    */
   function getLdapLink (bool $sizelimit = FALSE): ldapMultiplexer
   {
-    global $ui;
-
     if (($this->ldapLink === NULL) || ($this->ldapLink->cid === FALSE)) {
       /* Build new connection */
       $this->ldapLink = LDAP::init($this->current['SERVER'], $this->current['BASE'],
@@ -374,15 +372,8 @@ class Config
    */
   function set_current ($name)
   {
-    global $ui;
-
-    if (!isset($this->data['LOCATIONS'][$name])) {
-      throw new FatalError(htmlescape(sprintf(_('Location "%s" could not be found in the configuration file'), $name)));
-    }
-    $this->current = $this->data['LOCATIONS'][$name];
-
-    if (isset($this->current['INITIAL_BASE']) && isset($ui)) {
-      $ui->setCurrentBase($this->current['INITIAL_BASE']);
+    if (!isset($this->current['INITIAL_BASE']) && user_info() !== null) {
+      user_info()->setCurrentBase($this->current['INITIAL_BASE']);
     }
 
     /* Sort referrals, if present */
@@ -434,7 +425,6 @@ class Config
   /* Check that configuration is in LDAP, check that no plugin got installed since last configuration update */
   function checkLdapConfig ($forceReload = FALSE)
   {
-    global $ui;
     $dn = CONFIGRDN.$this->current['BASE'];
 
     if (!$forceReload) {
@@ -526,16 +516,14 @@ class Config
    */
   public function updateManagementConfig (string $managementClass, $managementConfig, bool $userConfig = FALSE): array
   {
-    global $ui;
-
     $changes = [];
     if ($userConfig) {
-      if (!isset($this->current['MANAGEMENTUSERCONFIG'][$ui->dn])) {
-        $this->current['MANAGEMENTUSERCONFIG'][$ui->dn] = [];
+      if (!isset($this->current['MANAGEMENTUSERCONFIG'][user_info()->dn])) {
+        $this->current['MANAGEMENTUSERCONFIG'][user_info()->dn] = [];
       }
-      $currentConfig  =& $this->current['MANAGEMENTUSERCONFIG'][$ui->dn];
+      $currentConfig  =& $this->current['MANAGEMENTUSERCONFIG'][user_info()->dn];
       $attrib         = 'fdManagementUserConfig';
-      $prefix         = $ui->dn.':'.$managementClass;
+      $prefix         = user_info()->dn.':'.$managementClass;
     } else {
       if (!isset($this->current['MANAGEMENTCONFIG'])) {
         $this->current['MANAGEMENTCONFIG'] = [];
@@ -590,10 +578,8 @@ class Config
    */
   public function hasManagementConfig (string $managementClass, bool $userConfig = FALSE): bool
   {
-    global $ui;
-
     if ($userConfig) {
-      return isset($this->current['MANAGEMENTUSERCONFIG'][$ui->dn][$managementClass]);
+      return isset($this->current['MANAGEMENTUSERCONFIG'][user_info()->dn][$managementClass]);
     } else {
       return isset($this->current['MANAGEMENTCONFIG'][$managementClass]);
     }
@@ -604,10 +590,8 @@ class Config
    */
   public function getManagementConfig ($managementClass)
   {
-    global $ui;
-
-    if (isset($this->current['MANAGEMENTUSERCONFIG'][$ui->dn][$managementClass])) {
-      return json_decode($this->current['MANAGEMENTUSERCONFIG'][$ui->dn][$managementClass], TRUE);
+    if (isset($this->current['MANAGEMENTUSERCONFIG'][user_info()->dn][$managementClass])) {
+      return json_decode($this->current['MANAGEMENTUSERCONFIG'][user_info()->dn][$managementClass], TRUE);
     } elseif (isset($this->current['MANAGEMENTCONFIG'][$managementClass])) {
       return json_decode($this->current['MANAGEMENTCONFIG'][$managementClass], TRUE);
     } else {
