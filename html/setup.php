@@ -1,4 +1,5 @@
 <?php
+use FusionDirectory\Utility\InputFilter;
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2003-2010  Cajus Pollmeier
@@ -23,6 +24,7 @@
 require_once("../include/php_setup.php");
 require_once("functions.php");
 require_once("variables.php");
+require_once("../include/Utility/InputFilter.php");
 
 require_once("../setup/class_setup.inc");
 require_once("../setup/class_setupStep.inc");
@@ -78,8 +80,8 @@ if (!(is_dir($smarty->getCompileDir()) && is_writable($smarty->getCompileDir()))
 }
 
 /* Get posted language */
-if (isset($_POST['lang_selected']) && $_POST['lang_selected'] != '') {
-  $lang = $_POST['lang_selected'];
+if (InputFilter::has('lang_selected') && InputFilter::post('lang_selected') != '') {
+  $lang = InputFilter::post('lang_selected');
 
   /* Append .UTF-8 to language string if necessary */
   if (!preg_match('/utf(-)?8$/i', $lang)) {

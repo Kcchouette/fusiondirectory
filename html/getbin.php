@@ -1,4 +1,5 @@
 <?php
+use FusionDirectory\Utility\InputFilter;
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2003-2010  Cajus Pollmeier
@@ -23,6 +24,7 @@
 @require_once('../include/php_setup.php');
 @require_once('functions.php');
 @require_once('variables.php');
+require_once('../include/Utility/InputFilter.php');
 
 error_reporting(0);
 session_cache_limiter('private');
@@ -43,8 +45,8 @@ header('Pragma: no-cache');
 header('Cache-Control: post-check=0, pre-check=0');
 
 $key = 'binary';
-if (isset($_GET['key'])) {
-  $key .= $_GET['key'];
+if (InputFilter::has('key')) {
+  $key .= InputFilter::get('key');
 }
 
 $bintype = (Session::is_set($key.'type') ? Session::get($key.'type') : 'octet-stream');

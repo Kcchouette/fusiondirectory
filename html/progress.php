@@ -1,4 +1,5 @@
 <?php
+use FusionDirectory\Utility\InputFilter;
 
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
@@ -20,19 +21,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+require_once("../include/Utility/InputFilter.php");
+
 session_cache_limiter("private");
 
 /* Check for parameter completenes */
-if (!isset($_GET['x']) || !isset($_GET['y']) || !isset($_GET['p'])) {
+if (!InputFilter::has('x') || !InputFilter::has('y') || !InputFilter::has('p')) {
   die("Missing parameters!");
 }
-if (!is_numeric($_GET['x']) || !is_numeric($_GET['y'])) {
+if (!is_numeric(InputFilter::get('x')) || !is_numeric(InputFilter::get('y'))) {
   die("Parameters must be numeric!");
 }
 
-$p = (int)($_GET['p']);
-$x = (int)($_GET['x']);
-$y = (int)($_GET['y']);
+$p = InputFilter::getInt('p');
+$x = InputFilter::getInt('x');
+$y = InputFilter::getInt('y');
 
 /* Check percentage */
 if ($p < 0) {

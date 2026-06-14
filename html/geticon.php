@@ -1,4 +1,5 @@
 <?php
+use FusionDirectory\Utility\InputFilter;
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2013-2020  FusionDirectory
@@ -22,6 +23,7 @@
 @require_once("../include/php_setup.php");
 @require_once("functions.php");
 @require_once("variables.php");
+require_once("../include/Utility/InputFilter.php");
 
 session_cache_limiter("private");
 Session::start();
@@ -35,18 +37,18 @@ if (Session::is_set('Config')) {
   header("cache-control: no-cache");
 }
 IconTheme::$extensions    = ['png'];
-if (!isset($_GET['context']) || !isset($_GET['icon']) || !isset($_GET['size'])) {
+if (!InputFilter::has('context') || !InputFilter::has('icon') || !InputFilter::has('size')) {
   trigger_error('Missing information in query string: '.$_SERVER['QUERY_STRING']);
   exit;
 }
-$src  = IconTheme::findThemeIcon($theme, $_GET['context'], $_GET['icon'], $_GET['size']);
+$src  = IconTheme::findThemeIcon($theme, InputFilter::get('context'), InputFilter::get('icon'), InputFilter::get('size'));
 if ($src === NULL) {
   trigger_error('Could not find icon for '.$_SERVER['QUERY_STRING']);
   exit;
 }
 
 header("Content-Type: image/png");
-if (isset($_GET['disabled']) && $_GET['disabled']) {
+if (InputFilter::has('disabled') && InputFilter::get('disabled')) {
   $im = new Imagick($src);
   $im->modulateImage(100, 0, 100);
   $im->evaluateImage(Imagick::EVALUATE_DIVIDE, 2, Imagick::CHANNEL_ALPHA);

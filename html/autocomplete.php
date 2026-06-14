@@ -1,4 +1,5 @@
 <?php
+use FusionDirectory\Utility\InputFilter;
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2003-2010  Cajus Pollmeier
@@ -23,6 +24,7 @@
 @require_once("../include/php_setup.php");
 @require_once("functions.php");
 @require_once("variables.php");
+require_once("../include/Utility/InputFilter.php");
 
 session_cache_limiter("private");
 Session::start();
@@ -36,7 +38,7 @@ if (!Session::is_set('ui')) {
 }
 
 /* Base completition or filter completition? */
-if (isset($_GET['type']) && $_GET['type'] == "base") {
+if (InputFilter::has('type') && InputFilter::get('type') == "base") {
 
   // Find dn based on name and description
   if (Session::is_set("pathMapping") && count($_POST) == 1) {

@@ -1,4 +1,5 @@
 <?php
+use FusionDirectory\Utility\InputFilter;
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2003-2010  Cajus Pollmeier
@@ -24,6 +25,7 @@ require_once("../include/php_setup.php");
 require_once("functions.php");
 require_once("variables.php");
 require_once("class_logging.inc");
+require_once("../include/Utility/InputFilter.php");
 
 /* Set headers */
 header('Content-type: text/html; charset=UTF-8');
@@ -45,7 +47,7 @@ header('X-Frame-Options: deny');
    and start session. */
 Session::start();
 
-if (isset($_REQUEST['signout']) && $_REQUEST['signout']) {
+if (InputFilter::has('signout') && InputFilter::request('signout')) {
   $reason = '';
   if (Session::is_set('connected')) {
     $config = Session::get('Config');
@@ -57,13 +59,13 @@ if (isset($_REQUEST['signout']) && $_REQUEST['signout']) {
       phpCAS::logout();
     }
     $reason = 'Sign out';
-    if (isset($_REQUEST['message'])) {
-      switch ($_REQUEST['message']) {
+    if (InputFilter::has('message')) {
+      switch (InputFilter::request('message')) {
         case 'expired':
           $reason = 'Session expired';
           break;
         case 'invalidparameter':
-          $reason = sprintf('Invalid plugin parameter "%s"!', $_REQUEST['plug']);
+          $reason = sprintf('Invalid plugin parameter "%s"!', InputFilter::request('plug'));
           break;
         case 'nosession':
           $reason = 'No session found';
@@ -145,8 +147,8 @@ if (isset($_SERVER['HTTP_X_FUSIONDIRECTORY_LOCATION'])) {
       )
     );
   }
-} else if (isset($_POST['server'])) {
-  $server = $_POST['server'];
+} else if (InputFilter::has('server')) {
+  $server = InputFilter::post('server');
 } else {
   $server = $config->data['MAIN']['DEFAULT'];
 }
@@ -166,19 +168,19 @@ if (($config->get_cfg_value('forcessl') == 'TRUE') && ($ssl != '')) {
   exit;
 }
 
-if (isset($_REQUEST['message'])) {
-  switch ($_REQUEST['message']) {
+if (InputFilter::has('message')) {
+  switch (InputFilter::request('message')) {
     case 'expired':
       $message = _('Your FusionDirectory session has expired!');
       break;
     case 'invalidparameter':
-      $message = sprintf(_('Invalid plugin parameter "%s"!'), $_REQUEST['plug']);
+      $message = sprintf(_('Invalid plugin parameter "%s"!'), InputFilter::request('plug'));
       break;
     case 'nosession':
       $message = _('No session found!');
       break;
     default:
-      $message = $_REQUEST['message'];
+      $message = InputFilter::request('message');
   }
 }
 

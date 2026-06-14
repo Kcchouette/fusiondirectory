@@ -1,4 +1,5 @@
 <?php
+use FusionDirectory\Utility\InputFilter;
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2003-2010  Cajus Pollmeier
@@ -31,6 +32,7 @@
 require_once("../include/php_setup.php");
 require_once("functions.php");
 require_once("variables.php");
+require_once("../include/Utility/InputFilter.php");
 
 /* Set headers */
 header('Content-type: text/html; charset=UTF-8');
@@ -133,12 +135,12 @@ if (($expired == POSIX_WARN_ABOUT_EXPIRATION) && !Session::is_set('POSIX_WARN_AB
 
   // Hide the FusionDirectory menus to avoid leaving the enforced password change dialog.
   $smarty->assign('hideMenus', TRUE);
-  $plug = (isset($_GET['plug'])) ? $_GET['plug'] : NULL;
+  $plug = InputFilter::get('plug');
 
   // Search for the 'user' class and set its id as active plug.
   foreach ($plist->dirlist as $key => $value) {
     if ($value == 'user') {
-      if (!isset($_GET['plug']) || ($_GET['plug'] != $key)) {
+      if (!InputFilter::has('plug') || (InputFilter::get('plug') != $key)) {
         $_GET['plug'] = $key;
         $warning = new FusionDirectoryWarning(htmlescape(_('Your password has expired, please set a new one.')));
         $warning->display();
@@ -148,8 +150,8 @@ if (($expired == POSIX_WARN_ABOUT_EXPIRATION) && !Session::is_set('POSIX_WARN_AB
   }
 }
 
-if (isset($_GET['plug']) && $plist->plugin_access_allowed($_GET['plug'])) {
-  $plugin_index = validate($_GET['plug']);
+if (InputFilter::has('plug') && $plist->plugin_access_allowed(InputFilter::get('plug'))) {
+  $plugin_index = validate(InputFilter::get('plug'));
 } else {
   /* set to welcome page as default plugin */
   $plugin_index = 'welcome';
@@ -167,7 +169,7 @@ $remove_lock  = FALSE;
 /* Check if we have changed the selected plugin */
 if (!empty($old_plugin_index) && ($old_plugin_index != $plugin_index)) {
   Pluglist::runMainInc($old_plugin_index, TRUE);
-} elseif ((isset($_GET['reset']) && $_GET['reset'] == 1) || isset($_POST['delete_lock'])) {
+} elseif ((InputFilter::has('reset') && InputFilter::get('reset') == 1) || InputFilter::has('delete_lock')) {
   /* Reset was posted, remove all created locks for the current plugin */
   $remove_lock = TRUE;
 }
@@ -204,7 +206,7 @@ $smarty->assign("usePrototype", "false");
 
 /* React on clicks */
 if (($_SERVER['REQUEST_METHOD'] == 'POST')
-  && (isset($_POST['delete_lock']) || isset($_POST['open_readonly']))) {
+  && (InputFilter::has('delete_lock') || InputFilter::has('open_readonly'))) {
 
   /* Set old Post data */
   if (Session::is_set('LOCK_VARS_USED_GET')) {
@@ -236,7 +238,7 @@ $smarty->assign("contents", $display);
 $smarty->assign("sessionLifetime", $config->get_cfg_value("sessionLifetime", 60 * 60 * 2));
 
 /* If there's some post, take a look if everything is there... */
-if (count($_POST) && !isset($_POST['php_c_check'])) {
+if (count($_POST) && !InputFilter::has('php_c_check')) {
   throw new FatalError(
     htmlescape(_('Fatal error: not all POST variables have been transfered by PHP - please inform your administrator!'))
   );
