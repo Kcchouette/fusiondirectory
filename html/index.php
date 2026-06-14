@@ -29,9 +29,7 @@ require_once("../include/Utility/InputFilter.php");
 
 /* Set headers */
 header('Content-type: text/html; charset=UTF-8');
-header('X-XSS-Protection: 1; mode=block');
-header('X-Content-Type-Options: nosniff');
-header('X-Frame-Options: deny');
+SecurityHeaders::send();
 
 /**
  * @var Smarty $smarty    Defined in php_setup.inc
