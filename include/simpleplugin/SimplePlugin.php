@@ -40,7 +40,7 @@ class SimplePlugin implements SimpleTab
    */
   public array $attributesAccess = [];
   // Thisb bolean allows children class to get readOnly automatically via static state or class-level state.
-  private static $user_locked = FALSE;
+  private static bool $user_locked = FALSE;
 
   public mixed $displayPlugin = null;
 

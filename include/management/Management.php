@@ -41,7 +41,7 @@ class Management implements FusionDirectoryDialog
 
   /* Snapshots */
   public ?object $snapHandler = null;
-  public static $skipSnapshots = FALSE;
+  public static bool $skipSnapshots = FALSE;
 
   // The currently used object(s) (e.g. in edit, removal)
   public string $currentDn = '';
@@ -73,7 +73,7 @@ class Management implements FusionDirectoryDialog
 
   public array $neededAttrs = [];
 
-  public static $skipTemplates = TRUE;
+  public static bool $skipTemplates = TRUE;
 
   /* Disable and hide configuration system */
   public bool $skipConfiguration = false;
@@ -81,7 +81,7 @@ class Management implements FusionDirectoryDialog
   public mixed $columnConfiguration = null;
 
    /* Default columns */
-   public static $columns = [
+   public static array $columns = [
     ['ObjectTypeColumn', []],
     ['LinkColumn', ['attributes' => 'nameAttr', 'label' => 'Name']],
     ['LinkColumn', ['attributes' => 'description', 'label' => 'Description']],

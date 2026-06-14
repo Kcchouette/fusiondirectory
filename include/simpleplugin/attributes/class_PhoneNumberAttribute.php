@@ -26,7 +26,7 @@ declare(strict_types=1);
 class PhoneSelect extends SelectManagement
 {
   /* Default columns */
-  public static $columns = [
+  public static array $columns = [
     ['ObjectTypeColumn', []],
     ['LinkColumn',       ['attributes' => 'nameAttr',         'label' => 'Name']],
     ['LinkColumn',       ['attributes' => 'telephoneNumber',  'label' => 'Number']],

@@ -23,7 +23,7 @@ declare(strict_types=1);
 class MailAddressSelect extends SelectManagement
 {
   /* Default columns */
-  public static $columns = [
+  public static array $columns = [
     ['ObjectTypeColumn', []],
     ['LinkColumn',       ['attributes' => 'mail',     'label' => 'Email']],
     ['LinkColumn',       ['attributes' => 'nameAttr', 'label' => 'Name']],

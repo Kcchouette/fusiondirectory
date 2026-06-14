@@ -388,7 +388,7 @@ class GeneralizedTimeDisplayAttribute extends GeneralizedTimeDateAttribute
 class EpochDaysDateAttribute extends DateAttribute
 {
   /* 24 * 60 * 60 = 86400 */
-  public static $secondsPerDay = 86400;
+  public static int $secondsPerDay = 86400;
 
   function __construct (string $label, string $description, string $ldapName, bool $required, $defaultValue = 'today', $min = NULL, $max = NULL, string $acl = '')
   {
