@@ -37,14 +37,15 @@ if (!Session::is_set('ui')) {
   exit;
 }
 
-/* Base completition or filter completition? */
+/* Base completion or filter completion? */
 if (InputFilter::has('type') && InputFilter::get('type') == "base") {
 
   // Find dn based on name and description
-  if (Session::is_set("pathMapping") && count($_POST) == 1) {
+  if (Session::is_set("pathMapping") && count($_POST) == 1 && InputFilter::has('search')) {
     $res          = "";
     $pathMapping  = Session::get("pathMapping");
-    $search       = preg_replace('/&quot;/', '"', current($_POST));
+    $search       = preg_replace('/&quot;/', '"', InputFilter::post('search', ''));
+    $search       = htmlspecialchars($search, ENT_QUOTES, 'UTF-8');
 
     $config         = Session::get('Config');
     $departmentInfo = $config->getDepartmentInfo();
@@ -75,7 +76,7 @@ if (InputFilter::has('type') && InputFilter::get('type') == "base") {
   $ui = Session::get('ui');
   $config = Session::get('Config');
 
-  /* Is there a filter object arround? */
+  /* Is there a filter object around? */
   if (Session::is_set('autocomplete')) {
     $filter = Session::get('autocomplete');
     $filter->processAutocomplete();
