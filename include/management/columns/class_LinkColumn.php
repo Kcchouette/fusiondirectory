@@ -1,5 +1,8 @@
 <?php
 declare(strict_types=1);
+
+use FusionDirectory\Utility\InputFilter;
+
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
   Copyright (C) 2017-2018  FusionDirectory
@@ -35,10 +38,12 @@ class LinkColumn extends Column
       if ($this->parent->getMultiSelect()) {
         return '<label title="'.$entry->dn.'" for="listing_selected_'.$entry->row.'">'.$htmlValue.'</label>';
       } else {
-        return '<a href="?plug='.$_GET['plug'].'&amp;PID='.$entry->getPid().'&amp;act=listing_select_'.$entry->row.'&amp;add_finish=1" title="'.$entry->dn.'">'.$htmlValue.'</a>';
+        $plug = htmlspecialchars(InputFilter::get('plug', ''), ENT_QUOTES, 'UTF-8');
+        return '<a href="?plug='.$plug.'&amp;PID='.$entry->getPid().'&amp;act=listing_select_'.$entry->row.'&amp;add_finish=1" title="'.$entry->dn.'">'.$htmlValue.'</a>';
       }
     } else {
-      return '<a href="?plug='.$_GET['plug'].'&amp;PID='.$entry->getPid().'&amp;act=listing_edit_'.$entry->row.'" title="'.$entry->dn.'">'.$htmlValue.'</a>';
+      $plug = htmlspecialchars(InputFilter::get('plug', ''), ENT_QUOTES, 'UTF-8');
+      return '<a href="?plug='.$plug.'&amp;PID='.$entry->getPid().'&amp;act=listing_edit_'.$entry->row.'" title="'.$entry->dn.'">'.$htmlValue.'</a>';
     }
   }
 }
