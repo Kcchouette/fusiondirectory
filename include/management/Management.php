@@ -35,17 +35,17 @@ class Management implements FusionDirectoryDialog
   public ?ManagementFilter $filter = null;
 
   /* Copy&Paste */
-  protected ?CopyPasteHandler $cpHandler = null;
-  protected bool $cpPastingStarted = false;
+  public ?CopyPasteHandler $cpHandler = null;
+  public bool $cpPastingStarted = false;
   protected bool $skipCpHandler = false;
 
   /* Snapshots */
-  protected ?object $snapHandler = null;
+  public ?object $snapHandler = null;
   public static $skipSnapshots = FALSE;
 
   // The currently used object(s) (e.g. in edit, removal)
-  protected string $currentDn = '';
-  protected array $currentDns = [];
+  public string $currentDn = '';
+  public array $currentDns = [];
 
   // The last used object(s).
   protected string $previousDn = '';
@@ -55,11 +55,11 @@ class Management implements FusionDirectoryDialog
   /**
    * @var ?simpleTabs
    */
-  protected ?object $tabObject = null;
-  protected ?object $dialogObject = null;
+  public ?object $tabObject = null;
+  public ?object $dialogObject = null;
 
   // The last opened object.
-  protected ?object $last_tabObject = null;
+  public ?object $last_tabObject = null;
   protected ?object $last_dialogObject = null;
 
   protected mixed $renderCache = null;
@@ -68,17 +68,17 @@ class Management implements FusionDirectoryDialog
   public string $title = '';
   public string $icon = '';
 
-  protected array $actions = [];
-  protected array $actionHandlers = [];
+  public array $actions = [];
+  public array $actionHandlers = [];
 
   public array $neededAttrs = [];
 
   public static $skipTemplates = TRUE;
 
   /* Disable and hide configuration system */
-  protected bool $skipConfiguration = false;
+  public bool $skipConfiguration = false;
 
-  protected mixed $columnConfiguration = null;
+  public mixed $columnConfiguration = null;
 
    /* Default columns */
    public static $columns = [
@@ -149,12 +149,12 @@ class Management implements FusionDirectoryDialog
 
   protected function setUpListing ()
   {
-    $this->listing = new ManagementListing($this);
+    $this->listingComponent->setUpListing();
   }
 
   protected function setUpFilter (array $filterElementDefinitions)
   {
-    $this->filter = new ManagementFilter($this, NULL, $filterElementDefinitions);
+    $this->listingComponent->setUpFilter($filterElementDefinitions);
   }
 
   protected function setUpHeadline ()
@@ -264,7 +264,7 @@ class Management implements FusionDirectoryDialog
           ['w']
         )
       );
-      $this->actions['paste']->setEnableFunction([$this, 'enablePaste']);
+      $this->actions['paste']->setEnableFunction([$this->actionsComponent, 'enablePaste']);
     }
 
     if (!static::$skipTemplates) {
@@ -312,7 +312,7 @@ class Management implements FusionDirectoryDialog
         )
       );
       $this->actions['snapshot']->setSeparator(TRUE);
-      $this->actions['restore']->setEnableFunction([$this, 'enableSnapshotRestore']);
+      $this->actions['restore']->setEnableFunction([$this->snapshotComponent, 'enableSnapshotRestore']);
     }
 
     if (!static::$skipTemplates) {
@@ -353,86 +353,27 @@ class Management implements FusionDirectoryDialog
 
   public function getColumnConfiguration (): array
   {
-    if (!isset($this->columnConfiguration)) {
-      // LDAP configuration
-      $this->columnConfiguration = config()->getManagementConfig(get_class($this));
-    }
-
-    if (!isset($this->columnConfiguration)) {
-      // Default configuration
-      $this->columnConfiguration = static::$columns;
-    }
-
-    // Session configuration
-    return $this->columnConfiguration;
+    return $this->listingComponent->getColumnConfiguration();
   }
 
   public function setColumnConfiguration ($columns)
   {
-    $this->columnConfiguration = $columns;
-    $this->listing->reloadColumns();
+    $this->listingComponent->setColumnConfiguration($columns);
   }
 
-  /*!
-   * \brief  Detects actions/events send by the ui
-   *           and the corresponding targets.
-   */
   function detectPostActions (): array
   {
-    if (!is_object($this->listing)) {
-      throw new FusionDirectoryException('No valid listing object');
-    }
-    $action = ['targets' => [], 'action' => '', 'subaction' => NULL];
-    if ($this->showTabFooter()) {
-      if (isset($_POST['edit_cancel'])) {
-        $action['action'] = 'cancel';
-      } elseif (isset($_POST['edit_finish'])) {
-        $action['action'] = 'save';
-      } elseif (isset($_POST['edit_apply'])) {
-        $action['action'] = 'apply';
-      }
-    } elseif (!$this->dialogOpened()) {
-      if (isset($_POST['delete_confirmed'])) {
-        $action['action'] = 'removeConfirmed';
-      } elseif (isset($_POST['delete_cancel'])) {
-        $action['action'] = 'cancelDelete';
-      } elseif (isset($_POST['archive_confirmed'])) {
-        $action['action'] = 'archiveConfirmed';
-      } elseif (isset($_POST['archive_cancel'])) {
-        $action['action'] = 'archiveCancel';
-      } else {
-        $action = $this->listing->getAction();
-      }
-    }
-
-    return $action;
+    return $this->actionsComponent->detectPostActions();
   }
 
-  /*!
-   *  \brief  Calls the registered method for a given action/event.
-   */
   function handleAction (array $action)
   {
-    // Start action
-    if (isset($action['subaction']) && isset($this->actionHandlers[$action['action'] . '_' . $action['subaction']])) {
-      return $this->actionHandlers[$action['action'] . '_' . $action['subaction']]->execute($this, $action);
-    } elseif (isset($this->actionHandlers[$action['action']])) {
-      return $this->actionHandlers[$action['action']]->execute($this, $action);
-    }
+    return $this->actionsComponent->handleAction($action);
   }
 
   protected function handleSubAction (array $action): bool
   {
-    if (preg_match('/^tab_/', $action['subaction'])) {
-      $tab = preg_replace('/^tab_/', '', $action['subaction']);
-      if (isset($this->tabObject->by_object[$tab])) {
-        $this->tabObject->current = $tab;
-      } else {
-        trigger_error('Unknown tab: ' . $tab);
-      }
-      return TRUE;
-    }
-    return FALSE;
+    return $this->actionsComponent->handleSubAction($action);
   }
 
   /* For management we have to render directly in readPost in some cases */
@@ -538,62 +479,27 @@ class Management implements FusionDirectoryDialog
 
   function renderList (): string
   {
-    // Rendering things using smarty themselves first
-    $listRender   = $this->listing->render();
-    $filterRender = $this->renderFilter();
-    $actionMenu   = $this->renderActionMenu();
-
-    $smarty = get_smarty();
-    $smarty->assign('usePrototype', 'true');
-    $smarty->assign('LIST', $listRender);
-    $smarty->assign('FILTER', $filterRender);
-    $smarty->assign('ACTIONS', $actionMenu);
-    $smarty->assign('SIZELIMIT', user_info()->getSizeLimitHandler()->renderWarning());
-    $smarty->assign('NAVIGATION', $this->listing->renderNavigation($this->skipConfiguration));
-    $smarty->assign('BASE', $this->listing->renderBase());
-    $smarty->assign('HEADLINE', $this->headline);
-
-    return $this->getHeader() . $smarty->fetch(get_template_path('management/management.tpl'));
+    return $this->listingComponent->renderList();
   }
 
   protected function renderFilter (): string
   {
-    return $this->filter->render();
+    return $this->listingComponent->renderFilter();
   }
 
   protected function renderActionMenu (): string
   {
-    $menuActions = [];
-    foreach ($this->actions as $action) {
-      // Build ul/li list
-      $action->fillMenuItems($menuActions);
-    }
-
-    if (empty($menuActions)) {
-      return '';
-    }
-
-    $smarty = get_smarty();
-    $smarty->assign('actions', $menuActions);
-    return $smarty->fetch(get_template_path('management/actionmenu.tpl'));
+    return $this->listingComponent->renderActionMenu();
   }
 
   function renderActionColumn (ListingEntry $entry): string
   {
-    // Go thru all actions
-    $result = '';
-    foreach ($this->actions as $action) {
-      $result .= $action->renderColumnIcons($entry);
-    }
-
-    return $result;
+    return $this->listingComponent->renderActionColumn($entry);
   }
 
   function fillActionRowClasses (&$classes, ListingEntry $entry)
   {
-    foreach ($this->actions as $action) {
-      $action->fillRowClasses($classes, $entry);
-    }
+    $this->listingComponent->fillActionRowClasses($classes, $entry);
   }
 
   /*!
@@ -700,431 +606,79 @@ class Management implements FusionDirectoryDialog
 
   function handleTemplateApply ($cancel = FALSE)
   {
-    if (static::$skipTemplates) {
-      return;
-    }
-    if ($cancel) {
-      $msgs = [];
-    } else {
-      $msgs = $this->tabObject->save();
-    }
-    if (count($msgs)) {
-      MsgDialog::displayChecks($msgs);
-      return;
-    } else {
-      if (!$cancel) {
-        Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Template applied!');
-      }
-      Lock::deleteByObject($this->currentDn);
-      if (empty($this->currentDns)) {
-        $this->closeDialogs();
-      } else {
-        $this->last_tabObject = $this->tabObject;
-        $this->tabObject      = NULL;
-        $this->currentDn      = array_shift($this->currentDns);
-        $this->dialogObject->setNextTarget($this->currentDn);
-        $this->dialogObject->readPost();
-      }
-    }
+    return $this->actionsComponent->handleTemplateApply($cancel);
   }
 
   function enablePaste ($action, ?ListingEntry $entry = NULL): bool
   {
-    if ($entry === NULL) {
-      return $this->cpHandler->entriesQueued();
-    } else {
-      return FALSE;
-    }
+    return $this->actionsComponent->enablePaste($action, $entry);
   }
 
   /* Action handlers */
 
-  /*!
-   * \brief  This method intiates the object creation.
-   *
-   * \param  array  $action A combination of both 'action' and 'target':
-   *                        action: The name of the action which was the used as trigger.
-   *                        target: A list of object dns, which should be affected by this method.
-   */
   function newEntry (array $action)
   {
-    $type = $action['subaction'];
-
-    $this->currentDn = 'new';
-
-    // Open object
-    $this->openTabObject(Objects::create($type));
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Create entry initiated');
+    $this->actionsComponent->newEntry($action);
   }
 
   function newEntryTemplate (array $action)
   {
-    if (static::$skipTemplates) {
-      return;
-    }
-    $type = preg_replace('/^template_/', '', $action['subaction']);
-
-    $this->currentDn = 'new';
-
-    // Open object
-    $this->openTabObject(Objects::createTemplate($type));
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Create template entry initiated');
+    $this->actionsComponent->newEntryTemplate($action);
   }
 
   function newEntryFromTemplate (array $action)
   {
-    if (static::$skipTemplates) {
-      return;
-    }
-    if (isset($action['targets'][0])) {
-      $dn = $action['targets'][0];
-    } else {
-      $dn = NULL;
-    }
-    if ($action['subaction'] == 'apply') {
-      if ($dn === NULL) {
-        return;
-      }
-      $type = $this->listing->getEntry($dn)->getTemplatedType();
-    } else {
-      $type = preg_replace('/^apply_/', '', $action['subaction']);
-    }
-    $this->dialogObject = new TemplateDialog($this, $type, $dn);
+    $this->actionsComponent->newEntryFromTemplate($action);
   }
 
   function applyTemplateToEntry (array $action)
   {
-    if (static::$skipTemplates) {
-      return;
-    }
-    if (empty($action['targets'])) {
-      return;
-    }
-    $this->currentDns = $action['targets'];
-
-    // check locks
-    if ($locks = Lock::get($this->currentDns)) {
-      return Lock::genLockedMessage($locks, FALSE, _('Apply anyway'));
-    }
-
-    // Add locks
-    Lock::add($this->currentDns);
-
-    // Detect type and check that all targets share the same type
-    $type = NULL;
-
-    foreach ($this->currentDns as $dn) {
-      $entry = $this->listing->getEntry($dn);
-      if ($entry === NULL) {
-        trigger_error('Could not find ' . $dn . ', action canceled');
-        $this->currentDns = [];
-        return;
-      }
-
-      if ($entry->isTemplate()) {
-        $error = new FusionDirectoryError(htmlescape(_('Applying a template to a template is not possible')));
-        $error->display();
-        $this->currentDns = [];
-        return;
-      }
-
-      if (!isset($type)) {
-        $type = $entry->type;
-      } elseif ($entry->type != $type) {
-        $error = new FusionDirectoryError(htmlescape(_('All selected entries need to share the same type to be able to apply a template to them')));
-        $error->display();
-        $this->currentDns = [];
-        return;
-      }
-    }
-
-    $this->currentDn = array_shift($this->currentDns);
-
-    $this->dialogObject = new TemplateDialog($this, $type, NULL, $this->currentDn);
+    $this->actionsComponent->applyTemplateToEntry($action);
   }
 
-  /*! \brief  Queue selected objects to be archived.
-   *          Checks Locks and ask for confirmation.
-   */
   public function archiveRequested (array $action)
   {
-    if (empty($action['targets'])) {
-      return;
-    }
-    $this->currentDns = $action['targets'];
-
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action['targets'], 'Entry archive requested');
-
-    // Check locks
-    if ($locks = Lock::get($this->currentDns)) {
-      return Lock::genLockedMessage($locks, FALSE, _('Archive anyway'));
-    }
-
-    // Add locks
-    Lock::add($this->currentDns);
-
-    $objects = [];
-    foreach ($this->currentDns as $dn) {
-      $entry = $this->listing->getEntry($dn);
-      if ($entry->isTemplate()) {
-        $error = new FusionDirectoryError(htmlescape(_('Archiving a template is not possible')));
-        $error->display();
-        $this->removeLocks();
-        $this->currentDns = [];
-        return;
-      }
-      $infos     = Objects::infos($entry->getTemplatedType());
-      $objects[] = [
-        'name' => $entry[$infos['nameAttr']][0],
-        'dn'   => $dn,
-        'icon' => $infos['icon'],
-        'type' => $infos['name']
-      ];
-    }
-
-    $smarty = get_smarty();
-    $smarty->assign('Objects', $objects);
-    return $smarty->fetch(get_template_path('simple-archive.tpl'));
+    $this->actionsComponent->archiveRequested($action);
   }
 
   public function archiveConfirmed (array $action)
   {
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDns, 'Archiving');
-
-    $success = 0;
-    foreach ($this->currentDns as $dn) {
-      $entry = $this->listing->getEntry($dn);
-
-      $errors = archivedObject::archiveObject($entry->type, $dn);
-      if (empty($errors)) {
-        $success++;
-      } else {
-        MsgDialog::displayChecks($errors);
-      }
-      Lock::deleteByObject($dn);
-    }
-
-    if ($success > 0) {
-      MsgDialog::display(
-        _('Archive success'),
-        htmlescape(sprintf(_('%d entries were successfully archived'), $success)),
-        INFO_DIALOG
-      );
-    }
-
-    $this->currentDns = [];
+    $this->actionsComponent->archiveConfirmed($action);
   }
 
-  /*!
-   * \brief  This method opens an existing object to be edited.
-   *
-   * \param  array  $action A combination of both 'action' and 'targets':
-   *                        action: The name of the action which was the used as trigger.
-   *                        targets: A list of object dns, which should be affected by this method.
-   */
   function editEntry (array $action)
   {
-    // Do not create a new tabObject while there is already one opened,
-    //  the user may have just pressed F5 to reload the page.
-    if (is_object($this->tabObject)) {
-      return;
-    }
-
-    $target = array_pop($action['targets']);
-
-    $entry = $this->listing->getEntry($target);
-    if ($entry === NULL) {
-      trigger_error('Could not find ' . $target . ', open canceled');
-      return;
-    }
-
-    // Get the dn of the object and create lock
-    $this->currentDn = $target;
-    if ($locks = Lock::get($this->currentDn, TRUE)) {
-      return Lock::genLockedMessage($locks, TRUE);
-    }
-    Lock::add($this->currentDn);
-
-    // Open object
-    $this->openTabObject(Objects::open($this->currentDn, $entry->getTemplatedType()));
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Edit entry initiated');
-    if (isset($action['subaction'])
-      && ($this->handleSubAction($action) === FALSE)) {
-      trigger_error('Was not able to handle subaction: ' . $action['subaction']);
-    }
+    $this->actionsComponent->editEntry($action);
   }
 
-  /*!
-   * \brief  Editing an object was canceled.
-   *          Close dialogs/tabs and remove locks.
-   */
   function cancelEdit ()
   {
-    if (($this->tabObject instanceof SimpleTabs) && ($this->dialogObject instanceof TemplateDialog)) {
-      $this->handleTemplateApply(TRUE);
-      return;
-    }
-    $this->removeLocks();
-    $this->closeDialogs();
+    $this->actionsComponent->cancelEdit();
   }
 
-  /*!
-   * \brief  Save object modifications and closes dialogs (returns to object listing).
-   *          - Calls 'SimpleTabs::save' to save back object modifications (e.g. to ldap).
-   *          - Calls 'Management::closeDialogs' to return to the object listing.
-   */
   function saveChanges ()
   {
-    if ($this->tabObject instanceof SimpleTabs) {
-      $this->tabObject->readPost();
-      $this->tabObject->update();
-      if ($this->dialogObject instanceof TemplateDialog) {
-        $this->handleTemplateApply();
-      } else {
-        $msgs = $this->tabObject->save();
-        if (count($msgs)) {
-          MsgDialog::displayChecks($msgs);
-        } else {
-          Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDns, 'Entry saved');
-          $this->removeLocks();
-          $this->closeDialogs();
-        }
-      }
-    }
+    $this->actionsComponent->saveChanges();
   }
 
-  /*!
-   *  \brief  Save object modifications and keep dialogs opened
-   */
   function applyChanges ()
   {
-    if ($this->tabObject instanceof SimpleTabs) {
-      $this->tabObject->readPost();
-      $this->tabObject->update();
-      $msgs = $this->tabObject->save();
-      if (count($msgs)) {
-        MsgDialog::displayChecks($msgs);
-      } else {
-        Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDns, 'Modifications applied');
-        $this->tabObject->reInit();
-        /* Avoid applying the POST a second time */
-        $_POST = [];
-      }
-    }
+    $this->actionsComponent->applyChanges();
   }
 
-  /*! \brief  Queue selected objects to be removed.
-   *          Checks ACLs, Locks and ask for confirmation.
-   */
   function removeRequested (array $action)
   {
-    $disallowed       = [];
-    $this->currentDns = [];
-
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action['targets'], 'Entry deletion requested');
-
-    // Check permissons for each target
-    foreach ($action['targets'] as $dn) {
-      $entry = $this->listing->getEntry($dn);
-      try {
-        if ($entry->checkAcl('d')) {
-          $this->currentDns[] = $dn;
-        } else {
-          $disallowed[] = $dn;
-        }
-      } catch (NonExistingObjectTypeException $e) {
-        trigger_error('Unknown object type received :' . $e->getMessage());
-      }
-    }
-    if (count($disallowed)) {
-      $error = new FusionDirectoryPermissionError(MsgPool::permDelete($disallowed));
-      $error->display();
-    }
-
-    // We've at least one entry to delete.
-    if (count($this->currentDns)) {
-      // Check locks
-      if ($locks = Lock::get($this->currentDns)) {
-        return Lock::genLockedMessage($locks, FALSE, _('Delete anyway'));
-      }
-
-      // Add locks
-      Lock::add($this->currentDns);
-
-      $objects = [];
-      foreach ($this->currentDns as $dn) {
-        $entry = $this->listing->getEntry($dn);
-        $infos = Objects::infos($entry->getTemplatedType());
-        if ($entry->isTemplate()) {
-          $infos['nameAttr'] = 'cn';
-        }
-        $objects[] = [
-          'name' => $entry[$infos['nameAttr']][0],
-          'dn'   => $dn,
-          'icon' => $infos['icon'],
-          'type' => $infos['name']
-        ];
-      }
-
-      return $this->removeConfirmationDialog($objects);
-    }
+    $this->actionsComponent->removeRequested($action);
   }
 
-  /*! \brief Display confirmation dialog
-   */
   protected function removeConfirmationDialog (array $objects)
   {
-    $smarty = get_smarty();
-    $smarty->assign('Objects', $objects);
-    $smarty->assign('multiple', TRUE);
-    return $smarty->fetch(get_template_path('simple-remove.tpl'));
+    $this->actionsComponent->removeConfirmationDialog($objects);
   }
 
-  /*! \brief  Deletion was confirmed, delete the objects queued.
-   *          Checks ACLs just in case.
-   */
   function removeConfirmed (array $action)
   {
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDns, 'Entry deletion confirmed');
-
-    $snapshotHandler = new SnapshotHandler();
-    foreach ($this->currentDns as $dn) {
-      $entry = $this->listing->getEntry($dn);
-      if (empty($entry)) {
-        continue;
-      }
-      if ($entry->checkAcl('d')) {
-        // Delete the object
-        $this->currentDn = $dn;
-        $this->openTabObject(Objects::open($this->currentDn, $entry->getTemplatedType()));
-
-        // Temporarily disable read_only flag for user tab if it exists
-        // This ensures deletion works regardless of lock status
-        if (isset($this->tabObject->by_object['user'])) {
-          $this->tabObject->by_object['user']->read_only = FALSE;
-        }
-
-        $errors = $this->tabObject->delete();
-        MsgDialog::displayChecks($errors);
-
-        // Remove the lock for the current object.
-        Lock::deleteByObject($this->currentDn);
-
-        // Remove related snapshots
-        $dnSnapshotsList = $snapshotHandler->getSnapshots($this->currentDn, TRUE);
-        foreach ($dnSnapshotsList as $snap) {
-          $snapshotHandler->removeSnapshot($snap['dn']);
-        }
-      } else {
-        $error = new FusionDirectoryPermissionError(MsgPool::permDelete($dn));
-        $error->display();
-        Logging::log('security', 'management/' . get_class($this), $dn, [], 'Tried to trick deletion.');
-      }
-    }
-
-    // Cleanup
-    $this->removeLocks();
-    $this->closeDialogs();
+    $this->actionsComponent->removeConfirmed($action);
   }
 
   function configureDialog (array $action)
@@ -1134,234 +688,58 @@ class Management implements FusionDirectoryDialog
     }
   }
 
-  /*! \brief  This method is used to queue and process copy&paste actions.
-   *          Allows to copy, cut and paste mutliple entries at once.
-   */
   function copyPasteHandler (array $action = ['action' => ''])
   {
-    // Exit if copy&paste handler is disabled.
-    if (!is_object($this->cpHandler)) {
-      return FALSE;
-    }
-
-    // Save user input
-    $this->cpHandler->readPost();
-
-    // Add entries to queue
-    if (($action['action'] == 'copy') || ($action['action'] == 'cut')) {
-      $this->cpHandler->cleanupQueue();
-      foreach ($action['targets'] as $dn) {
-        $entry = $this->listing->getEntry($dn);
-        if (($action['action'] == 'copy') && $entry->checkAcl('r')) {
-          $this->cpHandler->addToQueue($dn, 'copy', $entry->getTemplatedType());
-          Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Entry copied!');
-        }
-        if (($action['action'] == 'cut') && $entry->checkAcl('rd')) {
-          $this->cpHandler->addToQueue($dn, 'cut', $entry->getTemplatedType());
-          Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Entry cut!');
-        }
-      }
-    }
-
-    // Initiate pasting
-    if ($action['action'] == 'paste') {
-      $this->cpPastingStarted = TRUE;
-    }
-
-    // Display any c&p dialogs, eg. object modifications required before pasting.
-    if ($this->cpPastingStarted && $this->cpHandler->entriesQueued()) {
-      $this->cpHandler->update();
-      $data = $this->cpHandler->render();
-      if (!empty($data)) {
-        return $data;
-      }
-    }
-
-    // Automatically disable pasting process since there is no entry left to paste.
-    if (!$this->cpHandler->entriesQueued()) {
-      $this->cpPastingStarted = FALSE;
-      $this->cpHandler->resetPaste();
-    }
-
-    return '';
-  }
-
-  /*!
-   * \brief  Opens the snapshot creation dialog for the given target.
-   */
-  function createSnapshotDialog (array $action)
-  {
-    Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action['targets'], 'Snapshot creation initiated!');
-
-    $this->currentDn = array_pop($action['targets']);
-    if (empty($this->currentDn)) {
-      return;
-    }
-    $entry = $this->listing->getEntry($this->currentDn);
-    if ($entry->snapshotCreationAllowed()) {
-      $this->dialogObject = new SnapshotCreateDialog($this->currentDn, $this, '');
-    } else {
-      $error = new FusionDirectoryError(
-        htmlescape(sprintf(
-          _('You are not allowed to create a snapshot for %s.'),
-          $this->currentDn
-        ))
-      );
-      $error->display();
-    }
-  }
-
-  /*!
-   * \brief  Displays the "Restore snapshot dialog" for a given target.
-   *          If no target is specified, open the restore removed object dialog.
-   */
-  function restoreSnapshotDialog (array $action)
-  {
-    if (empty($action['targets'])) {
-      // No target, open the restore removed object dialog.
-      $this->currentDn = $this->listing->getBase();
-      $aclCategories   = $this->listAclCategories();
-    } else {
-      // Display the restore points for a given object.
-      $this->currentDn = $action['targets'][0];
-      if (empty($this->currentDn)) {
-        return;
-      }
-      $aclCategories = [Objects::infos($this->listing->getEntry($this->currentDn)->getTemplatedType())['aclCategory']];
-    }
-
-    if (user_info()->allowSnapshotRestore($this->currentDn, $aclCategories, empty($action['targets']))) {
-      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->currentDn, 'Snapshot restoring initiated!');
-      $this->dialogObject = new SnapshotRestoreDialog($this->currentDn, $this, empty($action['targets']), $aclCategories);
-    } else {
-      $error = new FusionDirectoryError(
-        htmlescape(sprintf(
-          _('You are not allowed to restore a snapshot for %s.'),
-          $this->currentDn
-        ))
-      );
-      $error->display();
-    }
+    return $this->actionsComponent->copyPasteHandler($action);
   }
 
   /* End of action handlers */
 
   /* Methods related to Snapshots */
 
+  function createSnapshotDialog (array $action)
+  {
+    $this->snapshotComponent->createSnapshotDialog($action);
+  }
+
+  function restoreSnapshotDialog (array $action)
+  {
+    $this->snapshotComponent->restoreSnapshotDialog($action);
+  }
+
   function getSnapshotBases (): array
   {
-    $bases = [];
-    foreach ($this->objectTypes as $type) {
-      $infos   = Objects::infos($type);
-      $bases[] = $infos['ou'] . $this->listing->getBase();
-    }
-
-    // No bases specified? Try base
-    if (!count($bases)) {
-      $bases[] = $this->listing->getBase();
-    }
-
-    return array_unique($bases);
+    return $this->snapshotComponent->getSnapshotBases();
   }
 
-  /*!
-   * \brief Get all deleted snapshots
-   */
   function getAllDeletedSnapshots (): array
   {
-    $bases = $this->getSnapshotBases();
-    $tmp   = [];
-    foreach ($bases as $base) {
-      $tmp = array_merge($tmp, $this->snapHandler->getAllDeletedSnapshots($base));
-    }
-    return $tmp;
+    return $this->snapshotComponent->getAllDeletedSnapshots();
   }
 
-  /*
-   * \brief Return available snapshots for the given base
-   *
-   * \param string $dn The DN
-   */
   function getAvailableSnapsShots (string $dn): array
   {
-    return $this->snapHandler->getAvailableSnapsShots($dn);
+    return $this->snapshotComponent->getAvailableSnapsShots($dn);
   }
 
-  /*
-   * \brief Whether snapshot restore action should be enabled for an entry
-   */
   function enableSnapshotRestore ($action, ?ListingEntry $entry = NULL): bool
   {
-    if ($entry !== NULL) {
-      /* For entries */
-      return $this->snapHandler->hasSnapshots($entry->dn);
-    } else {
-      /* For action menu */
-      return $this->snapHandler->hasDeletedSnapshots($this->getSnapshotBases());
-    }
+    return $this->snapshotComponent->enableSnapshotRestore($action, $entry);
   }
 
-  /*!
-   * \brief  Creates a new snapshot entry
-   * If source arg is not set, default to 'FD'.
-   */
   function createSnapshot (string $dn, string $description, string $snapshotSource = 'FD')
   {
-    if (empty($dn) || ($this->currentDn !== $dn)) {
-      trigger_error('There was a problem with the snapshot workflow');
-      return;
-    }
-    $entry = $this->listing->getEntry($dn);
-    if ($entry->snapshotCreationAllowed()) {
-      $this->snapHandler->createSnapshot($dn, $description, $entry->type, $snapshotSource);
-      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot created!');
-    } else {
-      $error = new FusionDirectoryPermissionError(htmlescape(sprintf(_('You are not allowed to restore a snapshot for %s.'), $dn)));
-      $error->display();
-    }
+    $this->snapshotComponent->createSnapshot($dn, $description, $snapshotSource);
   }
 
-  /*!
-   * \brief  Restores a snapshot object.
-   *
-   * \param  String  $dn  The DN of the snapshot
-   */
   function restoreSnapshot (string $dn)
   {
-    if (!empty($dn) && user_info()->allowSnapshotRestore($dn, $this->dialogObject->aclCategory, $this->dialogObject->global)) {
-      $dn = $this->snapHandler->restoreSnapshot($dn);
-      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot restored');
-      $this->closeDialogs();
-      if ($dn !== FALSE) {
-        $this->listing->focusDn($dn);
-        $entry           = $this->listing->getEntry($dn);
-        $this->currentDn = $dn;
-        Lock::add($this->currentDn);
-
-        // Open object
-        $this->openTabObject(Objects::open($this->currentDn, $entry->getTemplatedType()));
-        $this->saveChanges();
-      }
-    } else {
-      $error = new FusionDirectoryPermissionError(htmlescape(sprintf(_('You are not allowed to restore a snapshot for %s.'), $dn)));
-      $error->display();
-    }
+    $this->snapshotComponent->restoreSnapshot($dn);
   }
 
-  /*!
-   * \brief Delete a snapshot
-   *
-   * \param string $dn DN of the snapshot
-   */
   function removeSnapshot (string $dn)
   {
-    if (!empty($dn) && user_info()->allowSnapshotDelete($dn, $this->dialogObject->aclCategory)) {
-      $this->snapHandler->removeSnapshot($dn);
-      Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot deleted');
-    } else {
-      $error = new FusionDirectoryPermissionError(htmlescape(sprintf(_('You are not allowed to delete a snapshot for %s.'), $dn)));
-      $error->display();
-    }
+    $this->snapshotComponent->removeSnapshot($dn);
   }
 
   static function mainInc ($classname = NULL, $objectTypes = FALSE)

@@ -11,48 +11,139 @@ class ManagementSnapshotComponent
     ) {
     }
 
-    public function createSnapshotDialog(array $action): void
+    function createSnapshotDialog (array $action)
     {
-        $this->management->createSnapshotDialog($action);
+        Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $action['targets'], 'Snapshot creation initiated!');
+
+        $this->management->currentDn = array_pop($action['targets']);
+        if (empty($this->management->currentDn)) {
+            return;
+        }
+        $entry = $this->management->listing->getEntry($this->management->currentDn);
+        if ($entry->snapshotCreationAllowed()) {
+            $this->management->dialogObject = new SnapshotCreateDialog($this->management->currentDn, $this->management, '');
+        } else {
+            $error = new FusionDirectoryError(
+                htmlescape(sprintf(
+                    _('You are not allowed to create a snapshot for %s.'),
+                    $this->management->currentDn
+                ))
+            );
+            $error->display();
+        }
     }
 
-    public function restoreSnapshotDialog(array $action): void
+    function restoreSnapshotDialog (array $action)
     {
-        $this->management->restoreSnapshotDialog($action);
+        if (empty($action['targets'])) {
+            $this->management->currentDn = $this->management->listing->getBase();
+            $aclCategories   = $this->management->listAclCategories();
+        } else {
+            $this->management->currentDn = $action['targets'][0];
+            if (empty($this->management->currentDn)) {
+                return;
+            }
+            $aclCategories = [Objects::infos($this->management->listing->getEntry($this->management->currentDn)->getTemplatedType())['aclCategory']];
+        }
+
+        if (user_info()->allowSnapshotRestore($this->management->currentDn, $aclCategories, empty($action['targets']))) {
+            Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->management->currentDn, 'Snapshot restoring initiated!');
+            $this->management->dialogObject = new SnapshotRestoreDialog($this->management->currentDn, $this->management, empty($action['targets']), $aclCategories);
+        } else {
+            $error = new FusionDirectoryError(
+                htmlescape(sprintf(
+                    _('You are not allowed to restore a snapshot for %s.'),
+                    $this->management->currentDn
+                ))
+            );
+            $error->display();
+        }
     }
 
-    public function getSnapshotBases(): array
+    function getSnapshotBases (): array
     {
-        return $this->management->getSnapshotBases();
+        $bases = [];
+        foreach ($this->management->objectTypes as $type) {
+            $infos   = Objects::infos($type);
+            $bases[] = $infos['ou'] . $this->management->listing->getBase();
+        }
+
+        if (!count($bases)) {
+            $bases[] = $this->management->listing->getBase();
+        }
+
+        return array_unique($bases);
     }
 
-    public function getAllDeletedSnapshots(): array
+    function getAllDeletedSnapshots (): array
     {
-        return $this->management->getAllDeletedSnapshots();
+        $bases = $this->getSnapshotBases();
+        $tmp   = [];
+        foreach ($bases as $base) {
+            $tmp = array_merge($tmp, $this->management->snapHandler->getAllDeletedSnapshots($base));
+        }
+        return $tmp;
     }
 
-    public function getAvailableSnapsShots(string $dn): array
+    function getAvailableSnapsShots (string $dn): array
     {
-        return $this->management->getAvailableSnapsShots($dn);
+        return $this->management->snapHandler->getAvailableSnapsShots($dn);
     }
 
-    public function enableSnapshotRestore($action, ?ListingEntry $entry = null): bool
+    function enableSnapshotRestore ($action, ?ListingEntry $entry = NULL): bool
     {
-        return $this->management->enableSnapshotRestore($action, $entry);
+        if ($entry !== NULL) {
+            return $this->management->snapHandler->hasSnapshots($entry->dn);
+        } else {
+            return $this->management->snapHandler->hasDeletedSnapshots($this->getSnapshotBases());
+        }
     }
 
-    public function createSnapshot(string $dn, string $description, string $snapshotSource = 'FD'): void
+    function createSnapshot (string $dn, string $description, string $snapshotSource = 'FD')
     {
-        $this->management->createSnapshot($dn, $description, $snapshotSource);
+        if (empty($dn) || ($this->management->currentDn !== $dn)) {
+            trigger_error('There was a problem with the snapshot workflow');
+            return;
+        }
+        $entry = $this->management->listing->getEntry($dn);
+        if ($entry->snapshotCreationAllowed()) {
+            $this->management->snapHandler->createSnapshot($dn, $description, $entry->type, $snapshotSource);
+            Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot created!');
+        } else {
+            $error = new FusionDirectoryPermissionError(htmlescape(sprintf(_('You are not allowed to restore a snapshot for %s.'), $dn)));
+            $error->display();
+        }
     }
 
-    public function restoreSnapshot(string $dn): void
+    function restoreSnapshot (string $dn)
     {
-        $this->management->restoreSnapshot($dn);
+        if (!empty($dn) && user_info()->allowSnapshotRestore($dn, $this->management->dialogObject->aclCategory, $this->management->dialogObject->global)) {
+            $dn = $this->management->snapHandler->restoreSnapshot($dn);
+            Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot restored');
+            $this->management->closeDialogs();
+            if ($dn !== FALSE) {
+                $this->management->listing->focusDn($dn);
+                $entry           = $this->management->listing->getEntry($dn);
+                $this->management->currentDn = $dn;
+                Lock::add($this->management->currentDn);
+
+                $this->management->openTabObject(Objects::open($this->management->currentDn, $entry->getTemplatedType()));
+                $this->management->saveChanges();
+            }
+        } else {
+            $error = new FusionDirectoryPermissionError(htmlescape(sprintf(_('You are not allowed to restore a snapshot for %s.'), $dn)));
+            $error->display();
+        }
     }
 
-    public function removeSnapshot(string $dn): void
+    function removeSnapshot (string $dn)
     {
-        $this->management->removeSnapshot($dn);
+        if (!empty($dn) && user_info()->allowSnapshotDelete($dn, $this->management->dialogObject->aclCategory)) {
+            $this->management->snapHandler->removeSnapshot($dn);
+            Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $dn, 'Snapshot deleted');
+        } else {
+            $error = new FusionDirectoryPermissionError(htmlescape(sprintf(_('You are not allowed to delete a snapshot for %s.'), $dn)));
+            $error->display();
+        }
     }
 }
