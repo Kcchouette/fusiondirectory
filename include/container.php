@@ -154,3 +154,12 @@ function &display(): mixed
     global $display;
     return $display;
 }
+
+/**
+ * Get plug variable (replaces `global $plug`).
+ */
+function &plug(): mixed
+{
+    global $plug;
+    return $plug;
+}

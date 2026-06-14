@@ -182,7 +182,7 @@ function html_trace ($errstr = "")
  */
 function gosaRaiseError ($errno, $errstr, $errfile, $errline)
 {
-  global $error_collector;
+  $error_collector = &error_collector();
   $error_collector_mailto = &error_collector_mailto();
 
   // To avoid recursion - restore original error handler.

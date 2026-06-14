@@ -555,7 +555,7 @@ class Pluglist
     $display = &display();
     $remove_lock = &remove_lock();
     $cleanup = &cleanup();
-    global $plug;
+    $plug = &plug();
 
     if ($index == 'welcome') {
       $plugin_dir = base_dir()."/plugins/generic/welcome";
