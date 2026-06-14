@@ -14,7 +14,7 @@ class InputFilter
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        $value = filter_input(INPUT_GET, $key, FILTER_UNSAFE_RAW);
+        $value = filter_input(INPUT_GET, $key, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         return $value !== null && $value !== false ? $value : $default;
     }
 
@@ -23,17 +23,20 @@ class InputFilter
      */
     public static function post(string $key, mixed $default = null): mixed
     {
-        $value = filter_input(INPUT_POST, $key, FILTER_UNSAFE_RAW);
+        $value = filter_input(INPUT_POST, $key, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         return $value !== null && $value !== false ? $value : $default;
     }
 
     /**
-     * Get a filtered REQUEST parameter.
+     * Get a filtered REQUEST parameter (checks GET first, then POST).
      */
     public static function request(string $key, mixed $default = null): mixed
     {
-        $value = filter_input(INPUT_REQUEST, $key, FILTER_UNSAFE_RAW);
-        return $value !== null && $value !== false ? $value : $default;
+        $value = self::get($key);
+        if ($value !== null) {
+            return $value;
+        }
+        return self::post($key, $default);
     }
 
     /**
@@ -54,10 +57,27 @@ class InputFilter
     }
 
     /**
+     * Get a filtered POST parameter as int.
+     */
+    public static function postInt(string $key, int $default = 0): int
+    {
+        $value = filter_input(INPUT_POST, $key, FILTER_VALIDATE_INT);
+        return $value !== false && $value !== null ? (int) $value : $default;
+    }
+
+    /**
      * Check if a GET parameter exists.
      */
     public static function has(string $key): bool
     {
         return filter_input(INPUT_GET, $key) !== null;
+    }
+
+    /**
+     * Check if a POST parameter exists.
+     */
+    public static function hasPost(string $key): bool
+    {
+        return filter_input(INPUT_POST, $key) !== null;
     }
 }

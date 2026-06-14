@@ -25,4 +25,25 @@ class InputFilterTest extends TestCase
     {
         $this->assertEquals('default', InputFilter::getString('nonexistent', 'default'));
     }
+
+    public function testPostIntReturnsDefaultForMissingKey(): void
+    {
+        $this->assertEquals(99, InputFilter::postInt('nonexistent', 99));
+    }
+
+    public function testHasPostReturnsFalseForMissingKey(): void
+    {
+        $this->assertFalse(InputFilter::hasPost('nonexistent'));
+    }
+
+    public function testPostReturnsDefaultForMissingKey(): void
+    {
+        $this->assertNull(InputFilter::post('nonexistent'));
+        $this->assertEquals('default', InputFilter::post('nonexistent', 'default'));
+    }
+
+    public function testRequestReturnsDefaultForMissingKey(): void
+    {
+        $this->assertNull(InputFilter::request('nonexistent'));
+    }
 }
