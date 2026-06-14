@@ -89,7 +89,7 @@ class SnapshotRestoreDialog extends ManagementDialog
 
   function render (): string
   {
-    global $ui;
+    $ui = user_info();
     if ($this->dialog == 'delete') {
       $objects = [
         [
@@ -143,7 +143,7 @@ class SnapshotRestoreDialog extends ManagementDialog
 
   function attrIsWriteable ($attr): bool
   {
-    global $ui;
+    $ui = user_info();
 
     if (!is_object($attr)) {
       $attr = $this->attributesAccess[$attr];

@@ -113,7 +113,7 @@ class SnapshotCreateDialog extends ManagementDialog
    */
   function attrIsWriteable ($attr): bool
   {
-    global $ui;
+    $ui = user_info();
 
     if (!is_object($attr)) {
       $attr = $this->attributesAccess[$attr];
@@ -127,7 +127,7 @@ class SnapshotCreateDialog extends ManagementDialog
 
   function renderAttributes (bool $readOnly = FALSE)
   {
-    global $ui;
+    $ui = user_info();
     $smarty = get_smarty();
 
     $permissions = $ui->get_snapshot_permissions($this->object_dn, $this->aclCategory);

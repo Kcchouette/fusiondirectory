@@ -47,7 +47,7 @@ class Lock
    */
   public static function add ($object, ?string $user = NULL)
   {
-    global $ui;
+    $ui = user_info();
 
     /* Remember which entries were opened as read only, because we
         don't need to remove any locks for them later */

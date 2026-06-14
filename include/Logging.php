@@ -53,7 +53,7 @@ class Logging
    */
   static function log (string $action, string $objecttype, string $object, array $changes = [], string $result = '')
   {
-    global $ui;
+    $ui = user_info();
 
     /* Create data object */
     $entry = [
@@ -64,7 +64,7 @@ class Logging
       'changes'     => $changes,
       'result'      => $result
     ];
-    if (isset($ui->dn) && !empty($ui->dn)) {
+    if ($ui !== NULL && isset($ui->dn) && !empty($ui->dn)) {
       $entry['user']  = $ui->dn;
     } elseif (isset($_SERVER['REMOTE_ADDR'])) {
       $entry['user'] = $_SERVER['REMOTE_ADDR'];

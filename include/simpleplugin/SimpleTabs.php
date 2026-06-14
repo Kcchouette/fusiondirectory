@@ -170,7 +170,7 @@ class SimpleTabs implements FusionDirectoryDialog
 
   function resetBase ()
   {
-    global $ui;
+    $ui = user_info();
     $baseobject = $this->getBaseObject();
     if (isset($baseobject->base)) {
       Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $baseobject->base, 'Fixing base');
@@ -416,7 +416,7 @@ class SimpleTabs implements FusionDirectoryDialog
    */
   function save ()
   {
-    global $ui;
+    $ui = user_info();
     $messages = $this->check();
     if (!empty($messages)) {
       return $messages;

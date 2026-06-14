@@ -243,7 +243,7 @@ class Pluglist
    */
   function checkAccess ($infos)
   {
-    global $ui;
+    $ui = user_info();
 
     if (isset($infos['CLASS']) && $ui->isBlacklisted($infos['CLASS'])) {
       return FALSE;

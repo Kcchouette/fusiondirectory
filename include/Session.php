@@ -187,14 +187,9 @@ class Session
    */
   public static function destroy (string $reason = '')
   {
-    global $ui;
-
-    if (!isset($ui)) {
-      $ui = static::get('ui');
-    }
-
     try {
-      if (isset($ui)) {
+      $ui = user_info();
+      if ($ui !== NULL) {
         Logging::log(
           'security',
           'logout',

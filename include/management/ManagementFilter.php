@@ -90,7 +90,7 @@ class ManagementFilter
 
   function update (string $base)
   {
-    global $ui;
+    $ui = user_info();
 
     if (isset($_POST['FILTER_PID']) && ($_POST['FILTER_PID'] == $this->pid)) {
       // Load post values and adapt filter, base and scope accordingly
@@ -166,7 +166,7 @@ class ManagementFilter
 
   function query (array $attrs, string $base): array
   {
-    global $ui;
+    $ui = user_info();
 
     $objectTypeCount  = [];
     $entries          = [];

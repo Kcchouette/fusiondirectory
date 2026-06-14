@@ -234,7 +234,7 @@ class Action
 
   function hasPermission (?ListingEntry $entry = NULL): bool
   {
-    global $ui;
+    $ui = user_info();
 
     if ($entry === NULL) {
       $dn       = $this->parent->listing->getBase();

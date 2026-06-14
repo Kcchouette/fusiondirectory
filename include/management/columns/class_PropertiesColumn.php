@@ -105,7 +105,7 @@ class PropertiesColumn extends Column
 
   protected function computeIcons (ListingEntry $entry): array
   {
-    global $ui;
+    $ui = user_info();
 
     if (isset($entry->cache[__CLASS__]['icons'])) {
       return $entry->cache[__CLASS__]['icons'];

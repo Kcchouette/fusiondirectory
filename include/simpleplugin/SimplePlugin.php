@@ -609,7 +609,7 @@ class SimplePlugin implements SimpleTab
     */
   function move (string $src_dn, string $dst_dn)
   {
-    global $ui;
+    $ui = user_info();
 
     /* Do not move if only case has changed */
     if (strtolower($src_dn) == strtolower($dst_dn)) {
@@ -903,7 +903,7 @@ class SimplePlugin implements SimpleTab
 
   function renderAttributes (bool $readOnly = FALSE)
   {
-    global $ui;
+    $ui = user_info();
     $smarty = get_smarty();
 
     if ($this->is_template) {

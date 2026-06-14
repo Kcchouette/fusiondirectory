@@ -159,7 +159,7 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   function attrIsWriteable ($attr): bool
   {
-    global $ui;
+    $ui = user_info();
 
     $noAclAttrs   = ['managementColumns', 'saveInLdapUser', 'resetInLdapUser'];
     $configAttrs  = ['saveInLdap', 'resetInLdap'];
@@ -194,7 +194,7 @@ class ManagementConfigurationDialog extends ManagementDialog
 
   public function render (): string
   {
-    global $ui;
+    $ui = user_info();
 
     $smarty = get_smarty();
     $smarty->assign('ManagementConfigurationACL', 'rw');
