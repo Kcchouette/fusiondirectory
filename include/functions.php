@@ -1359,7 +1359,7 @@ function send_binary_content ($data, $name, $type = "application/octet-stream")
   header('Content-Disposition: attachment; filename="'.$name.'"');
 
   echo $data;
-  exit();
+  throw new \RuntimeException('Binary content sent');
 }
 
 /*!

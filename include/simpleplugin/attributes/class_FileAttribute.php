@@ -188,7 +188,7 @@ class FileDownloadAttribute extends FileAttribute
             Session::set('binarytype', 'octet-stream');
             Session::set('binaryfile', $this->computeFilename());
             header('location: getbin.php');
-            exit();
+            throw new \RuntimeException('Binary download requested');
           }
         }
       }
@@ -272,7 +272,7 @@ class FileTextAreaAttribute extends FileDownloadAttribute
             Session::set('binarytype', 'octet-stream');
             Session::set('binaryfile', $this->computeFilename());
             header('location: getbin.php');
-            exit();
+            throw new \RuntimeException('Binary download requested');
           }
         }
       }

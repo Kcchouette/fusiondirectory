@@ -213,7 +213,7 @@ abstract class standAlonePage
       /* If SSL is forced, just forward to the SSL enabled site */
       if (config()->get_cfg_value('forcessl') == 'TRUE') {
         header("Location: $ssl");
-        exit;
+        throw new \RuntimeException('SSL forced');
       } elseif (config()->get_cfg_value('warnssl') == 'TRUE') {
         /* Display SSL mode warning? */
         $smarty->assign('ssl', sprintf(htmlescape(_('Warning: %sSession is not encrypted!%s')), '<a href="'.$ssl.'">', '</a>'));

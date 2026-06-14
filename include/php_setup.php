@@ -253,7 +253,7 @@ function gosaRaiseError ($errno, $errstr, $errfile, $errline)
     }
     echo $error_collector . "</div>";
     flush();
-    exit;
+    throw new \RuntimeException('Fatal error');
   }
 
   set_error_handler('gosaRaiseError', E_WARNING | E_NOTICE | E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE);
@@ -284,7 +284,7 @@ function fusiondirectoryExceptionHandler (Throwable $throwable)
     echo 'Uncaught ' . get_class($throwable) . ': ' . $throwable->getMessage();
   }
 
-  exit(255);
+  throw new \RuntimeException('Uncaught exception handler terminated');
 }
 
 /*!
@@ -297,7 +297,7 @@ function dummy_error_handler ()
 /* Bail out for incompatible/old PHP versions */
 if (!version_compare(phpversion(), PHP_MIN_VERSION, ">=")) {
   echo "PHP version needs to be " . PHP_MIN_VERSION . " or above to run FusionDirectory. Aborted.";
-  exit();
+  throw new \RuntimeException('PHP version too old');
 }
 
 /* Set timezone */
