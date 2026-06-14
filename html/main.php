@@ -50,7 +50,8 @@ Session::start();
 reset_errors();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  Logging::debug(DEBUG_POST, __LINE__, '', __FILE__, $_POST, '_POST');
+  $safePost = array_map('htmlspecialchars', $_POST);
+  Logging::debug(DEBUG_POST, __LINE__, '', __FILE__, $safePost, '_POST');
 }
 Logging::debug(DEBUG_SESSION, __LINE__, '', __FILE__, $_SESSION, '_SESSION');
 
