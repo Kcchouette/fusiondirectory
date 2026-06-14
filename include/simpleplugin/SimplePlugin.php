@@ -1776,8 +1776,6 @@ class SimplePlugin implements SimpleTab
 
   function browseForeignKeys (string $mode, $param1 = NULL, $param2 = NULL)
   {
-    global $plist;
-
     $subobjects = FALSE;
     if (preg_match('/^handle_/', $mode)) {
       $olddn   = $param1;
@@ -1802,7 +1800,7 @@ class SimplePlugin implements SimpleTab
       $field = 'dn';
       /* Special treatment for foreign keys on DN when moving an object
        * All references on DN are treated on subobjects */
-      foreach ($plist->dnForeignRefs as $ref) {
+      foreach (pluglist()->dnForeignRefs as $ref) {
         $class     = $ref[0];
         $ofield    = $ref[1];
         $filter    = $ref[2];

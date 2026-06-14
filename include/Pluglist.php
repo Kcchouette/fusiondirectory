@@ -535,7 +535,6 @@ class Pluglist
    */
   static function load ()
   {
-    global $plist;
     if (!Session::is_set('plist')) {
       /* Initially load all classes */
       load_all_classes();
@@ -553,14 +552,14 @@ class Pluglist
 
   static function runMainInc ($index, $forceCleanup = FALSE)
   {
-    global $BASE_DIR, $plist, $ui, $smarty, $display, $remove_lock, $cleanup, $plug;
+    global $BASE_DIR, $ui, $display, $remove_lock, $cleanup, $plug;
 
     if ($index == 'welcome') {
       $plugin_dir = "$BASE_DIR/plugins/generic/welcome";
       $plugin     = $index;
     } else {
-      $plugin_dir = $plist->getPath($index);
-      $plugin     = $plist->dirlist[$index];
+      $plugin_dir = pluglist()->getPath($index);
+      $plugin     = pluglist()->dirlist[$index];
     }
     /* Used by get_template_path */
     Session::set('plugin_dir', $plugin_dir);
@@ -587,8 +586,8 @@ class Pluglist
         $cleanup = $remove_lock = FALSE;
       }
     } catch (Exception $e) {
-      $smarty->assign('headline',       _('Fatal error!'));
-      $smarty->assign('headline_image', 'geticon.php?context=status&icon=dialog-error&size=32');
+      smarty()->assign('headline',       _('Fatal error!'));
+      smarty()->assign('headline_image', 'geticon.php?context=status&icon=dialog-error&size=32');
       $display = '<h1>'.htmlescape(_('An unrecoverable error occurred. Please contact your administator.')).'</h1><p>';
       if (ini_get('display_errors') == 1) {
         $display .= nl2br(htmlescape((string)$e));

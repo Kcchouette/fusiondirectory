@@ -83,14 +83,14 @@ class LoginMethod
    * Also trims username */
   static function validateUserInput (): bool
   {
-    global $message, $smarty;
+    global $message;
     static::$username = trim(static::$username);
     if (!preg_match('/^[@A-Za-z0-9_.-]+$/', static::$username)) {
       $message = _('Please specify a valid username!');
       return FALSE;
     } elseif (mb_strlen(static::$password, 'UTF-8') == 0) {
       $message = _('Please specify your password!');
-      $smarty->assign('focusfield', 'password');
+      smarty()->assign('focusfield', 'password');
       return FALSE;
     }
     return TRUE;
@@ -99,7 +99,7 @@ class LoginMethod
   /*! \brief Performs an LDAP bind with $username and $password */
   static function ldapLoginUser (): bool
   {
-    global $message, $smarty;
+    global $message;
     /* Login as user, initialize user ACL's */
     try {
       $ui = UserInfo::loginUser(static::$username, static::$password);
@@ -109,7 +109,7 @@ class LoginMethod
       Logging::log('security', 'login failure', static::$username, [], 'Authentication failed: '.$e->getMessage());
       /* Show the same message whether the user exists or not to avoid information leak */
       $message = $e->getMessage();
-      $smarty->assign('focusfield', 'password');
+      smarty()->assign('focusfield', 'password');
       return FALSE;
     }
     return TRUE;
@@ -118,7 +118,7 @@ class LoginMethod
   /*! \brief Called after successful login, return FALSE if account is expired */
   static function loginAndCheckExpired (): bool
   {
-    global $plist, $message, $smarty;
+    global $message;
 
     /* Remove all locks of this user */
     Lock::deleteByUser(user_info()->dn);
@@ -144,7 +144,7 @@ class LoginMethod
     if ($expired == POSIX_ACCOUNT_EXPIRED) {
       Logging::log('security', 'account', user_info()->dn, [], 'Account for user "'.static::$username.'" has expired');
       $message = _('Account locked. Please contact your system administrator!');
-      $smarty->assign('focusfield', 'username');
+      smarty()->assign('focusfield', 'username');
       return FALSE;
     }
 
@@ -197,8 +197,6 @@ class LoginMethod
   /*! \brief All login steps in the right order */
   static function loginProcess ()
   {
-    global $smarty;
-
     $method = config()->get_cfg_value('LoginMethod', '');
     if (empty($method)) {
       // Try to detect configurations from FD<1.4
@@ -224,14 +222,14 @@ class LoginMethod
         $display .= 'Error detail display is turned off.';
       }
       $display .= '</p>'."\n";
-      $smarty->assign('headline',       _('Fatal error!'));
-      $smarty->assign('headline_image', 'geticon.php?context=status&icon=dialog-error&size=32');
-      $smarty->assign('usePrototype',   'false');
-      $smarty->assign('date',           date('l, dS F Y H:i:s O'));
-      $smarty->assign('lang',           preg_replace('/_.*$/', '', $lang));
-      $smarty->assign('rtl',            Language::isRTL($lang));
+      smarty()->assign('headline',       _('Fatal error!'));
+      smarty()->assign('headline_image', 'geticon.php?context=status&icon=dialog-error&size=32');
+      smarty()->assign('usePrototype',   'false');
+      smarty()->assign('date',           date('l, dS F Y H:i:s O'));
+      smarty()->assign('lang',           preg_replace('/_.*$/', '', $lang));
+      smarty()->assign('rtl',            Language::isRTL($lang));
 
-      $smarty->display(get_template_path('headers.tpl'));
+      smarty()->display(get_template_path('headers.tpl'));
       echo $display;
       exit();
     }

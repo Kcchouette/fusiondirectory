@@ -135,8 +135,6 @@ class UserInfo
    */
   function loadACL ()
   {
-    global $plist;
-
     $this->ACL          = [];
     $this->groups       = [];
     $this->roles        = [];
@@ -340,8 +338,8 @@ class UserInfo
     }
 
     /* Reset plist menu and ACL cache if needed */
-    if (is_object($plist)) {
-      $plist->resetCache();
+    if (is_object(pluglist())) {
+      pluglist()->resetCache();
     }
   }
 

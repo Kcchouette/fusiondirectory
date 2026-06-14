@@ -10,6 +10,7 @@ declare(strict_types=1);
  * Usage:
  *   $config = config();
  *   $ui = user_info();
+ *   $smarty = smarty();
  *   Or: $config = container()->get(Config::class);
  */
 function container(): FusionDirectory\Container\Container
@@ -53,4 +54,13 @@ function pluglist(): ?Pluglist
 {
     global $plist;
     return $plist ?? null;
+}
+
+/**
+ * Get the Smarty instance (replaces `global $smarty`).
+ */
+function smarty(): ?Smarty
+{
+    global $smarty;
+    return $smarty ?? null;
 }

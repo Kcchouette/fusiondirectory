@@ -624,10 +624,8 @@ class Management implements FusionDirectoryDialog
    */
   protected function getHeader (): string
   {
-    global $smarty;
-
-    $smarty->assign('headline', $this->title);
-    $smarty->assign('headline_image', $this->icon);
+    smarty()->assign('headline', $this->title);
+    smarty()->assign('headline_image', $this->icon);
 
     if (is_object($this->tabObject) && ($this->currentDn != '')) {
       return '<div class="pluginfo">' . $this->currentDn . "</div>\n";
