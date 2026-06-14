@@ -99,7 +99,7 @@ class Language
   public static function detect ()
   {
     /* Try to use users primary language */
-    $ui = get_userinfo();
+    $ui = getUserInfo();
     if (isset($ui) && ($ui->language != '')) {
       return $ui->language.'.UTF-8';
     }

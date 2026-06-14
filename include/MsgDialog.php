@@ -192,7 +192,7 @@ class MsgDialog
     if (Session::isSet('msg_dialogs') &&
         is_array(Session::get('msg_dialogs')) &&
         count(Session::get('msg_dialogs'))) {
-      $smarty = get_smarty();
+      $smarty = getSmarty();
 
       $msg_dialogs  = Session::get('msg_dialogs');
       $dialogInfos  = [];
@@ -206,7 +206,7 @@ class MsgDialog
       $smarty->assign('dialogInfos',  $dialogInfos);
       $smarty->assign('dialogIds',    $dialogIds);
 
-      return $smarty->fetch(get_template_path('msg_dialog.tpl'));
+      return $smarty->fetch(getTemplatePath('msg_dialog.tpl'));
     } else {
       return '';
     }

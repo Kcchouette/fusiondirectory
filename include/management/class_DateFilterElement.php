@@ -58,17 +58,17 @@ class DateFilterElement extends FilterElement
 
   public function render (): string
   {
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('NAME',       $this->label);
     $smarty->assign('attribute',  $this->attribute);
     $smarty->assign('nt_value',   $this->min);
     $smarty->assign('ot_value',   $this->max);
-    return $smarty->fetch(get_template_path('management/filter-element-date.tpl'));
+    return $smarty->fetch(getTemplatePath('management/filter-element-date.tpl'));
   }
 
   public function getFilters (string $type, array &$filters): bool
   {
-    if (!empty($this->types) && !in_array_ics($type, $this->types)) {
+    if (!empty($this->types) && !inArrayIcs($type, $this->types)) {
       return FALSE;
     }
     if (!empty($this->min)) {

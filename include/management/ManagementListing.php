@@ -169,7 +169,7 @@ class ManagementListing
 
     $this->renderHeader();
 
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('PID',          $this->pid);
     $smarty->assign('PLUG',         InputFilter::get('plug', ''));
     $smarty->assign('multiSelect',  $this->multiSelect);
@@ -234,7 +234,7 @@ class ManagementListing
       $error->display();
     }
 
-    return $smarty->fetch(get_template_path('management/list.tpl'));
+    return $smarty->fetch(getTemplatePath('management/list.tpl'));
   }
 
   function getIterator (): Iterator
@@ -292,7 +292,7 @@ class ManagementListing
           $parentBase = preg_replace('/^[^,]+,/', '', $this->base);
           $this->tryAndSetBase($parentBase);
         } elseif ($action == 'HOME') {
-          $ui = get_userinfo();
+          $ui = getUserInfo();
           $this->tryAndSetBase($ui->getBase());
         }
       }
@@ -383,7 +383,7 @@ class ManagementListing
       }
 
       /* Check if we are in users home  department */
-      if (!count($deps) || ($this->base == user_info()->getBase()) || !in_array_ics(user_info()->getBase(), $deps)) {
+      if (!count($deps) || ($this->base == user_info()->getBase()) || !inArrayIcs(user_info()->getBase(), $deps)) {
         $enableHome = FALSE;
       }
 
@@ -535,7 +535,7 @@ class ManagementListing
    */
   function refreshBasesList ()
   {
-    $ui = get_userinfo();
+    $ui = getUserInfo();
 
     // Fill internal bases list
     $this->bases = [];
@@ -549,7 +549,7 @@ class ManagementListing
     $deps = $ui->getModuleDepartments(array_values($categories));
     $departmentTree = config()->getDepartmentTree();
     foreach ($departmentTree as $key => $dep) {
-      if (in_array_ics($key, $deps)) {
+      if (inArrayIcs($key, $deps)) {
         $this->bases[$key] = $dep;
       }
     }

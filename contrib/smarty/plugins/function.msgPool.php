@@ -20,7 +20,7 @@
 */
 function smarty_function_msgPool ($params)
 {
-  if (class_available('msgPool') && isset($params['type'])) {
+  if (classAvailable('msgPool') && isset($params['type'])) {
     $parameter = [];
     foreach ($params as $para => $value) {
       if (!preg_match('/^type$/i', $para)) {

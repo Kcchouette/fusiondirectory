@@ -274,7 +274,7 @@ class SimplePlugin implements SimpleTab
       }
 
       /* Set the template flag according to the existence of objectClass fdTemplate */
-      if (isset($this->attrs['objectClass']) && in_array_ics('fdTemplate', $this->attrs['objectClass'])) {
+      if (isset($this->attrs['objectClass']) && inArrayIcs('fdTemplate', $this->attrs['objectClass'])) {
         Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, 'found', 'Template check');
         $this->setTemplate(TRUE);
         $this->templateLoadAttrs($this->attrs);
@@ -293,9 +293,9 @@ class SimplePlugin implements SimpleTab
       $ldap->cd(config()->current['BASE']);
       foreach ($this->inheritance as $oc => $at) {
         if ($this->mainTab) {
-          $filter = '(&(objectClass=' . $oc . ')(' . $at . '=' . ldap_escape_f($this->dn) . '))';
+          $filter = '(&(objectClass=' . $oc . ')(' . $at . '=' . ldapEscapeF($this->dn) . '))';
         } else {
-          $filter = '(&(objectClass=' . $oc . ')' . static::getLdapFilter() . '(' . $at . '=' . ldap_escape_f($this->dn) . '))';
+          $filter = '(&(objectClass=' . $oc . ')' . static::getLdapFilter() . '(' . $at . '=' . ldapEscapeF($this->dn) . '))';
         }
         $ldap->search($filter, $this->attributes);
         if ($ldap->count() == 1) {
@@ -321,7 +321,7 @@ class SimplePlugin implements SimpleTab
     }
 
     if (!isset($this->templatePath)) {
-      $this->templatePath = get_template_path('simpleplugin.tpl');
+      $this->templatePath = getTemplatePath('simpleplugin.tpl');
     }
   }
 
@@ -901,7 +901,7 @@ class SimplePlugin implements SimpleTab
       }
 
       list($attribute,) = explode(';', $index, 2);
-      if (!in_array_ics($index, $this->attributes) && !in_array_ics($attribute, $this->attributes) && strcasecmp('objectClass', $attribute)) {
+      if (!inArrayIcs($index, $this->attributes) && !inArrayIcs($attribute, $this->attributes) && strcasecmp('objectClass', $attribute)) {
         unset($this->saved_attributes[$index]);
         continue;
       }
@@ -958,7 +958,7 @@ class SimplePlugin implements SimpleTab
       if (is_array($this->attrs[$index]) &&
         isset($this->saved_attributes[$index]) &&
         is_array($this->saved_attributes[$index]) &&
-        !array_differs($this->attrs[$index], $this->saved_attributes[$index])) {
+        !arrayDiffers($this->attrs[$index], $this->saved_attributes[$index])) {
         unset($this->attrs[$index]);
         continue;
       }
@@ -1229,7 +1229,7 @@ class SimplePlugin implements SimpleTab
             'oldvalue' => $oldvalue,
             'newvalue' => $newvalue,
           ];
-          $filter = TemplateHandling::parseString($filtersub, ['oldvalue' => $oldvalue, 'newvalue' => $newvalue], 'ldap_escape_f');
+          $filter = TemplateHandling::parseString($filtersub, ['oldvalue' => $oldvalue, 'newvalue' => $newvalue], 'ldapEscapeF');
           if (!preg_match('/^\(.*\)$/', $filter)) {
             $filter = '(' . $filter . ')';
           }
@@ -1294,7 +1294,7 @@ class SimplePlugin implements SimpleTab
                   'oldvalue' => $oldvalue,
                   'newvalue' => $newvalue,
                 ];
-                $filter = TemplateHandling::parseString($filter, ['oldvalue' => $oldvalue, 'newvalue' => $newvalue], 'ldap_escape_f');
+                $filter = TemplateHandling::parseString($filter, ['oldvalue' => $oldvalue, 'newvalue' => $newvalue], 'ldapEscapeF');
               } elseif ($mode == 'references') {
                 $foreignRefs[$objectType]['refs'][$class]['name'] = $cinfos['plShortName'];
 
@@ -1305,7 +1305,7 @@ class SimplePlugin implements SimpleTab
                   'tabname' => $this->parent->by_name[$tabclass],
                   'value'   => $this->parent->by_object[$tabclass]->$field,
                 ];
-                $filter = TemplateHandling::parseString($filter, ['oldvalue' => $this->parent->by_object[$tabclass]->$field], 'ldap_escape_f');
+                $filter = TemplateHandling::parseString($filter, ['oldvalue' => $this->parent->by_object[$tabclass]->$field], 'ldapEscapeF');
               }
               if (!preg_match('/^\(.*\)$/', $filter)) {
                 $filter = '(' . $filter . ')';
@@ -1443,7 +1443,7 @@ class SimplePlugin implements SimpleTab
     $base = preg_replace('/^,*/', '', $base);
 
     /* Try to use plain entry first */
-    $dn = $attribute . '=' . ldap_escape_dn($this->$attribute) . ',' . $base;
+    $dn = $attribute . '=' . ldapEscapeDn($this->$attribute) . ',' . $base;
     if (($dn == $this->orig_dn) || !$ldap->dnExists($dn)) {
       return $dn;
     }
@@ -1457,9 +1457,9 @@ class SimplePlugin implements SimpleTab
     }
     for ($i = 1; $i < count($usableAttributes); $i++) {
       foreach (new Combinations($usableAttributes, $i) as $attrs) {
-        $dn = $attribute . '=' . ldap_escape_dn($this->$attribute);
+        $dn = $attribute . '=' . ldapEscapeDn($this->$attribute);
         foreach ($attrs as $attr) {
-          $dn .= '+' . $attr . '=' . ldap_escape_dn($this->$attr);
+          $dn .= '+' . $attr . '=' . ldapEscapeDn($this->$attr);
         }
         $dn .= ',' . $base;
         if (($dn == $this->orig_dn) || !$ldap->dnExists($dn)) {
@@ -1839,7 +1839,7 @@ class SimplePlugin implements SimpleTab
 
       /* Page header */
       if (!preg_match('/^geticon/', $plIcon)) {
-        $plIcon = get_template_path($plIcon);
+        $plIcon = getTemplatePath($plIcon);
       }
       smarty()->assign('headline', $plHeadline);
       smarty()->assign('headline_image', $plIcon);

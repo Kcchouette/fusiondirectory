@@ -11,7 +11,7 @@ class DnConverter
      */
     public static function convertDepartmentDn(string $dn, ?string $base = null): string
     {
-        return \convert_department_dn($dn, $base);
+        return \convertDepartmentDn($dn, $base);
     }
 
     /**
@@ -19,7 +19,7 @@ class DnConverter
      */
     public static function getOu(string $name): string
     {
-        return \get_ou($name);
+        return \getOu($name);
     }
 
     /**
@@ -27,7 +27,7 @@ class DnConverter
      */
     public static function getPeopleOu(): string
     {
-        return \get_people_ou();
+        return \getPeopleOu();
     }
 
     /**
@@ -35,7 +35,7 @@ class DnConverter
      */
     public static function getBaseFromPeople(string $dn): string
     {
-        return \get_base_from_people($dn);
+        return \getBaseFromPeople($dn);
     }
 
     /**

@@ -11,7 +11,7 @@ class ArrayHelper
      */
     public static function removeEntries(array $needles, array $haystack): array
     {
-        return \array_remove_entries($needles, $haystack);
+        return \arrayRemoveEntries($needles, $haystack);
     }
 
     /**
@@ -19,7 +19,7 @@ class ArrayHelper
      */
     public static function removeEntriesIcs(array $needles, array $haystack): array
     {
-        return \array_remove_entries_ics($needles, $haystack);
+        return \arrayRemoveEntriesIcs($needles, $haystack);
     }
 
     /**
@@ -35,7 +35,7 @@ class ArrayHelper
      */
     public static function inArrayIcs($value, array $items): bool
     {
-        return \in_array_ics($value, $items);
+        return \inArrayIcs($value, $items);
     }
 
     /**
@@ -43,7 +43,7 @@ class ArrayHelper
      */
     public static function arrayKeyIcs($ikey, array $items)
     {
-        return \array_key_ics($ikey, $items);
+        return \arrayKeyIcs($ikey, $items);
     }
 
     /**
@@ -51,7 +51,7 @@ class ArrayHelper
      */
     public static function differs(array $src, array $dst): bool
     {
-        return \array_differs($src, $dst);
+        return \arrayDiffers($src, $dst);
     }
 
     /**
@@ -59,7 +59,7 @@ class ArrayHelper
      */
     public static function differsRecursive($src, $dst): bool
     {
-        return \array_differs_recursive($src, $dst);
+        return \arrayDiffersRecursive($src, $dst);
     }
 
     /**
@@ -67,6 +67,6 @@ class ArrayHelper
      */
     public static function cmpRecursive($src, $dst): int
     {
-        return \array_cmp_recursive($src, $dst);
+        return \arrayCmpRecursive($src, $dst);
     }
 }

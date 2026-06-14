@@ -104,7 +104,7 @@ class ObjectsAttribute extends GenericDialogAttribute
       if ($this->store_attr == 'dn') {
         $objects = Objects::ls($this->selectManagementParameters[0], $this->selectManagementParameters[2], $value, '', FALSE, 'base');
       } else {
-        $objects = Objects::ls($this->selectManagementParameters[0], $this->selectManagementParameters[2], NULL, '('.$this->store_attr.'='.ldap_escape_f($value).')');
+        $objects = Objects::ls($this->selectManagementParameters[0], $this->selectManagementParameters[2], NULL, '('.$this->store_attr.'='.ldapEscapeF($value).')');
       }
     } catch (EmptyFilterException $e) {
       $objects = [];
@@ -192,7 +192,7 @@ class ObjectsAttribute extends GenericDialogAttribute
         $img = 'images/empty.png';
       }
       $display .= '<option value="'.$key.'" class="select"'.
-                  ' style="background-image:url(\''.get_template_path($img).'\');"'.
+                  ' style="background-image:url(\''.getTemplatePath($img).'\');"'.
                   '>'.$value."</option>\n";
     }
     $display .= '</select><br/>'."\n";

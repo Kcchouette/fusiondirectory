@@ -159,7 +159,7 @@ class ObjectAttribute extends DialogButtonAttribute
         if ($this->storeAttr == 'dn') {
           $objects = Objects::ls($this->objectType, $this->selectManagementParameters[2], $value, '', FALSE, 'base');
         } else {
-          $objects = Objects::ls($this->objectType, $this->selectManagementParameters[2], NULL, '('.$this->storeAttr.'='.ldap_escape_f($value).')');
+          $objects = Objects::ls($this->objectType, $this->selectManagementParameters[2], NULL, '('.$this->storeAttr.'='.ldapEscapeF($value).')');
         }
         if (!empty($objects)) {
           $this->handleDialogResult(key($objects), reset($objects));

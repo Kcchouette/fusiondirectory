@@ -159,7 +159,7 @@ class SnapshotHandler
     /* Fetch all objects with  gosaSnapshotDN=$dn */
     $ldap->cd($base);
     $ldap->search(
-      '(&(objectClass=gosaSnapshotObject)(gosaSnapshotDN='.ldap_escape_f($dn).'))',
+      '(&(objectClass=gosaSnapshotObject)(gosaSnapshotDN='.ldapEscapeF($dn).'))',
       ['gosaSnapshotTimestamp','gosaSnapshotDN','description'],
       'one'
     );
@@ -372,7 +372,7 @@ class SnapshotHandler
     /* Fetch all objects with  gosaSnapshotDN=$dn */
     $ldap->cd($new_base);
     $ldap->search(
-      '(&(objectClass=gosaSnapshotObject)(gosaSnapshotDN='.ldap_escape_f($dn).'))',
+      '(&(objectClass=gosaSnapshotObject)(gosaSnapshotDN='.ldapEscapeF($dn).'))',
       ['gosaSnapshotTimestamp','gosaSnapshotDN','description','fdSnapshotObjectType','fdSnapshotHash'],
       'one'
     );

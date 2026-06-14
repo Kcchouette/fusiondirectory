@@ -236,7 +236,7 @@ class BaseSelector
       ];
     }
 
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('htmlid',       $this->getInputHtmlId());
     $smarty->assign('pid',          $this->pid);
     $smarty->assign('currentValue', $this->pathMapping[$this->base]);
@@ -246,7 +246,7 @@ class BaseSelector
     $smarty->assign('rootBase',     config()->current['BASE']);
     $smarty->assign('tree',         $tree);
 
-    $this->tree = $smarty->fetch(get_template_path('baseselector.tpl'));
+    $this->tree = $smarty->fetch(getTemplatePath('baseselector.tpl'));
   }
 
   /*!

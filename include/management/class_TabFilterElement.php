@@ -39,7 +39,7 @@ class TabFilterElement extends FilterElement
         if (isset($this->tabs[$class])) {
           continue;
         }
-        if (class_available($class)) {
+        if (classAvailable($class)) {
           $classInfos = Pluglist::pluginInfos($class);
           if (isset($classInfos['plFilterObject'])) {
             $this->tabs[$class] = [
@@ -75,10 +75,10 @@ class TabFilterElement extends FilterElement
         'checked' => $tab['checked'],
       ];
     }
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('NAME',   _('Tabs'));
     $smarty->assign('INPUTS', $inputs);
-    return $smarty->fetch(get_template_path('management/filter-element.tpl'));
+    return $smarty->fetch(getTemplatePath('management/filter-element.tpl'));
   }
 
   public function getFilters (string $type, array &$filters): bool

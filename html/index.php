@@ -77,7 +77,7 @@ if (InputFilter::has('signout') && InputFilter::request('signout')) {
 }
 
 /* Reset errors */
-reset_errors();
+resetErrors();
 
 /* Check if we need to run setup */
 if (!file_exists(CONFIG_DIR.'/'.CONFIG_FILE)) {
@@ -119,7 +119,7 @@ if (!(is_dir($smarty->getCompileDir()) && is_writable($smarty->getCompileDir()))
 }
 
 /* Check for old files in compile directory */
-clean_smarty_compile_dir($smarty->getCompileDir());
+cleanSmartyCompileDir($smarty->getCompileDir());
 
 Language::init();
 

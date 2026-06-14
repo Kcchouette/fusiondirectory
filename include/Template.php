@@ -263,7 +263,7 @@ class Template implements FusionDirectoryDialog
 
   public function render (): string
   {
-    $smarty   = get_smarty();
+    $smarty   = getSmarty();
     $sections = [];
     $posted   = [];
     $smarty->assign('baseACL', 'rw');
@@ -292,7 +292,7 @@ class Template implements FusionDirectoryDialog
       $smarty->assign('attributes', $attributesRendered);
 
       $posted[]   = $class.'_posted';
-      $sections[] = $smarty->fetch(get_template_path('simpleplugin_section.tpl'));
+      $sections[] = $smarty->fetch(getTemplatePath('simpleplugin_section.tpl'));
     }
     unset($plugin);
 
@@ -300,7 +300,7 @@ class Template implements FusionDirectoryDialog
     $smarty->assign('hiddenPostedInput', $posted);
     $smarty->assign('focusedField', '');
 
-    return $smarty->fetch(get_template_path('simpleplugin.tpl'));
+    return $smarty->fetch(getTemplatePath('simpleplugin.tpl'));
   }
 
   /* Apply template and current values to an object and returns it for saving or edition
@@ -350,7 +350,7 @@ class Template implements FusionDirectoryDialog
     }
     unset($array);
 
-    $ui           = get_userinfo();
+    $ui           = getUserInfo();
     $specialAttrs = [];
     foreach (static::$uiSpecialAttributes as $attr) {
       $specialAttrs['caller'.strtoupper($attr)] = $ui->$attr;

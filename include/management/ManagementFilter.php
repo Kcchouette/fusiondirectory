@@ -131,7 +131,7 @@ class ManagementFilter
    */
   function render (): string
   {
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     $smarty->assign('SCOPE',      $this->scope);
     $smarty->assign('SHOWSCOPE',  $this->showScope());
@@ -158,7 +158,7 @@ class ManagementFilter
     $smarty->assign('FILTERS',  $elements);
 
     // load the file from the theme folder
-    $file = get_template_path('management/filter.tpl');
+    $file = getTemplatePath('management/filter.tpl');
 
     // Load template
     return $smarty->fetch($file);
@@ -207,7 +207,7 @@ class ManagementFilter
           if ($this->showTemplates) {
             $searchAttributesTmp[]  = '_template_cn';
           }
-          $elementFilters[] = '(|('.implode('='.ldap_escape_f($this->search, '*').')(', $searchAttributesTmp).'='.ldap_escape_f($this->search, '*').'))';
+          $elementFilters[] = '(|('.implode('='.ldapEscapeF($this->search, '*').')(', $searchAttributesTmp).'='.ldapEscapeF($this->search, '*').'))';
         }
       }
 

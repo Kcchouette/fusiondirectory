@@ -77,7 +77,7 @@ class SimpleTabs implements FusionDirectoryDialog
 
     $this->baseclass = NULL;
     foreach ($data as $tab) {
-      if (!plugin_available($tab['CLASS'])) {
+      if (!pluginAvailable($tab['CLASS'])) {
         continue;
       }
       if (!is_a($tab['CLASS'], 'SimpleTab', TRUE)) {
@@ -374,7 +374,7 @@ class SimpleTabs implements FusionDirectoryDialog
     if ($this->getBaseObject()->is_template) {
       $ldap = config()->getLdapLink();
       $ldap->cd(config()->current['BASE']);
-      $filter = '(&(objectClass=fdTemplate)(cn='.ldap_escape_f($this->getBaseObject()->_template_cn).'))';
+      $filter = '(&(objectClass=fdTemplate)(cn='.ldapEscapeF($this->getBaseObject()->_template_cn).'))';
       $ldap->search($filter, ['dn']);
       while ($attrs = $ldap->fetch()) {
         if ($attrs['dn'] != $this->getBaseObject()->dn) {
@@ -524,7 +524,7 @@ class SimpleTabs implements FusionDirectoryDialog
   {
     $baseobject = $this->getBaseObject();
     foreach (config()->data['TABS']['SPECIALTABS'] as $tab) {
-      if (!plugin_available($tab['CLASS'])) {
+      if (!pluginAvailable($tab['CLASS'])) {
         continue;
       }
 

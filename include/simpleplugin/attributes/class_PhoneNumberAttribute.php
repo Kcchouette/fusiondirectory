@@ -65,7 +65,7 @@ class PhoneNumberButtonAttribute extends PhoneNumberAttribute
   {
     parent::__construct($label, $description, $ldapName, $required, $defaultValue, $acl);
 
-    if (class_available('phoneGeneric')) {
+    if (classAvailable('phoneGeneric')) {
       $this->type = $type;
     } else {
       $this->type = FALSE;

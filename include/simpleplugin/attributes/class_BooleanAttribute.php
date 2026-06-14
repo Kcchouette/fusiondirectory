@@ -250,7 +250,7 @@ class ObjectClassBooleanAttribute extends BooleanAttribute
     if ($this->getValue()) {
       $attrs['objectClass'] = array_merge_unique($this->objectclasses, $attrs['objectClass']);
     } else {
-      $attrs['objectClass'] = array_remove_entries($this->objectclasses, $attrs['objectClass']);
+      $attrs['objectClass'] = arrayRemoveEntries($this->objectclasses, $attrs['objectClass']);
     }
   }
 }

@@ -310,7 +310,7 @@ class ogroup extends SimplePlugin
     parent::handleForeignKeys($olddn, $newdn, $mode);
     if ($this->attributeHaveChanged('gosaGroupObjects')) {
       /* Propagate member type changes to parent groups */
-      $parents = Objects::ls('ogroup', ['dn' => 'raw'], NULL, '(member='.ldap_escape_f($this->dn).')');
+      $parents = Objects::ls('ogroup', ['dn' => 'raw'], NULL, '(member='.ldapEscapeF($this->dn).')');
       foreach (array_keys($parents) as $dn) {
         $tabobject = Objects::open($dn, 'ogroup');
         $errors = $tabobject->save();

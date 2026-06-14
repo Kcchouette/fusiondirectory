@@ -19,7 +19,7 @@ class FileHelper
      */
     public static function scanDirectory(string $path, bool $sortDesc = false): array
     {
-        return \scan_directory($path, $sortDesc);
+        return \scanDirectory($path, $sortDesc);
     }
 
     /**
@@ -27,7 +27,7 @@ class FileHelper
      */
     public static function cleanSmartyCompileDir(string $directory): void
     {
-        \clean_smarty_compile_dir($directory);
+        \cleanSmartyCompileDir($directory);
     }
 
     /**
@@ -35,7 +35,7 @@ class FileHelper
      */
     public static function createRevision(string $revisionFile, string $revision): bool
     {
-        return \create_revision($revisionFile, $revision);
+        return \createRevision($revisionFile, $revision);
     }
 
     /**
@@ -43,7 +43,7 @@ class FileHelper
      */
     public static function compareRevision(string $revisionFile, string $revision): bool
     {
-        return \compare_revision($revisionFile, $revision);
+        return \compareRevision($revisionFile, $revision);
     }
 
     /**

@@ -143,9 +143,9 @@ class Acl
         /* Found entry... */
         if ($ldap->count()) {
           $attrs = $ldap->fetch();
-          if (in_array_ics('inetOrgPerson', $attrs['objectClass'])) {
+          if (inArrayIcs('inetOrgPerson', $attrs['objectClass'])) {
             $a['U:'.$dn] = $attrs['cn'][0].' ['.$attrs['uid'][0].']';
-          } elseif (in_array_ics('organizationalRole', $attrs['objectClass'])) {
+          } elseif (inArrayIcs('organizationalRole', $attrs['objectClass'])) {
             $a['R:'.$dn] = $attrs['cn'][0];
             if (isset($attrs['description'][0])) {
               $a['R:'.$dn] .= ' ['.$attrs['description'][0].']';

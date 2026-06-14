@@ -68,7 +68,7 @@ class GroupContentFilterElement extends FilterElement
     $smarty = get_smarty();
     $smarty->assign('NAME',   _('Members'));
     $smarty->assign('INPUTS', $inputs);
-    return $smarty->fetch(get_template_path('management/filter-element.tpl'));
+    return $smarty->fetch(getTemplatePath('management/filter-element.tpl'));
   }
 
   public function getFilters (string $type, array &$filters): bool

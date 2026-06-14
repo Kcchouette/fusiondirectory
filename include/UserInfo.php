@@ -145,19 +145,19 @@ class UserInfo
     $targetFilterLimit  = config()->getCfgValue('AclTargetFilterLimit', 100);
 
     /* Get member groups... */
-    $ldap->search('(&(objectClass=groupOfNames)(member='.ldap_escape_f($this->dn).'))', ['dn']);
+    $ldap->search('(&(objectClass=groupOfNames)(member='.ldapEscapeF($this->dn).'))', ['dn']);
     while ($attrs = $ldap->fetch()) {
       $this->groups[$attrs['dn']] = $attrs['dn'];
     }
 
     /* Get member POSIX groups... */
-    $ldap->search('(&(objectClass=posixGroup)(memberUid='.ldap_escape_f($this->uid).'))', ['dn']);
+    $ldap->search('(&(objectClass=posixGroup)(memberUid='.ldapEscapeF($this->uid).'))', ['dn']);
     while ($attrs = $ldap->fetch()) {
       $this->groups[$attrs['dn']] = $attrs['dn'];
     }
 
     /* Get member roles... */
-    $ldap->search('(&(objectClass=organizationalRole)(roleOccupant='.ldap_escape_f($this->dn).'))', ['dn']);
+    $ldap->search('(&(objectClass=organizationalRole)(roleOccupant='.ldapEscapeF($this->dn).'))', ['dn']);
     while ($attrs = $ldap->fetch()) {
       $this->roles[$attrs['dn']] = $attrs['dn'];
     }
@@ -200,13 +200,13 @@ class UserInfo
           list($memberType, $memberDn) = explode(':', $member, 2);
           switch ($memberType) {
             case 'G':
-              if (in_array_ics($memberDn, $this->groups)) {
+              if (inArrayIcs($memberDn, $this->groups)) {
                 $interesting = TRUE;
                 break 2;
               }
               break;
             case 'R':
-              if (in_array_ics($memberDn, $this->roles)) {
+              if (inArrayIcs($memberDn, $this->roles)) {
                 $interesting = TRUE;
                 break 2;
               }
@@ -234,7 +234,7 @@ class UserInfo
         if (!empty($ACLRule['targetfilter'])) {
           $ldap->cd($dn);
           $ldap->setSizeLimit($targetFilterLimit);
-          $targetFilter = TemplateHandling::parseString($ACLRule['targetfilter'], $this->cachedAttrs, 'ldap_escape_f');
+          $targetFilter = TemplateHandling::parseString($ACLRule['targetfilter'], $this->cachedAttrs, 'ldapEscapeF');
           $ldap->search($targetFilter, ['dn']);
           if ($ldap->hitSizeLimit()) {
             $error = new FusionDirectoryError(
@@ -805,7 +805,7 @@ class UserInfo
 
     $ldap = config()->getLdapLink();
 
-    if (class_available('ppolicyAccount')) {
+    if (classAvailable('ppolicyAccount')) {
       try {
         list($policy, $attrs) = user::fetchPpolicy($this->dn);
         if (
@@ -944,7 +944,7 @@ class UserInfo
    */
   function getAttributeCategory ($type, $attribute)
   {
-    if (in_array_ics($attribute, ['objectClass', 'dn'])) {
+    if (inArrayIcs($attribute, ['objectClass', 'dn'])) {
       return TRUE;
     }
 
@@ -984,7 +984,7 @@ class UserInfo
    */
   function getBase ()
   {
-    return get_base_from_people($this->dn);
+    return getBaseFromPeople($this->dn);
   }
 
   /* \brief Returns the current base the user went to in management classes

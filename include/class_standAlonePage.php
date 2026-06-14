@@ -100,7 +100,7 @@ abstract class standAlonePage
 
     static::checkDirectoryChooser();
 
-    reset_errors();
+    resetErrors();
 
     static::securityHeaders();
 
@@ -145,7 +145,7 @@ abstract class standAlonePage
 
   function setupSmarty ()
   {
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     /* Set template compile directory */
     $smarty->compile_dir = config()->getCfgValue('templateCompileDirectory', SPOOL_DIR);
@@ -161,7 +161,7 @@ abstract class standAlonePage
     }
 
     /* Check for old files in compile directory */
-    clean_smarty_compile_dir($smarty->compile_dir);
+    cleanSmartyCompileDir($smarty->compile_dir);
 
     $smarty->assign('date',       gmdate('D, d M Y H:i:s'));
     $smarty->assign('params',     '');
@@ -188,7 +188,7 @@ abstract class standAlonePage
   {
     $error_collector_mailto = &error_collector_mailto();
     $error_collector = &error_collector();
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     $smarty->assign('PHPSESSID', session_id());
     if ($error_collector != '') {
@@ -202,7 +202,7 @@ abstract class standAlonePage
 
   function checkForSSL ()
   {
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     /* Check for SSL connection */
     $ssl = '';

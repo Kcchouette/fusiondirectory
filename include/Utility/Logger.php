@@ -19,7 +19,7 @@ class Logger
      */
     public static function log(string $message): void
     {
-        \fusiondirectory_log($message);
+        \fusiondirectoryLog($message);
     }
 
     /**
@@ -35,6 +35,6 @@ class Logger
      */
     public static function resetErrors(): void
     {
-        \reset_errors();
+        \resetErrors();
     }
 }

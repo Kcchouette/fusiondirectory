@@ -307,7 +307,7 @@ class Config
       $cache = Session::get('HTTP_FDKEY_CACHE');
       if (!isset($cache[$creds])) {
         try {
-          $cache[$creds] = cred_decrypt($creds, $_SERVER['HTTP_FDKEY']);
+          $cache[$creds] = credDecrypt($creds, $_SERVER['HTTP_FDKEY']);
           Session::set('HTTP_FDKEY_CACHE', $cache);
         } catch (FusionDirectoryException $e) {
           $msg = nl2br(htmlescape(sprintf(
@@ -688,7 +688,7 @@ class Config
 
       /* Only assign non-root departments */
       if ($dn != $result['/']) {
-        $c_dn = convert_department_dn($dn).' ('.$infos['mainAttr'].')';
+        $c_dn = convertDepartmentDn($dn).' ('.$infos['mainAttr'].')';
         $result[$c_dn] = $dn;
       }
     }
@@ -941,7 +941,7 @@ class Config
           if (is_numeric($key)) {
             /* This is not the main tab */
             $tabclass = strtoupper($value).'TABS';
-            if (($tabclass == 'GROUPTABS') && class_available('mixedGroup')) {
+            if (($tabclass == 'GROUPTABS') && classAvailable('mixedGroup')) {
               $tabclass = 'OGROUP-USERTABS';
             }
             Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $tabclass, "Adding $class to tab list");
@@ -993,7 +993,7 @@ class Config
             array_unshift($this->data['TABS'][$tabclass], $entry);
           }
         }
-      } elseif (class_available($class) && is_subclass_of($class, 'SimpleService')) {
+      } elseif (classAvailable($class) && is_subclass_of($class, 'SimpleService')) {
         Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $class, "Adding service");
         if (!isset($this->data['TABS']['SERVERSERVICE'])) {
           $this->data['TABS']['SERVERSERVICE'] = [];
@@ -1107,7 +1107,7 @@ class Config
               $this->data['OBJECTS'][$obj]['snapshotActive']  = TRUE;
               $this->data['CATEGORIES'][$cat]['classes'][]    = 'SnapshotHandler';
             }
-            if (class_available('archivedObject') && archivedObject::isArchiveActive($obj)) {
+            if (classAvailable('archivedObject') && archivedObject::isArchiveActive($obj)) {
               $this->data['OBJECTS'][$obj]['archiveActive']   = TRUE;
               $this->data['CATEGORIES'][$cat]['classes'][]    = 'archivedObject';
             }

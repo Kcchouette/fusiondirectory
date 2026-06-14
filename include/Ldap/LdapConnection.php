@@ -31,7 +31,7 @@ class LdapConnection
 
             $this->ldap->error = 'No Error';
             $serverctrls = [];
-            if (class_available('ppolicyAccount')) {
+            if (classAvailable('ppolicyAccount')) {
                 $serverctrls = [['oid' => LDAP_CONTROL_PASSWORDPOLICYREQUEST]];
             }
             $result = @ldap_bind_ext($this->ldap->cid, $this->ldap->binddn, $this->ldap->bindpw, $serverctrls); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */

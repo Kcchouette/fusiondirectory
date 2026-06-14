@@ -27,7 +27,7 @@ require_once("../include/Utility/InputFilter.php");
 
 session_cache_limiter("private");
 Session::start();
-reset_errors();
+resetErrors();
 
 $theme = '';
 if (Session::isSet('Config')) {

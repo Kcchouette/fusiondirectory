@@ -40,7 +40,7 @@ class recoveryConfig extends SimplePlugin
       'settings' => [
         'name'      => _('Password recovery settings'),
         'class'     => ['alone'],
-        'Template'  => get_template_path('simpleplugin_section_alone.tpl'),
+        'Template'  => getTemplatePath('simpleplugin_section_alone.tpl'),
         'attrs'     => [
           new StringAttribute(
             _('Recovery RDN'), _('The branch where recovery tokens are stored'),

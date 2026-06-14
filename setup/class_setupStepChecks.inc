@@ -28,14 +28,14 @@ class setupStepChecks extends setupStep
     return [
       'modules' => [
         'name'      => _('PHP module and extension checks'),
-        'Template'  => get_template_path("setup_checks.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => getTemplatePath("setup_checks.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
           new FakeAttribute('basic_checks')
         ]
       ],
       'setup' => [
         'name'      => _('PHP setup configuration'),
-        'Template'  => get_template_path("setup_checks.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => getTemplatePath("setup_checks.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
           new FakeAttribute('config_checks')
         ]

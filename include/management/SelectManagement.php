@@ -75,10 +75,10 @@ class SelectManagement extends Management
   {
     $list = parent::renderList();
 
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('MULTISELECT',  $this->multiSelect);
 
-    return $list.$smarty->fetch(get_template_path('management/select-footer.tpl'));
+    return $list.$smarty->fetch(getTemplatePath('management/select-footer.tpl'));
   }
 
   /*!

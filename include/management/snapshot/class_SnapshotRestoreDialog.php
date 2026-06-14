@@ -101,9 +101,9 @@ class SnapshotRestoreDialog extends ManagementDialog
       ];
 
       // Display confirmation dialog.
-      $smarty = get_smarty();
+      $smarty = getSmarty();
       $smarty->assign('Objects', $objects);
-      $str = $smarty->fetch(get_template_path('simple-remove.tpl'));
+      $str = $smarty->fetch(getTemplatePath('simple-remove.tpl'));
     } elseif ($this->dialog == 'restore') {
       $objects = [
         [
@@ -115,11 +115,11 @@ class SnapshotRestoreDialog extends ManagementDialog
       ];
 
       // Display confirmation dialog.
-      $smarty = get_smarty();
+      $smarty = getSmarty();
       $smarty->assign('Objects', $objects);
-      $str = $smarty->fetch(get_template_path('restore-confirm.tpl'));
+      $str = $smarty->fetch(getTemplatePath('restore-confirm.tpl'));
     } else {
-      $smarty = get_smarty();
+      $smarty = getSmarty();
       $permissions = $ui->get_snapshot_permissions($this->getAclBase(), $this->aclCategory);
       $acl = '';
       if (in_array('r', $permissions)) {

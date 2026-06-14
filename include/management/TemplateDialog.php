@@ -109,7 +109,7 @@ class TemplateDialog implements FusionDirectoryDialog
 
   public function render (): string
   {
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     if (is_object($this->template)) {
       $templateOutput = $this->template->render();
       if ($this->template->dialogOpened()) {
@@ -120,7 +120,7 @@ class TemplateDialog implements FusionDirectoryDialog
     } else {
       $smarty->assign('templates', $this->templates);
     }
-    $display = $smarty->fetch(get_template_path('template.tpl'));
+    $display = $smarty->fetch(getTemplatePath('template.tpl'));
     return $display;
   }
 

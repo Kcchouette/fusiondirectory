@@ -191,7 +191,7 @@ class SetAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
       $this->size = min(15, $this->getValueCount());
     }
     $id = $this->getHtmlId();
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign($id.'_values', $this->getDisplayValues());
     $display = '<select multiple="multiple"  name="row'.$id.'[]" id="row'.$id.'" size="'.$this->size.'"'.
                 ($this->disabled ? ' disabled="disabled"' : '').
@@ -505,7 +505,7 @@ class OrderedArrayAttribute extends SetAttribute
     }
     $id = $this->getHtmlId();
     $div = new DivSelectBox('rows'.$id);
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $height = ($this->size * 26) + 6;
     if ($this->headers) {
       $height += 29;

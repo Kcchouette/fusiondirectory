@@ -116,20 +116,20 @@ class PasswordRecovery extends standAlonePage
 
     Logging::debug(DEBUG_TRACE, __LINE__, __FUNCTION__, __FILE__, $this->step, "Step");
 
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     $this->assignSmartyVars();
 
     $smarty->append('js_files', 'include/pwdStrength.js');
-    $smarty->append('css_files', get_template_path('login.css'));
+    $smarty->append('css_files', getTemplatePath('login.css'));
     $smarty->assign('title', _('Password recovery'));
-    $smarty->display(get_template_path('headers.tpl'));
+    $smarty->display(getTemplatePath('headers.tpl'));
 
     $smarty->assign('step', $this->step);
     $smarty->assign('delay_allowed', $this->delay_allowed);
     $smarty->assign('activated', $this->activated);
     $smarty->assign('email_address', $this->email_address);
-    $smarty->display(get_template_path('recovery.tpl'));
+    $smarty->display(getTemplatePath('recovery.tpl'));
     exit();
   }
 
@@ -165,7 +165,7 @@ class PasswordRecovery extends standAlonePage
     $ldap = config()->getLdapLink();
 
     // Check if token branch is here
-    $token = get_ou('RecoveryTokenRDN') . config()->current['BASE'];
+    $token = getOu('RecoveryTokenRDN') . config()->current['BASE'];
     $ldap->cat($token, ['dn']);
     if (!$ldap->count()) {
       /* It's not, let's create it */
@@ -175,7 +175,7 @@ class PasswordRecovery extends standAlonePage
       } catch (FusionDirectoryError $error) {
         return $error;
       }
-      fusiondirectory_log("Created token branch " . $token);
+      fusiondirectoryLog("Created token branch " . $token);
     }
 
     $dn = 'ou=' . $this->login . ',' . $token;
@@ -217,7 +217,7 @@ class PasswordRecovery extends standAlonePage
     /* Retrieve hash from the ldap */
     $ldap = config()->getLdapLink();
 
-    $token = get_ou('RecoveryTokenRDN') . config()->current['BASE'];
+    $token = getOu('RecoveryTokenRDN') . config()->current['BASE'];
     $dn    = 'ou=' . $this->login . ',' . $token;
     $ldap->cat($dn);
     $attrs = $ldap->fetch();
@@ -236,13 +236,13 @@ class PasswordRecovery extends standAlonePage
     $ldap = config()->getLdapLink();
 
     $objectClasses = ['gosaMailAccount'];
-    if (class_available('personalInfo') && (config()->getCfgValue('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
+    if (classAvailable('personalInfo') && (config()->getCfgValue('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
       $objectClasses[] = 'fdPersonalInfo';
     }
-    if (class_available('supannAccount') && (config()->getCfgValue('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
+    if (classAvailable('supannAccount') && (config()->getCfgValue('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
       $objectClasses[] = 'supannPerson';
     }
-    $filter = '(&(|(objectClass=' . join(')(objectClass=', $objectClasses) . '))(' . $this->loginAttribute . '=' . ldap_escape_f($this->login) . '))';
+    $filter = '(&(|(objectClass=' . join(')(objectClass=', $objectClasses) . '))(' . $this->loginAttribute . '=' . ldapEscapeF($this->login) . '))';
     $ldap->cd(config()->current['BASE']);
     $ldap->search($filter, ['dn']);
 
@@ -268,16 +268,16 @@ class PasswordRecovery extends standAlonePage
     }
 
     /* Search login corresponding to the mail */
-    $address_escaped = ldap_escape_f($this->email_address);
+    $address_escaped = ldapEscapeF($this->email_address);
     if ($this->usealternates) {
       $filter = '(&(objectClass=gosaMailAccount)(|(mail=' . $address_escaped . ')(gosaMailAlternateAddress=' . $address_escaped . ')))';
     } else {
       $filter = '(&(objectClass=gosaMailAccount)(mail=' . $address_escaped . '))';
     }
-    if (class_available('personalInfo') && (config()->getCfgValue('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
+    if (classAvailable('personalInfo') && (config()->getCfgValue('privateEmailPasswordRecovery', 'FALSE') == 'TRUE')) {
       $filter = '(|' . $filter . '(&(objectClass=fdPersonalInfo)(fdPrivateMail=' . $address_escaped . ')))';
     }
-    if (class_available('supannAccount') && (config()->getCfgValue('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
+    if (classAvailable('supannAccount') && (config()->getCfgValue('supannPasswordRecovery', 'TRUE') == 'TRUE')) {
       $filter = '(|' . $filter . '(&(objectClass=supannPerson)(|(supannMailPerso=' . $address_escaped . ')(supannMailPrive={SECOURS}' . $address_escaped . '))))';
     }
     $ldap = config()->getLdapLink();
@@ -304,7 +304,7 @@ class PasswordRecovery extends standAlonePage
     $this->step  = 2;
 
     if ($this->interactive) {
-      $smarty = get_smarty();
+      $smarty = getSmarty();
 
       $smarty->assign('login', $this->login);
       $smarty->assign('email_address', $this->email_address);
@@ -349,12 +349,12 @@ class PasswordRecovery extends standAlonePage
     /* Send the mail */
     $body = sprintf($this->mail_body, $this->login, $reinit_link);
 
-    if (mail_utf8($this->email_address, FALSE, $this->from_mail, $this->mail_subject, $body)) {
+    if (mailUtf8($this->email_address, FALSE, $this->from_mail, $this->mail_subject, $body)) {
       $this->step = 3;
     } else {
       $this->message[] = new FusionDirectoryError(htmlescape(_('Contact your administrator, there was a problem with the mail server')));
     }
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     $smarty->assign('login', $this->login);
   }
@@ -369,7 +369,7 @@ class PasswordRecovery extends standAlonePage
       return;
     }
 
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     $smarty->assign('uniq', $uniq_id_from_mail);
     $this->uniq = $uniq_id_from_mail;
@@ -408,7 +408,7 @@ class PasswordRecovery extends standAlonePage
       return;
     }
 
-    fusiondirectory_log('User ' . $this->login . ' password has been changed');
+    fusiondirectoryLog('User ' . $this->login . ' password has been changed');
 
     return TRUE;
   }
@@ -424,8 +424,8 @@ class PasswordRecovery extends standAlonePage
     /* Send the mail */
     $body = sprintf($this->mail2_body, $this->login);
 
-    if (mail_utf8($this->email_address, FALSE, $this->from_mail, $this->mail2_subject, $body)) {
-      $smarty     = get_smarty();
+    if (mailUtf8($this->email_address, FALSE, $this->from_mail, $this->mail2_subject, $body)) {
+      $smarty     = getSmarty();
       $this->step = 5;
       $smarty->assign('changed', TRUE);
     } else {

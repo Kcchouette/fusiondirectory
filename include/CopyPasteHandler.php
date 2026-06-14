@@ -161,7 +161,7 @@ class CopyPasteHandler implements FusionDirectoryDialog
 
   public function update (): bool
   {
-    $ui = get_userinfo();
+    $ui = getUserInfo();
 
     /* Check which entries can be pasted directly.
      * Create a list of all entries that can be pasted directly.

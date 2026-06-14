@@ -11,7 +11,7 @@ class LdapHelper
      */
     public static function escapeFilter(string $str, string $ignore = ''): string
     {
-        return \ldap_escape_f($str, $ignore);
+        return \ldapEscapeF($str, $ignore);
     }
 
     /**
@@ -19,7 +19,7 @@ class LdapHelper
      */
     public static function escapeDn(string $str, string $ignore = ''): string
     {
-        return \ldap_escape_dn($str, $ignore);
+        return \ldapEscapeDn($str, $ignore);
     }
 
     /**

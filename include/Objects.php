@@ -485,7 +485,7 @@ class Objects
         $searchAttrs[$infos['nameAttr']] = $infos['aclCategory'].'/'.$infos['mainTab'];
       }
       foreach (config()->data['TABS'][$infos['tabGroup']] as $tab) {
-        if (!plugin_available($tab['CLASS'])) {
+        if (!pluginAvailable($tab['CLASS'])) {
           continue;
         }
         $plInfos = Pluglist::pluginInfos($tab['CLASS']);

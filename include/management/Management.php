@@ -116,7 +116,7 @@ class Management implements FusionDirectoryDialog
 
     if (isset($this->icon)) {
       if (!preg_match('/^geticon/', $this->icon)) {
-        $this->icon = get_template_path($this->icon);
+        $this->icon = getTemplatePath($this->icon);
       }
     }
 
@@ -279,7 +279,7 @@ class Management implements FusionDirectoryDialog
       );
     }
 
-    if (class_available('archivedObject')) {
+    if (classAvailable('archivedObject')) {
       $action = archivedObject::getManagementAction($this->objectTypes, 'archiveRequested');
       if ($action !== NULL) {
         $this->registerAction($action);
@@ -598,10 +598,10 @@ class Management implements FusionDirectoryDialog
       return '';
     }
 
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('readOnly', $this->tabObject->readOnly());
     $smarty->assign('showApply', ($this->currentDn != 'new'));
-    return $smarty->fetch(get_template_path('management/tabfooter.tpl'));
+    return $smarty->fetch(getTemplatePath('management/tabfooter.tpl'));
   }
 
   function handleTemplateApply ($cancel = FALSE)

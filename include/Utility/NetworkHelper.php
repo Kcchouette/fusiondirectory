@@ -11,7 +11,7 @@ class NetworkHelper
      */
     public static function normalizeNetmask(string $netmask): string
     {
-        return \normalize_netmask($netmask);
+        return \normalizeNetmask($netmask);
     }
 
     /**
@@ -19,7 +19,7 @@ class NetworkHelper
      */
     public static function netmaskToBits(string $netmask): int
     {
-        return \netmask_to_bits($netmask);
+        return \netmaskToBits($netmask);
     }
 
     /**

@@ -79,7 +79,7 @@ class Pluglist
     $foreign_refs     = [];
     foreach ($classes as $cname) {
       $cmethods = get_class_methods($cname);
-      if (in_array_ics('plInfo', $cmethods)) {
+      if (inArrayIcs('plInfo', $cmethods)) {
         $infos = call_user_func([$cname, 'plInfo']);
         if (empty($infos)) {
           continue;
@@ -365,7 +365,7 @@ class Pluglist
           if (!$this->checkAccess($info)) {
             continue;
           }
-          if (isset($info['CLASS']) && plugin_available($info['CLASS'])) {
+          if (isset($info['CLASS']) && pluginAvailable($info['CLASS'])) {
             $index  = $this->getIndex($info['CLASS']);
             $this->allowed_plugins[$index] = $index;
             list ($plHeadline, $plDescription, $href, ) = $this->getInfos($info['CLASS']);
@@ -425,7 +425,7 @@ class Pluglist
           if (!$this->checkAccess($info)) {
             continue;
           }
-          if (isset($info['CLASS']) && plugin_available($info['CLASS'])) {
+          if (isset($info['CLASS']) && pluginAvailable($info['CLASS'])) {
             /* Read information from class variable */
             list ($plHeadline, $plDescription, $href, $plIcon) = $this->getInfos($info['CLASS']);
             $id             = $info['CLASS'];
@@ -441,7 +441,7 @@ class Pluglist
 
           /* Load icon */
           if (isset($info['CLASS']) && !preg_match("/\//", $plIcon) && !preg_match("/^geticon/", $plIcon)) {
-            $image = get_template_path('plugins/'.preg_replace('%^.*/([^/]+)/[^/]+$%', '\1', $class_mapping[$info['CLASS']]).'/images/'.$plIcon);
+            $image = getTemplatePath('plugins/'.preg_replace('%^.*/([^/]+)/[^/]+$%', '\1', $class_mapping[$info['CLASS']]).'/images/'.$plIcon);
           } else {
             $image = $plIcon;
           }
@@ -536,7 +536,7 @@ class Pluglist
   {
     if (!Session::isSet('plist')) {
       /* Initially load all classes */
-      load_all_classes();
+      loadAllClasses();
 
       $plist = new Pluglist();
       Session::set('plist', $plist);
@@ -563,7 +563,7 @@ class Pluglist
       $plugin_dir = pluglist()->getPath($index);
       $plugin     = pluglist()->dirlist[$index];
     }
-    /* Used by get_template_path */
+    /* Used by getTemplatePath */
     Session::set('plugin_dir', $plugin_dir);
 
     try {

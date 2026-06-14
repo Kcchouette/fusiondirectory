@@ -184,7 +184,7 @@ class SelectAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
 
   function renderFormInput (): string
   {
-    $smarty         = get_smarty();
+    $smarty         = getSmarty();
     $id             = $this->getHtmlId();
     $smartyChoices  = array_values(array_diff($this->choices, $this->hiddenChoices));
     $currentValue   = $this->getValue();

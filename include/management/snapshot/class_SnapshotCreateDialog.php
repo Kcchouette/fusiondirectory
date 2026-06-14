@@ -128,7 +128,7 @@ class SnapshotCreateDialog extends ManagementDialog
   function renderAttributes (bool $readOnly = FALSE)
   {
     $ui = user_info();
-    $smarty = get_smarty();
+    $smarty = getSmarty();
 
     $permissions = $ui->get_snapshot_permissions($this->object_dn, $this->aclCategory);
     $acl = '';

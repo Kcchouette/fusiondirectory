@@ -63,7 +63,7 @@ class PluginRenderer
             }
         }
 
-        $smarty = get_smarty();
+        $smarty = getSmarty();
 
         $this->renderAttributes(FALSE);
         $smarty->assign("hiddenPostedInput", get_class($this->plugin) . "_posted");
@@ -153,7 +153,7 @@ class PluginRenderer
     public function renderAttributes (bool $readOnly = FALSE)
     {
         $ui = user_info();
-        $smarty = get_smarty();
+        $smarty = getSmarty();
 
         if ($this->plugin->is_template) {
             $smarty->assign('template_cnACL', $ui->getPermissions($this->plugin->aclGetBase(), $this->plugin->acl_category . 'Template', 'template_cn', $this->plugin->aclSkipWrite()));
@@ -200,7 +200,7 @@ class PluginRenderer
             if (isset($sectionInfo['Template'])) {
                 $displaySection = $smarty->fetch($sectionInfo['Template']);
             } else {
-                $displaySection = $smarty->fetch(get_template_path('simpleplugin_section.tpl'));
+                $displaySection = $smarty->fetch(getTemplatePath('simpleplugin_section.tpl'));
             }
             $sections[$section] = $displaySection;
         }
@@ -216,7 +216,7 @@ class PluginRenderer
         $attrsWrapper        = new stdClass();
         $attrsWrapper->attrs = $this->plugin->group_attrs;
         $group               = new $class($this->plugin->group_attrs['dn'], $attrsWrapper, $this->plugin->parent, $this->plugin->mainTab);
-        $smarty              = get_smarty();
+        $smarty              = getSmarty();
 
         $group->renderAttributes(TRUE);
         $smarty->assign("hiddenPostedInput", get_class($this->plugin) . "_posted");

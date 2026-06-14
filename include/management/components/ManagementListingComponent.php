@@ -27,7 +27,7 @@ class ManagementListingComponent
         $filterRender = $this->renderFilter();
         $actionMenu   = $this->renderActionMenu();
 
-        $smarty = get_smarty();
+        $smarty = getSmarty();
         $smarty->assign('usePrototype', 'true');
         $smarty->assign('LIST', $listRender);
         $smarty->assign('FILTER', $filterRender);
@@ -37,7 +37,7 @@ class ManagementListingComponent
         $smarty->assign('BASE', $this->management->listing->renderBase());
         $smarty->assign('HEADLINE', $this->management->headline);
 
-        return $this->management->getHeader() . $smarty->fetch(get_template_path('management/management.tpl'));
+        return $this->management->getHeader() . $smarty->fetch(getTemplatePath('management/management.tpl'));
     }
 
     protected function renderFilter (): string
@@ -56,9 +56,9 @@ class ManagementListingComponent
             return '';
         }
 
-        $smarty = get_smarty();
+        $smarty = getSmarty();
         $smarty->assign('actions', $menuActions);
-        return $smarty->fetch(get_template_path('management/actionmenu.tpl'));
+        return $smarty->fetch(getTemplatePath('management/actionmenu.tpl'));
     }
 
     public function renderActionColumn (ListingEntry $entry): string

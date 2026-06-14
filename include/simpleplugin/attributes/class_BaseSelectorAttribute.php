@@ -69,7 +69,7 @@ class BaseSelectorAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
         $this->ou = 'ou=templates,'.$this->ou;
       }
       if ($this->plugin->dn == 'new') {
-        $ui = get_userinfo();
+        $ui = getUserInfo();
         $this->setValue($ui->getCurrentBase());
       } else {
         $this->setValue(dn2base($this->plugin->dn, $this->ou));
@@ -154,7 +154,7 @@ class BaseSelectorAttribute extends \FusionDirectory\Core\SimplePlugin\Attribute
 
   function renderFormInput (): string
   {
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('usePrototype', 'true');
     if ($this->disabled) {
       $display = $this->renderInputField(

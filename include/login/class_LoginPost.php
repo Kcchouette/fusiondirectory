@@ -39,7 +39,7 @@ class LoginPost extends LoginMethod
 
     /* Init second factor methods if needed */
     foreach (static::$secondFactorMethods as $secondFactorMethod) {
-      if (!class_available($secondFactorMethod)) {
+      if (!classAvailable($secondFactorMethod)) {
         continue;
       }
       $secondFactorMethod::init();
@@ -69,7 +69,7 @@ class LoginPost extends LoginMethod
         /* If needed redirect to second factor page */
         $secondFactor = FALSE;
         foreach (static::$secondFactorMethods as $secondFactorMethod) {
-          if (!class_available($secondFactorMethod)) {
+          if (!classAvailable($secondFactorMethod)) {
             continue;
           }
           $secondFactor = ($secondFactorMethod::hasSecondFactor() || $secondFactor);
@@ -114,7 +114,7 @@ class LoginPost extends LoginMethod
     smarty()->assign('date',       gmdate('D, d M Y H:i:s'));
     smarty()->assign('username',   $username);
     smarty()->assign('copynotice', copynotice());
-    smarty()->append('css_files',  get_template_path('login.css'));
+    smarty()->append('css_files',  getTemplatePath('login.css'));
     smarty()->assign('title',      _('Sign in'));
 
     /* Some error to display? */
@@ -162,10 +162,10 @@ class LoginPost extends LoginMethod
     smarty()->assign('lang',         preg_replace('/_.*$/', '', $lang));
     smarty()->assign('rtl',          Language::isRTL($lang));
 
-    smarty()->display(get_template_path('headers.tpl'));
+    smarty()->display(getTemplatePath('headers.tpl'));
     smarty()->assign('version', FD_VERSION);
 
-    smarty()->display(get_template_path('login.tpl'));
+    smarty()->display(getTemplatePath('login.tpl'));
     exit();
   }
 
@@ -189,7 +189,7 @@ class LoginPost extends LoginMethod
     smarty()->assign('date',       gmdate('D, d M Y H:i:s'));
     smarty()->assign('username',   $username);
     smarty()->assign('copynotice', copynotice());
-    smarty()->append('css_files',  get_template_path('login.css'));
+    smarty()->append('css_files',  getTemplatePath('login.css'));
     smarty()->assign('title',      _('Second factor'));
 
     /* Some error to display? */
@@ -216,7 +216,7 @@ class LoginPost extends LoginMethod
 
     /* Run second factor methods */
     foreach (static::$secondFactorMethods as $secondFactorMethod) {
-      if (!class_available($secondFactorMethod)) {
+      if (!classAvailable($secondFactorMethod)) {
         continue;
       }
       $methodOutput = $secondFactorMethod::execute();
@@ -227,10 +227,10 @@ class LoginPost extends LoginMethod
 
     smarty()->assign('methodOutputs', $methodOutputs);
 
-    smarty()->display(get_template_path('headers.tpl'));
+    smarty()->display(getTemplatePath('headers.tpl'));
     smarty()->assign('version', FD_VERSION);
 
-    smarty()->display(get_template_path('secondfactor.tpl'));
+    smarty()->display(getTemplatePath('secondfactor.tpl'));
     exit();
   }
 }

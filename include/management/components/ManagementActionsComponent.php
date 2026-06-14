@@ -283,10 +283,10 @@ class ManagementActionsComponent
 
     protected function removeConfirmationDialog (array $objects)
     {
-        $smarty = get_smarty();
+        $smarty = getSmarty();
         $smarty->assign('Objects', $objects);
         $smarty->assign('multiple', TRUE);
-        return $smarty->fetch(get_template_path('simple-remove.tpl'));
+        return $smarty->fetch(getTemplatePath('simple-remove.tpl'));
     }
 
     function removeConfirmed (array $action)
@@ -361,9 +361,9 @@ class ManagementActionsComponent
             ];
         }
 
-        $smarty = get_smarty();
+        $smarty = getSmarty();
         $smarty->assign('Objects', $objects);
-        return $smarty->fetch(get_template_path('simple-archive.tpl'));
+        return $smarty->fetch(getTemplatePath('simple-archive.tpl'));
     }
 
     public function archiveConfirmed (array $action)

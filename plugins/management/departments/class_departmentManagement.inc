@@ -62,7 +62,7 @@ class departmentManagement extends Management
   public function removeRequested (array $action)
   {
     global $config;
-    $action['targets'] = array_remove_entries([$config->current['BASE']], $action['targets']);
+    $action['targets'] = arrayRemoveEntries([$config->current['BASE']], $action['targets']);
     return parent::removeRequested($action);
   }
 

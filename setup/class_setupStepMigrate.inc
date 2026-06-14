@@ -100,7 +100,7 @@ class StepMigrateDialog implements FusionDirectoryDialog
   {
     $smarty = get_smarty();
     $smarty->assign('infos', $this->infos);
-    return $smarty->fetch(get_template_path($this->tplfile, TRUE, dirname(__FILE__)));
+    return $smarty->fetch(getTemplatePath($this->tplfile, TRUE, dirname(__FILE__)));
   }
 
   protected function handleFinish ()
@@ -223,7 +223,7 @@ class setupStepMigrate extends setupStep
       'checks' => [
         'class'     => ['fullwidth'],
         'name'      => _('PHP module and extension checks'),
-        'Template'  => get_template_path("setup_migrate.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => getTemplatePath("setup_migrate.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
           new FakeAttribute('checks')
         ]
@@ -805,7 +805,7 @@ class setupStepMigrate extends setupStep
                     $val_users = [];
                     if (isset($member_attrs['memberUid'])) {
                       for ($e = 0; $e < $member_attrs['memberUid']['count']; $e++) {
-                        $ldap->search('(&(objectClass=inetOrgPerson)(uid='.ldap_escape_f($member_attrs['memberUid'][$e]).'))', ['uid','dn']);
+                        $ldap->search('(&(objectClass=inetOrgPerson)(uid='.ldapEscapeF($member_attrs['memberUid'][$e]).'))', ['uid','dn']);
                         if ($user_attrs = $ldap->fetch()) {
                           $val_users[] = htmlescape(($user_attrs['uid'][0] ?? $user_attrs['dn']));
                         }
@@ -1174,7 +1174,7 @@ class setupStepMigrate extends setupStep
             $object['ldif'] = nl2br(htmlescape(sprintf(_("Entry will be moved from:\n\t%s\nto:\n\t%s"), $dn, $d_dn)));
 
             /* Check if there are references to this object */
-            $ldap->search('(&(member='.ldap_escape_f($dn).')(|(objectClass=gosaGroupOfNames)(objectClass=groupOfNames)))', ['dn']);
+            $ldap->search('(&(member='.ldapEscapeF($dn).')(|(objectClass=gosaGroupOfNames)(objectClass=groupOfNames)))', ['dn']);
             $refs = '';
             while ($attrs = $ldap->fetch()) {
               $ref_dn = $attrs['dn'];

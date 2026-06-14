@@ -29,7 +29,7 @@ class setupStepWelcome extends setupStep
     return [
       'welcome' => [
         'name'      => _('Welcome'),
-        'Template'  => get_template_path("setup_welcome.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => getTemplatePath("setup_welcome.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
         ]
       ]

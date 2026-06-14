@@ -100,7 +100,7 @@ class GenericDialogAttribute extends DialogAttribute
       $ldap->cat($value, $this->ldapAttributesToGet());
     } else {
       $ldap->cd(config()->current['BASE']);
-      $ldap->search('('.$this->store_attr.'='.ldap_escape_f($value).')', $this->ldapAttributesToGet());
+      $ldap->search('('.$this->store_attr.'='.ldapEscapeF($value).')', $this->ldapAttributesToGet());
     }
     $attrs = $ldap->fetch(TRUE);
     if (empty($attrs) && $this->isTemplate()) {

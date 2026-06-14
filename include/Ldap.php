@@ -437,7 +437,7 @@ class LDAP
   function getObjectclasses ($force_reload = FALSE)
   {
     /* Return the cached results. */
-    if (class_available('Session') && Session::isSet('LDAP_CACHE::getObjectclasses') && !$force_reload) {
+    if (classAvailable('Session') && Session::isSet('LDAP_CACHE::getObjectclasses') && !$force_reload) {
       return Session::get('LDAP_CACHE::getObjectclasses');
     }
 
@@ -508,7 +508,7 @@ class LDAP
         }
       }
     }
-    if (class_available('Session')) {
+    if (classAvailable('Session')) {
       Session::set('LDAP_CACHE::getObjectclasses', $objectclasses);
     }
 

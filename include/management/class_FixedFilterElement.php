@@ -39,10 +39,10 @@ class FixedFilterElement extends FilterElement
         'desc'  => $this->filter,
       ]
     ];
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('NAME',   _('Fixed'));
     $smarty->assign('INPUTS', $inputs);
-    return $smarty->fetch(get_template_path('management/filter-element-fixed.tpl'));
+    return $smarty->fetch(getTemplatePath('management/filter-element-fixed.tpl'));
   }
 
   public function getFilters (string $type, array &$filters): bool

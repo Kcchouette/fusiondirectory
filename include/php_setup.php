@@ -48,8 +48,8 @@ function html_trace ($errstr = "")
   static $hideArgs = [
     'LDAP/init'          => [3],
     'userinfo/loginUser' => [1],
-    'change_password'    => [1],
-    'cred_decrypt'       => [0, 1],
+    'changePassword'    => [1],
+    'credDecrypt'       => [0, 1],
     'LDAP/__construct'   => [1],
   ];
   if (!function_exists('debug_backtrace')) {

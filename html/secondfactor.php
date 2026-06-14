@@ -46,7 +46,7 @@ textdomain($domain);
 /* Remember everything we did after the last click */
 Session::start();
 Session::set('DEBUGLEVEL', 0);
-reset_errors();
+resetErrors();
 
 /* Force SSL for second factor */
 if ($ssl != '') {
@@ -95,7 +95,7 @@ if (Session::get('_LAST_PAGE_REQUEST') != '') {
 Session::set('_LAST_PAGE_REQUEST', time());
 
 foreach (LoginPost::$secondFactorMethods as $secondFactorMethod) {
-  if (!class_available($secondFactorMethod)) {
+  if (!classAvailable($secondFactorMethod)) {
     continue;
   }
   $secondFactorMethod::earlyProcess();

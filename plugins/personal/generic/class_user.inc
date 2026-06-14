@@ -340,7 +340,7 @@ class user extends SimplePlugin
     global $config;
 
     if ($this->is_template) {
-      return 'cn=' . ldap_escape_dn($this->_template_cn) . ',ou=templates,' . get_ou('userRDN') . $this->base;
+      return 'cn=' . ldapEscapeDn($this->_template_cn) . ',ou=templates,' . get_ou('userRDN') . $this->base;
     }
 
     $this->update_cn();

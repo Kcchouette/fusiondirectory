@@ -52,7 +52,7 @@ class reference extends SimplePlugin
         'attrs'     => [
           new FakeAttribute('refs')
         ],
-        'Template'  => get_template_path('contents.tpl', TRUE, dirname(__FILE__))
+        'Template'  => getTemplatePath('contents.tpl', TRUE, dirname(__FILE__))
       ],
     ];
   }

@@ -47,7 +47,7 @@ textdomain($domain);
 
 /* Remember everything we did after the last click */
 Session::start();
-reset_errors();
+resetErrors();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $safePost = array_map('htmlspecialchars', $_POST);
@@ -179,7 +179,7 @@ if (!empty($old_plugin_index) && ($old_plugin_index != $plugin_index)) {
 $ui->getSizeLimitHandler()->update();
 
 /* Check for memory */
-if (memory_get_usage() > (to_byte(ini_get('memory_limit')) - 2048000)) {
+if (memory_get_usage() > (toByte(ini_get('memory_limit')) - 2048000)) {
   $warning = new FusionDirectoryWarning(htmlescape(_('Running out of memory!')));
   $warning->display();
 }
@@ -258,14 +258,14 @@ $focus .= '</script>';
 $smarty->assign('focus',      $focus);
 $smarty->assign('CSRFtoken',  CSRFProtection::getToken());
 
-if (class_available('Game')) {
+if (classAvailable('Game')) {
   $smarty->assign('game_screen', Game::run());
 } else {
   $smarty->assign('game_screen', '');
 }
 
-$display  = $smarty->fetch(get_template_path('headers.tpl')).
-            $smarty->fetch(get_template_path('framework.tpl'));
+$display  = $smarty->fetch(getTemplatePath('headers.tpl')).
+            $smarty->fetch(getTemplatePath('framework.tpl'));
 
 /* Show page... */
 echo $display;
@@ -273,4 +273,4 @@ echo $display;
 /* Save plist and config */
 Session::set('plist', $plist);
 Session::set('Config', $config);
-reset_errors();
+resetErrors();

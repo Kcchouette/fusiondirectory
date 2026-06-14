@@ -96,7 +96,7 @@ class PluginHookManager
         foreach ($commands as $command) {
             $this->fillHookAttrs($addAttrs);
 
-            $ui = get_userinfo();
+            $ui = getUserInfo();
 
             $addAttrs['callerDN']        = $ui->dn;
             $addAttrs['callerCN']        = $ui->cn;

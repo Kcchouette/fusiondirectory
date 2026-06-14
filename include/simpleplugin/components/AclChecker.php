@@ -74,7 +74,7 @@ class AclChecker
         if (isset($this->plugin->parent) && isset($this->plugin->parent->ignoreAcls) && $this->plugin->parent->ignoreAcls) {
             return 'cdmr' . ($skipWrite ? '' : 'w');
         }
-        $ui        = get_userinfo();
+        $ui        = getUserInfo();
         $skipWrite |= $this->plugin->readOnly();
         if ($base === NULL) {
             $base = $this->getAclBase();

@@ -28,7 +28,7 @@ class setupStepFinish extends setupStep
     return [
       'welcome' => [
         'name'      => _('Welcome'),
-        'Template'  => get_template_path("setup_finish.tpl", TRUE, dirname(__FILE__)),
+        'Template'  => getTemplatePath("setup_finish.tpl", TRUE, dirname(__FILE__)),
         'attrs'     => [
         ]
       ]

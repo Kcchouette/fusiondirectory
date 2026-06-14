@@ -11,7 +11,7 @@ class HtmlHelper
      */
     public static function getTemplatePath(string $filename = '', bool $plugin = false, string $path = ''): string
     {
-        return \get_template_path($filename, $plugin, $path);
+        return \getTemplatePath($filename, $plugin, $path);
     }
 
     /**

@@ -122,7 +122,7 @@ class Tests
 
     /* STRICT adds spaces and case insenstivity to the uid check.
        This is dangerous and should not be used. */
-    if (strict_uid_mode()) {
+    if (strictUidMode()) {
       return preg_match("/^[a-z0-9_-]+$/", $uid);
     } else {
       return preg_match("/^[a-z0-9 _.-]+$/i", $uid);
@@ -292,7 +292,7 @@ class Tests
       }
     }
 
-    return in_array_ics($name, array_unique($reservedNames));
+    return inArrayIcs($name, array_unique($reservedNames));
   }
 
 

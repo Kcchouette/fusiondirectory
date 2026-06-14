@@ -28,7 +28,7 @@ require_once("../include/Utility/InputFilter.php");
 
 session_cache_limiter("private");
 Session::start();
-reset_errors();
+resetErrors();
 
 /* Logged in? Simple security check */
 if (!Session::isSet('ui')) {

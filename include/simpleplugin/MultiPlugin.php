@@ -42,7 +42,7 @@ class MultiPlugin extends SimplePlugin
 
     /* Load sections */
     foreach (config()->data['TABS'][static::$tabClass] as $plug) {
-      if (!plugin_available($plug['CLASS'])) {
+      if (!pluginAvailable($plug['CLASS'])) {
         continue;
       }
       $plInfos = Pluglist::pluginInfos($plug['CLASS']);
@@ -58,7 +58,7 @@ class MultiPlugin extends SimplePlugin
 
     /* Load sections */
     foreach (config()->data['TABS'][static::$tabClass] as $plug) {
-      if (!plugin_available($plug['CLASS'])) {
+      if (!pluginAvailable($plug['CLASS'])) {
         continue;
       }
       $plug['CLASS']::fixAttributesOnLoad($this);

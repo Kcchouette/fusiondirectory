@@ -42,7 +42,7 @@ require_once('accept-to-gettext.php');
  *  \param array $class_name list of class name
  */
 
-function fusiondirectory_autoload ($class_name)
+function fusiondirectoryAutoload ($class_name)
 {
   /* Do not try to autoload smarty classes */
   if (strpos($class_name, 'Smarty_') === 0) {
@@ -90,7 +90,7 @@ function fusiondirectory_autoload ($class_name)
     E_USER_WARNING
   );
 }
-spl_autoload_register('fusiondirectory_autoload');
+spl_autoload_register('fusiondirectoryAutoload');
 
 
 /*!
@@ -100,7 +100,7 @@ spl_autoload_register('fusiondirectory_autoload');
  *
  * \return boolean Return TRUE if successfull FALSE otherwise
  */
-function class_available ($name)
+function classAvailable ($name)
 {
   return isset(class_mapping()[$name]);
 }
@@ -115,7 +115,7 @@ function class_available ($name)
  *
  * \return boolean Return TRUE if successfull FALSE otherwise
  */
-function plugin_available ($plugin)
+function pluginAvailable ($plugin)
 {
   if (!isset(class_mapping()[$plugin])) {
     return FALSE;
@@ -179,7 +179,7 @@ function copynotice ()
  *
  * \return string Full path to the template file
  */
-function get_template_path ($filename = '', $plugin = FALSE, $path = '')
+function getTemplatePath ($filename = '', $plugin = FALSE, $path = '')
 {
   $default_theme = 'breezy';
 
@@ -243,9 +243,9 @@ function get_template_path ($filename = '', $plugin = FALSE, $path = '')
  *
  * @return array<int,mixed>
  */
-function array_remove_entries (array $needles, array $haystack): array
+function arrayRemoveEntries (array $needles, array $haystack): array
 {
-  return array_values(array_udiff($haystack, $needles, 'array_cmp_recursive'));
+  return array_values(array_udiff($haystack, $needles, 'arrayCmpRecursive'));
 }
 
 
@@ -261,7 +261,7 @@ function array_remove_entries (array $needles, array $haystack): array
  *
  * @return array<int,int|string|bool|null|float|double|object>
  */
-function array_remove_entries_ics (array $needles, array $haystack): array
+function arrayRemoveEntriesIcs (array $needles, array $haystack): array
 {
   // strcasecmp will work, because we only compare ASCII values here
   return array_values(array_udiff($haystack, $needles, 'strcasecmp'));
@@ -292,7 +292,7 @@ function array_merge_unique (array $ar1, array $ar2): array
  *
  * \param string $message the message to log
  */
-function fusiondirectory_log ($message)
+function fusiondirectoryLog ($message)
 {
   /* Preset to something reasonable */
   $username = '[unauthenticated]';
@@ -314,7 +314,7 @@ function fusiondirectory_log ($message)
  *
  * \return return the current userinfo object
  */
-function &get_userinfo ()
+function &getUserInfo ()
 {
   return user_info();
 }
@@ -324,7 +324,7 @@ function &get_userinfo ()
  *
  * \return return the global smarty object
  */
-function &get_smarty ()
+function &getSmarty ()
 {
   return smarty();
 }
@@ -347,7 +347,7 @@ function &get_smarty ()
  *
  * \return a string in the form as described above
  */
-function convert_department_dn ($dn, $base = NULL)
+function convertDepartmentDn ($dn, $base = NULL)
 {
   if ($base == NULL) {
     $base = config()->current['BASE'];
@@ -378,7 +378,7 @@ function convert_department_dn ($dn, $base = NULL)
  * Example:
  * \code
  * # Determine LDAP base where systems are stored
- * $base = get_ou('systemRDN') . $config->current['BASE'];
+ * $base = getOu('systemRDN') . $config->current['BASE'];
  * $ldap->cd($base);
  * \endcode
  *
@@ -387,7 +387,7 @@ function convert_department_dn ($dn, $base = NULL)
  * \return the ou associated the the RDN or nothing
  *
  */
-function get_ou ($name)
+function getOu ($name)
 {
   $map = [
     'fusiondirectoryRDN'      => 'ou=fusiondirectory,',
@@ -480,15 +480,15 @@ function get_ou ($name)
  *
  * \return the ou of the userRDN
  */
-function get_people_ou ()
+function getPeopleOu ()
 {
-  return get_ou('userRDN');
+  return getOu('userRDN');
 }
 
 /*! \brief Return a base from a given user DN
  *
  * \code
- * get_base_from_people('cn=Max Muster,dc=local')
+ * getBaseFromPeople('cn=Max Muster,dc=local')
  * # Result is 'dc=local'
  * \endcode
  *
@@ -496,9 +496,9 @@ function get_people_ou ()
  *
  * \return the base from the dn
  */
-function get_base_from_people ($dn)
+function getBaseFromPeople ($dn)
 {
-  $pattern  = "/^[^,]+,".preg_quote(get_people_ou(), '/')."/i";
+  $pattern  = "/^[^,]+,".preg_quote(getPeopleOu(), '/')."/i";
   $base     = preg_replace($pattern, '', $dn);
 
   /* Set to base, if we're not on a correct subtree */
@@ -520,7 +520,7 @@ function get_base_from_people ($dn)
  * \return Returns TRUE if strictNamingRules is set to TRUE or if the
  * config object is not available, otherwise FALSE.
  */
-function strict_uid_mode ()
+function strictUidMode ()
 {
   if (config() !== NULL) {
     return (config()->getCfgValue('strictNamingRules') == 'TRUE');
@@ -541,7 +541,7 @@ function strict_uid_mode ()
  *
  * \return string $value in html form.
  */
-function to_string ($value)
+function toString ($value)
 {
   /* If this is an array, generate a text blob */
   if (is_array($value)) {
@@ -609,11 +609,11 @@ function rewrite ($s)
 function dn2base ($dn, $ou = NULL)
 {
   if ($ou === NULL) {
-    if (get_people_ou() != '') {
-      $dn = preg_replace('/,'.get_people_ou().'/i', ',', $dn);
+    if (getPeopleOu() != '') {
+      $dn = preg_replace('/,'.getPeopleOu().'/i', ',', $dn);
     }
-    if (get_ou('groupRDN') != '') {
-      $dn = preg_replace('/,'.get_ou('groupRDN').'/i', ',', $dn);
+    if (getOu('groupRDN') != '') {
+      $dn = preg_replace('/,'.getOu('groupRDN').'/i', ',', $dn);
     }
   } else {
     $dn = preg_replace("/,$ou/i", ',', $dn);
@@ -632,7 +632,7 @@ function dn2base ($dn, $ou = NULL)
  *
  * \return TRUE if command exists and is executable, otherwise FALSE.
  */
-function check_command ($cmdline)
+function checkCommand ($cmdline)
 {
   $cmd = preg_replace("/ .*$/", '', $cmdline);
 
@@ -656,7 +656,7 @@ function check_command ($cmdline)
  *
  * \return string Converted netmask
  */
-function normalize_netmask ($netmask)
+function normalizeNetmask ($netmask)
 {
   /* Check for notation of netmask */
   if (!preg_match('/^([0-9]+\.){3}[0-9]+$/', $netmask)) {
@@ -690,23 +690,23 @@ function normalize_netmask ($netmask)
  *
  * Example:
  * \code
- * $bits = netmask_to_bits('255.255.255.0') # Returns 24
- * $bits = netmask_to_bits('255.255.254.0') # Returns 23
+ * $bits = netmaskToBits('255.255.255.0') # Returns 24
+ * $bits = netmaskToBits('255.255.254.0') # Returns 23
  * \endcode
  *
  * Be aware of the fact that the function does not check
  * if the given subnet mask is actually valid. For example:
  * Bad examples:
  * \code
- * $bits = netmask_to_bits('255.0.0.255') # Returns 16
- * $bits = netmask_to_bits('255.255.0.255') # Returns 24
+ * $bits = netmaskToBits('255.0.0.255') # Returns 16
+ * $bits = netmaskToBits('255.255.0.255') # Returns 24
  * \endcode
  *
  * \param $netmask given netmask
  *
  * \return the number of bits in the netmask
  */
-function netmask_to_bits ($netmask)
+function netmaskToBits ($netmask)
 {
   $nm = explode('.', $netmask, 4);
 
@@ -738,7 +738,7 @@ function netmask_to_bits ($netmask)
  * \return a byte value or the original value if specified string is simply
  * a numeric value
  */
-function to_byte ($value)
+function toByte ($value)
 {
   $value = strtolower(trim($value));
 
@@ -806,7 +806,7 @@ function humanReadableSize ($bytes, $precision = 2)
  *
  * \return Return TRUE is value is found, FALSE if not.
  */
-function in_array_ics ($value, array $items)
+function inArrayIcs ($value, array $items)
 {
   return preg_grep('/^'.preg_quote($value, '/').'$/i', $items);
 }
@@ -861,7 +861,7 @@ function rmdirRecursive ($path, $followLinks = FALSE)
  *
  * \return array content of directory in ascending sorted manner.
  */
-function scan_directory ($path, $sort_desc = FALSE)
+function scanDirectory ($path, $sort_desc = FALSE)
 {
   $ret = FALSE;
 
@@ -897,7 +897,7 @@ function scan_directory ($path, $sort_desc = FALSE)
  *
  * \param string $directory smarty compile dir
  */
-function clean_smarty_compile_dir ($directory)
+function cleanSmartyCompileDir ($directory)
 {
   if (is_dir($directory) && is_readable($directory)) {
     // Set revision filename to REVISION
@@ -907,9 +907,9 @@ function clean_smarty_compile_dir ($directory)
     if (file_exists($revision_file)) {
       // check for "$config->...['CONFIG']/revision" and the
       // contents should match the revision number
-      if (!compare_revision($revision_file, FD_VERSION)) {
+      if (!compareRevision($revision_file, FD_VERSION)) {
         // If revision differs, clean compile directory
-        foreach (scan_directory($directory) as $file) {
+        foreach (scanDirectory($directory) as $file) {
           if (($file == '.') || ($file == '..')) {
             continue;
           }
@@ -930,7 +930,7 @@ function clean_smarty_compile_dir ($directory)
     /* If the file does not exists or has just been deleted */
     if (!file_exists($revision_file)) {
       // create revision file
-      create_revision($revision_file, FD_VERSION);
+      createRevision($revision_file, FD_VERSION);
     }
   }
 }
@@ -946,7 +946,7 @@ function clean_smarty_compile_dir ($directory)
  *
  * \return TRUE if successfully created FALSE otherwise
  */
-function create_revision ($revision_file, $revision)
+function createRevision ($revision_file, $revision)
 {
   $result = FALSE;
 
@@ -988,7 +988,7 @@ function create_revision ($revision_file, $revision)
  *
  * \return TRUE if revision match FALSE otherwise
  */
-function compare_revision ($revision_file, $revision)
+function compareRevision ($revision_file, $revision)
 {
   // FALSE means revision differs
   $result = FALSE;
@@ -1027,8 +1027,8 @@ function compare_revision ($revision_file, $revision)
  *
  * \code
  * $items = array ('FOO' => 'blub', 'bar' => 'blub');
- * array_key_ics('foo', $items); # Returns 'blub'
- * array_key_ics('BAR', $items); # Returns 'blub'
+ * arrayKeyIcs('foo', $items); # Returns 'blub'
+ * arrayKeyIcs('BAR', $items); # Returns 'blub'
  * \endcode
  *
  * \param string $ikey needle
@@ -1037,7 +1037,7 @@ function compare_revision ($revision_file, $revision)
  *
  * \return return key or empty result
  */
-function array_key_ics ($ikey, array $items)
+function arrayKeyIcs ($ikey, array $items)
 {
   $tmp  = array_change_key_case($items, CASE_LOWER);
   $ikey = strtolower($ikey);
@@ -1058,7 +1058,7 @@ function array_key_ics ($ikey, array $items)
  *
  * @return bool TRUE or FALSE
  */
-function array_differs (array $src, array $dst): bool
+function arrayDiffers (array $src, array $dst): bool
 {
   /* If the count is differing, the arrays differ */
   if (count($src) != count($dst)) {
@@ -1077,9 +1077,9 @@ function array_differs (array $src, array $dst): bool
  *
  * @return bool TRUE or FALSE
  */
-function array_differs_recursive ($src, $dst): bool
+function arrayDiffersRecursive ($src, $dst): bool
 {
-  return (array_cmp_recursive($src, $dst) !== 0);
+  return (arrayCmpRecursive($src, $dst) !== 0);
 }
 
 /**
@@ -1091,7 +1091,7 @@ function array_differs_recursive ($src, $dst): bool
  *
  * @return int negative, 0 or positive if $src is <, = or > $dst
  */
-function array_cmp_recursive ($src, $dst): int
+function arrayCmpRecursive ($src, $dst): int
 {
   if (is_array($src)) {
     if (!is_array($dst)) {
@@ -1104,7 +1104,7 @@ function array_cmp_recursive ($src, $dst): int
       if (!isset($dst[$key])) {
         return 1;
       }
-      if (($cmp = array_cmp_recursive($dst[$key], $value)) !== 0) {
+      if (($cmp = arrayCmpRecursive($dst[$key], $value)) !== 0) {
         return $cmp;
       }
     }
@@ -1178,7 +1178,7 @@ function check_schema (array $cfg)
   $checks['template-fd']['IS_MUST_HAVE']     = FALSE;
   $checks['template-fd']['INFO']             = _('Used to store templates.');
 
-  if (class_available('posixAccount')) {
+  if (classAvailable('posixAccount')) {
     /* nis */
     $checks['nis'] = $def_check;
 
@@ -1216,11 +1216,11 @@ function check_schema (array $cfg)
     $checks['posixGroup']['IS_MUST_HAVE']     = TRUE;
 
     /* Depending on mixed groups plugin installation status, we need different schema configurations */
-    if (class_available('mixedGroup') && isset($objectclasses['posixGroup']['STRUCTURAL'])) {
+    if (classAvailable('mixedGroup') && isset($objectclasses['posixGroup']['STRUCTURAL'])) {
       $checks['posixGroup']['STATUS'] = FALSE;
       $checks['posixGroup']['MSG']    = _('You have installed the mixed groups plugin, but your schema configuration does not support this.');
       $checks['posixGroup']['INFO']   = _('In order to use mixed groups the objectClass "posixGroup" must be AUXILIARY');
-    } elseif (!class_available('mixedGroup') && !isset($objectclasses['posixGroup']['STRUCTURAL'])) {
+    } elseif (!classAvailable('mixedGroup') && !isset($objectclasses['posixGroup']['STRUCTURAL'])) {
       $checks['posixGroup']['STATUS'] = FALSE;
       $checks['posixGroup']['MSG']    = _('Your schema is configured to support mixed groups, but this plugin is not present.');
       $checks['posixGroup']['INFO']   = _('The objectClass "posixGroup" must be STRUCTURAL');
@@ -1241,7 +1241,7 @@ function check_schema (array $cfg)
  *
  * \return string
  */
-function get_post ($name)
+function getPost ($name)
 {
   if (!isset($_POST[$name])) {
     trigger_error("Requested POST value (".$name.") does not exists, you should add a check to prevent this message.");
@@ -1254,7 +1254,7 @@ function get_post ($name)
 /*!
  * \brief Return class name in correct case
  */
-function get_correct_class_name ($cls)
+function getCorrectClassName ($cls)
 {
   if (class_mapping() !== NULL && is_array(class_mapping())) {
     foreach (array_keys(class_mapping()) as $class) {
@@ -1281,7 +1281,7 @@ function get_correct_class_name ($cls)
  *
  * \return boolean TRUE on success and an error strings array on failure.
  */
-function change_password ($dn, $password, $hash = "")
+function changePassword ($dn, $password, $hash = "")
 {
   $userTabs = Objects::open($dn, 'user');
   $userTab  = $userTabs->getBaseObject();
@@ -1387,7 +1387,7 @@ function xmlentities ($str)
 /*!
  *  \brief Returns a random char
  */
-function get_random_char ()
+function getRandomChar ()
 {
   $randno = rand(0, 63);
   if ($randno < 12) {
@@ -1409,7 +1409,7 @@ function get_random_char ()
  *
  * \param String $password The password used
  */
-function cred_decrypt ($input, $password)
+function credDecrypt ($input, $password)
 {
   /************************* Inspired by Crypt/CBC.pm *******************************/
   $input = pack('H*', $input);
@@ -1476,12 +1476,12 @@ function mark ($needle, $haystack)
   return $result.$haystack;
 }
 
-function reset_errors ()
+function resetErrors ()
 {
   Session::set('errorsAlreadyPosted', []);
 }
 
-function load_all_classes ()
+function loadAllClasses ()
 {
   global $class_list;
   /* Initially load all classes */
@@ -1503,17 +1503,17 @@ function load_all_classes ()
   }
 }
 
-function ldap_escape_f ($str, $ignore = '')
+function ldapEscapeF ($str, $ignore = '')
 {
   return ldap_escape($str, $ignore, LDAP_ESCAPE_FILTER);
 }
 
-function ldap_escape_dn ($str, $ignore = '')
+function ldapEscapeDn ($str, $ignore = '')
 {
   return ldap_escape($str, $ignore, LDAP_ESCAPE_DN);
 }
 
-function mail_utf8 ($to, $from_user, $from_email, $subject, $message, $replyto_user = NULL, $replyto_email = NULL, $type = 'plain')
+function mailUtf8 ($to, $from_user, $from_email, $subject, $message, $replyto_user = NULL, $replyto_email = NULL, $type = 'plain')
 {
   $subject = "=?UTF-8?B?".base64_encode($subject)."?=";
 
@@ -1570,9 +1570,9 @@ function fopenWithErrorHandling (...$args)
 }
 
 // Check to see if it exists in case PHP has this function later
-if (!function_exists('mb_substr_replace')) {
+if (!function_exists('mbSubstrReplace')) {
   // Same parameters as substr_replace with the extra encoding parameter
-  function mb_substr_replace (string $string, string $replacement, $start, $length = NULL, $encoding = NULL)
+  function mbSubstrReplace (string $string, string $replacement, $start, $length = NULL, $encoding = NULL)
   {
     if ($encoding === NULL) {
       $encoding = mb_internal_encoding();

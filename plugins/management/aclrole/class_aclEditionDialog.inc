@@ -323,6 +323,6 @@ class ACLEditionDialog implements FusionDirectoryDialog
     /* Show main page */
     $smarty->assign('dialogState', $this->dialogState);
 
-    return $smarty->fetch(get_template_path('acleditiondialog.tpl', dirname(__FILE__)));
+    return $smarty->fetch(getTemplatePath('acleditiondialog.tpl', dirname(__FILE__)));
   }
 }

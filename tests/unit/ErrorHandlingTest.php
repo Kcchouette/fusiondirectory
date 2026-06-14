@@ -47,13 +47,13 @@ class ErrorHandlingTest extends TestCase
         $content = file_get_contents($file);
 
         // Find the autoload function
-        preg_match('/function fusiondirectory_autoload.*?\n\}/s', $content, $matches);
-        $this->assertNotEmpty($matches, 'fusiondirectory_autoload function not found');
+        preg_match('/function fusiondirectoryAutoload.*?\n\}/s', $content, $matches);
+        $this->assertNotEmpty($matches, 'fusiondirectoryAutoload function not found');
 
         $this->assertDoesNotMatchRegularExpression(
             '/\bexit\s*\(/',
             $matches[0],
-            'fusiondirectory_autoload still contains exit()'
+            'fusiondirectoryAutoload still contains exit()'
         );
     }
 }

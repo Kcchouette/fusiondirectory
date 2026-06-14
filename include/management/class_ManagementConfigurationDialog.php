@@ -196,7 +196,7 @@ class ManagementConfigurationDialog extends ManagementDialog
   {
     $ui = user_info();
 
-    $smarty = get_smarty();
+    $smarty = getSmarty();
     $smarty->assign('ManagementConfigurationACL', 'rw');
     $smarty->assign('fdManagementConfigACL', $ui->get_permissions(CONFIGRDN.config()->current['BASE'], 'configuration/configInLdap', 'fdManagementConfig', $this->readOnly()));
     return parent::render();

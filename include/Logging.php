@@ -141,7 +141,7 @@ class Logging
       $output .= "</div>\n";
 
       if (is_object(config()) && preg_match('/true/i', config()->getCfgValue('debugLogging', ''))) {
-        fusiondirectory_log($logline);
+        fusiondirectoryLog($logline);
       }
 
       if (($_SERVER['REQUEST_METHOD'] == 'POST') && preg_match('/index.php$/', $_SERVER['REQUEST_URI'])) {
@@ -185,7 +185,7 @@ class Logging
     } else {
       $str = '('.$entry['action'].') '.$entry['object'].' of type '.$entry['objecttype'].' '.implode(',', $entry['changes']).': '.$entry['result'];
     }
-    fusiondirectory_log($str);
+    fusiondirectoryLog($str);
   }
 
   /*

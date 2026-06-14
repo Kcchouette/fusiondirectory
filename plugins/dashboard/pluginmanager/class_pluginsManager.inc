@@ -47,7 +47,7 @@ class pluginsManager extends SimplePlugin
         'name'  => _('Plugins List'),
         'plShortName'   => _('Plugins List'),
         'attrs' => [new FakeAttribute('pluginsList')],
-        'Template' => get_template_path('plugins_list.tpl', TRUE, dirname(__FILE__)),
+        'Template' => getTemplatePath('plugins_list.tpl', TRUE, dirname(__FILE__)),
       ],
     ];
   }

@@ -509,9 +509,9 @@ class Attribute
         }
       }
       if (is_array($ldapValue)) {
-        $filter = '(|('.$this->getLdapName().'='.join(')('.$this->getLdapName().'=', array_map('ldap_escape_f', $ldapValue)).'))';
+        $filter = '(|('.$this->getLdapName().'='.join(')('.$this->getLdapName().'=', array_map('ldapEscapeF', $ldapValue)).'))';
       } else {
-        $filter = '('.$this->getLdapName().'='.ldap_escape_f($ldapValue).')';
+        $filter = '('.$this->getLdapName().'='.ldapEscapeF($ldapValue).')';
       }
       $infos = \Pluglist::pluginInfos(get_class($this->plugin));
       if ($this->uniqueFilter === NULL) {
@@ -605,7 +605,7 @@ class Attribute
           );
         }
       }
-      if (class_available('archivedObject')) {
+      if (classAvailable('archivedObject')) {
         $filter = \archivedObject::buildUniqueSearchFilter($this->getLdapName(), $ldapValue);
         $ldap->search($filter, [$this->getLdapName()]);
         if ($attrs = $ldap->fetch()) {

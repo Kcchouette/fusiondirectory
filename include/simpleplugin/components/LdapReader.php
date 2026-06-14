@@ -52,7 +52,7 @@ class LdapReader
                 if (preg_match('/^top$/i', $obj)) {
                     continue;
                 }
-                if (!isset($attrs['objectClass']) || !in_array_ics($obj, $attrs['objectClass'])) {
+                if (!isset($attrs['objectClass']) || !inArrayIcs($obj, $attrs['objectClass'])) {
                     $found = FALSE;
                     break;
                 }
@@ -182,9 +182,9 @@ class LdapReader
             $base = config()->current['BASE'];
         }
         if ($this->plugin->is_template) {
-            return 'cn=' . ldap_escape_dn($this->plugin->_template_cn) . ',ou=templates,' . $ou . $base;
+            return 'cn=' . ldapEscapeDn($this->plugin->_template_cn) . ',ou=templates,' . $ou . $base;
         }
-        return $attr . '=' . ldap_escape_dn($this->plugin->attributesAccess[$attr]->computeLdapValue()) . ',' . $ou . $base;
+        return $attr . '=' . ldapEscapeDn($this->plugin->attributesAccess[$attr]->computeLdapValue()) . ',' . $ou . $base;
     }
 
     /* \!brief Prepare $this->plugin->attrs */
@@ -290,7 +290,7 @@ class LdapReader
         $result = [];
 
         // If audit plugin is installed only.
-        if (class_available('auditConfig')) {
+        if (classAvailable('auditConfig')) {
             if (!empty(config()->current['AUDITCONFHIDDENATTRVALUES'])) {
                 if (is_string(config()->current['AUDITCONFHIDDENATTRVALUES'])) {
                     $result[] = config()->current['AUDITCONFHIDDENATTRVALUES'];
@@ -366,7 +366,7 @@ class LdapReader
             }
 
             /* Remove objectClasses from entry */
-            $this->plugin->attrs['objectClass'] = array_remove_entries_ics($this->plugin->objectclasses, $oc);
+            $this->plugin->attrs['objectClass'] = arrayRemoveEntriesIcs($this->plugin->objectclasses, $oc);
 
             /* Unset attributes from entry */
             foreach ($this->plugin->attributes as $val) {

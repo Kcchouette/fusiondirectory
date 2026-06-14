@@ -244,14 +244,14 @@ class TemplateHandling
       $ldap->cd(config()->current['BASE']);
       /* Return the first found unique value */
       foreach ($generator as $value) {
-        if (class_available('archivedObject')) {
+        if (classAvailable('archivedObject')) {
           $filter = archivedObject::buildUniqueSearchFilter($unique, $value);
           $ldap->search($filter, ['dn']);
           if ($ldap->count() > 0) {
             continue;
           }
         }
-        $filter = '('.ldap_escape_f($unique).'='.ldap_escape_f($value).')';
+        $filter = '('.ldapEscapeF($unique).'='.ldapEscapeF($value).')';
         $ldap->search($filter, ['dn']);
         if ($ldap->count() == 0) {
           return $value;
@@ -290,7 +290,7 @@ class TemplateHandling
       if ($escapeMethod !== NULL) {
         $possibility = $escapeMethod($possibility);
       }
-      $nrule = mb_substr_replace($rule, $possibility, $pos, $length);
+      $nrule = mbSubstrReplace($rule, $possibility, $pos, $length);
       foreach (static::iteratePossibleValues($nrule, $variables, $escapeMethod) as $result) {
         yield $result;
       }
@@ -337,7 +337,7 @@ class TemplateHandling
     if ($mode === 'ascii') {
       return [$str];
     } elseif ($mode === 'uid') {
-      if (strict_uid_mode()) {
+      if (strictUidMode()) {
         $str = preg_replace('/[^a-z0-9_-]/', '', mb_strtolower($str, 'UTF-8'));
       } else {
         $str = preg_replace('/[^a-zA-Z0-9 _.-]/', '', $str);

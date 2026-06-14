@@ -39,7 +39,7 @@ class PropertiesColumn extends Column
         if ($plug['CLASS'] == $infos['mainTab']) {
           continue;
         }
-        if (class_available($plug['CLASS'])) {
+        if (classAvailable($plug['CLASS'])) {
           $this->tabs[$type][] = $plug['CLASS'];
         }
       }

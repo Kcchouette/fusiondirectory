@@ -65,12 +65,12 @@ class LoginMethod
   static function checkForLockingBranch (): bool
   {
     $ldap = config()->get_ldap_link();
-    $ldap->cat(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE'], ['dn']);
+    $ldap->cat(getOu('lockRDN').getOu('fusiondirectoryRDN').config()->current['BASE'], ['dn']);
     $attrs = $ldap->fetch();
     if (!is_countable($attrs)) {
       $ldap->cd(config()->current['BASE']);
       try {
-        $ldap->create_missing_trees(get_ou('lockRDN').get_ou('fusiondirectoryRDN').config()->current['BASE']);
+        $ldap->create_missing_trees(getOu('lockRDN').getOu('fusiondirectoryRDN').config()->current['BASE']);
       } catch (FusionDirectoryError $error) {
         $error->display();
       }
@@ -229,7 +229,7 @@ class LoginMethod
       smarty()->assign('lang',           preg_replace('/_.*$/', '', $lang));
       smarty()->assign('rtl',            Language::isRTL($lang));
 
-      smarty()->display(get_template_path('headers.tpl'));
+      smarty()->display(getTemplatePath('headers.tpl'));
       echo $display;
       exit();
     }

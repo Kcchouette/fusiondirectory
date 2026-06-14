@@ -32,5 +32,5 @@ if (!$cleanup) {
   $smarty->assign('headline_image', 'geticon.php?context=applications&icon=config-welcome&size=48');
   $smarty->assign('copynotice',     copynotice());
 
-  $display = $smarty->fetch(get_template_path('welcome.tpl', TRUE));
+  $display = $smarty->fetch(getTemplatePath('welcome.tpl', TRUE));
 }

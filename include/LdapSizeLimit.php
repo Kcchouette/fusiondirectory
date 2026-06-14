@@ -112,9 +112,9 @@ class LdapSizeLimit
 
     /* Eventually show dialog */
     if ($this->limitExceeded) {
-      $smarty = get_smarty();
+      $smarty = getSmarty();
       $smarty->assign('sizelimit', $this->sizeLimit);
-      return $smarty->fetch(get_template_path('sizelimit.tpl'));
+      return $smarty->fetch(getTemplatePath('sizelimit.tpl'));
     }
 
     return '';
