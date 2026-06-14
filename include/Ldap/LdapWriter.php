@@ -17,8 +17,8 @@ class LdapWriter
             if ($this->ldap->reconnect) {
                 $this->ldap->connection->connect();
             }
-            $r = @ldap_add($this->ldap->cid, $this->ldap->basedn, $attrs);
-            $this->ldap->error = @ldap_error($this->ldap->cid);
+            $r = @ldap_add($this->ldap->cid, $this->ldap->basedn, $attrs); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             if (!$this->ldap->success()) {
                 $this->ldap->error .= $this->makeReadableErrors($this->ldap->error, $attrs);
             }
@@ -40,8 +40,8 @@ class LdapWriter
             if ($this->ldap->reconnect) {
                 $this->ldap->connection->connect();
             }
-            $r = @ldap_modify($this->ldap->cid, $this->ldap->basedn, $attrs);
-            $this->ldap->error = @ldap_error($this->ldap->cid);
+            $r = @ldap_modify($this->ldap->cid, $this->ldap->basedn, $attrs); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             if (!$this->ldap->success()) {
                 $this->ldap->error .= $this->makeReadableErrors($this->ldap->error, $attrs);
             }
@@ -63,8 +63,8 @@ class LdapWriter
             if ($this->ldap->reconnect) {
                 $this->ldap->connection->connect();
             }
-            $r            = @ldap_modify_batch($this->ldap->cid, $this->ldap->basedn, $changes);
-            $this->ldap->error  = @ldap_error($this->ldap->cid);
+            $r            = @ldap_modify_batch($this->ldap->cid, $this->ldap->basedn, $changes); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            $this->ldap->error  = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'modifyBatch('.$this->ldap->basedn.')');
             return $r;
         } else {
@@ -84,8 +84,8 @@ class LdapWriter
                 $dn = $this->ldap->basedn;
             }
 
-            $r = ldap_mod_del($this->ldap->cid, $dn, $attrs);
-            $this->ldap->error = @ldap_error($this->ldap->cid);
+            $r = @ldap_mod_del($this->ldap->cid, $dn, $attrs); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'rm('.$dn.')');
             return $r;
         } else {
@@ -105,8 +105,8 @@ class LdapWriter
                 $dn = $this->ldap->basedn;
             }
 
-            $r = @ldap_mod_add($this->ldap->cid, $dn, $attrs);
-            $this->ldap->error = @ldap_error($this->ldap->cid);
+            $r = @ldap_mod_add($this->ldap->cid, $dn, $attrs); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'modAdd('.$dn.')');
             return $r;
         } else {
@@ -122,8 +122,8 @@ class LdapWriter
             if ($this->ldap->reconnect) {
                 $this->ldap->connection->connect();
             }
-            $r = @ldap_delete($this->ldap->cid, $deletedn);
-            $this->ldap->error = @ldap_error($this->ldap->cid);
+            $r = @ldap_delete($this->ldap->cid, $deletedn); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'rmdir('.$deletedn.')');
             return ($r ? $r : 0);
         } else {
@@ -162,8 +162,8 @@ class LdapWriter
                 $this->ldap->connection->connect();
             }
             /* We have to pass TRUE as deleteoldrdn in case the attribute is single-valued */
-            $r = ldap_rename($this->ldap->cid, $source, $dest_rdn, $parent, TRUE);
-            $this->ldap->error = ldap_error($this->ldap->cid);
+            $r = @ldap_rename($this->ldap->cid, $source, $dest_rdn, $parent, TRUE); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
 
             /* Check if destination dn exists, if not the server may not support this operation */
             $r &= $this->ldap->serializer->dnExists($dest);
@@ -196,12 +196,12 @@ class LdapWriter
             /* Really Delete ALL dn's in subtree */
             $r = TRUE;
             foreach (array_keys($delarray) as $key) {
-                $r = @ldap_delete($this->ldap->cid, $key);
+                $r = @ldap_delete($this->ldap->cid, $key); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
                 if ($r === FALSE) {
                     break;
                 }
             }
-            $this->ldap->error = @ldap_error($this->ldap->cid);
+            $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'rmdirRecursive("'.$deletedn.'")');
             return ($r ? $r : 0);
         } else {

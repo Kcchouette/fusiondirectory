@@ -15,14 +15,18 @@ class LdapConnection
     {
         $this->ldap->hascon     = FALSE;
         $this->ldap->reconnect  = FALSE;
-        if ($this->ldap->cid = @ldap_connect($this->ldap->hostname)) {
-            @ldap_set_option($this->ldap->cid, LDAP_OPT_PROTOCOL_VERSION, 3);
+        if ($this->ldap->cid = @ldap_connect($this->ldap->hostname)) { /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            @ldap_set_option($this->ldap->cid, LDAP_OPT_PROTOCOL_VERSION, 3); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             if ($this->ldap->follow_referral) {
-                @ldap_set_option($this->ldap->cid, LDAP_OPT_REFERRALS, 1);
-                @ldap_set_rebind_proc($this->ldap->cid, [$this, 'rebind']);
+                @ldap_set_option($this->ldap->cid, LDAP_OPT_REFERRALS, 1); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+                @ldap_set_rebind_proc($this->ldap->cid, [$this, 'rebind']); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             }
             if ($this->ldap->tls) {
-                @ldap_start_tls($this->ldap->cid);
+                if (!@ldap_start_tls($this->ldap->cid)) { /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+                    $this->ldap->error = @ldap_error($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+                    Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, $this->ldap->error, 'connect: TLS failed');
+                    return;
+                }
             }
 
             $this->ldap->error = 'No Error';
@@ -30,8 +34,8 @@ class LdapConnection
             if (class_available('ppolicyAccount')) {
                 $serverctrls = [['oid' => LDAP_CONTROL_PASSWORDPOLICYREQUEST]];
             }
-            $result = @ldap_bind_ext($this->ldap->cid, $this->ldap->binddn, $this->ldap->bindpw, $serverctrls);
-            if (@ldap_parse_result($this->ldap->cid, $result, $errcode, $matcheddn, $errmsg, $referrals, $ctrls)) {
+            $result = @ldap_bind_ext($this->ldap->cid, $this->ldap->binddn, $this->ldap->bindpw, $serverctrls); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
+            if (@ldap_parse_result($this->ldap->cid, $result, $errcode, $matcheddn, $errmsg, $referrals, $ctrls)) { /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
                 if (isset($ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error'])) {
                     $this->ldap->hascon = FALSE;
                     switch ($ctrls[LDAP_CONTROL_PASSWORDPOLICYRESPONSE]['value']['error']) {
@@ -88,7 +92,7 @@ class LdapConnection
     function rebind ($ldap, $referral)
     {
         $credentials = $this->getCredentials($referral);
-        if (@ldap_bind($ldap, $credentials['ADMINDN'], $credentials['ADMINPASSWORD'])) {
+        if (@ldap_bind($ldap, $credentials['ADMINDN'], $credentials['ADMINPASSWORD'])) { /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             $this->ldap->error      = "Success";
             $this->ldap->hascon     = TRUE;
             $this->ldap->reconnect  = TRUE;
@@ -110,7 +114,7 @@ class LdapConnection
 
     function unbind ()
     {
-        @ldap_unbind($this->ldap->cid);
+        @ldap_unbind($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
         $this->ldap->cid = FALSE;
         Logging::debug(DEBUG_LDAP, __LINE__, __FUNCTION__, __FILE__, '', 'unbind');
     }
@@ -118,7 +122,7 @@ class LdapConnection
     function disconnect ()
     {
         if ($this->ldap->hascon) {
-            @ldap_close($this->ldap->cid);
+            @ldap_close($this->ldap->cid); /* @phpstan-ignore-line — PHP LDAP functions emit warnings on failure */
             $this->ldap->hascon = FALSE;
             $this->ldap->cid    = FALSE;
         }
