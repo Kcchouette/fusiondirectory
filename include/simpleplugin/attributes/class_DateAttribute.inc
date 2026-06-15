@@ -264,7 +264,7 @@ class TimeHisAttribute extends CompositeAttribute
     if ($this->convert) {
       $datetime = new DateTime('T'.implode(':', $values), timezone::utc());
 
-      $datetime->setTimeZone(timezone::getDefaultTimeZone());
+      $datetime->setTimeZone(new DateTimeZone(date_default_timezone_get()));
       if (count($values) < 3) {
         $values = explode(':', $datetime->format('H:i'));
       } else {
@@ -277,7 +277,7 @@ class TimeHisAttribute extends CompositeAttribute
   function writeValues (array $values)
   {
     if ($this->convert) {
-      $datetime = new DateTime('T'.implode(':', $values), timezone::getDefaultTimeZone());
+      $datetime = new DateTime('T'.implode(':', $values), new DateTimeZone(date_default_timezone_get()));
       $datetime->setTimeZone(timezone::utc());
       if (count($values) < 3) {
         $values = explode(':', $datetime->format('H:i'));
@@ -293,7 +293,7 @@ class TimeHisAttribute extends CompositeAttribute
     $values = parent::readValues($value);
     $datetime = new DateTime('T'.implode(':', $values), timezone::utc());
     if ($this->convert) {
-      $datetime->setTimeZone(timezone::getDefaultTimeZone());
+      $datetime->setTimeZone(new DateTimeZone(date_default_timezone_get()));
     }
     if (count($values) < 3) {
       return $datetime->format('H:i');
@@ -376,7 +376,7 @@ class GeneralizedTimeDisplayAttribute extends GeneralizedTimeDateAttribute
       return '';
     }
     $date = $this->getDateValue();
-    $date->setTimezone(timezone::getDefaultTimeZone());
+    $date->setTimezone(new DateTimeZone(date_default_timezone_get()));
     return htmlescape($date->format($this->displayFormat));
   }
 }

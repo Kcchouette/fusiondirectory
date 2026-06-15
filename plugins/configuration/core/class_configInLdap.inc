@@ -431,7 +431,7 @@ class configInLdap extends simplePlugin
     $languages = array_merge(["" => _("Automatic")], $languages);
     $attributesInfo['look_n_feel']['attrs'][0]->setChoices(array_keys($languages), array_values($languages));
     /* Timezones */
-    $attributesInfo['look_n_feel']['attrs'][2]->setChoices(timezone::_get_tz_zones());
+    $attributesInfo['look_n_feel']['attrs'][2]->setChoices(DateTimeZone::listIdentifiers());
     /* Password methods */
     $methods = passwordMethod::get_available_methods();
     $methods = $methods['name'];

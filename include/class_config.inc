@@ -161,9 +161,7 @@ class config
   {
     $this->last_modified  = filemtime($filename);
     $this->filename       = $filename;
-    $fh       = fopen($filename, 'r');
-    $xmldata  = fread($fh, 100000);
-    fclose($fh);
+    $xmldata  = file_get_contents($filename);
     $this->parse_data($xmldata);
   }
 
@@ -178,7 +176,7 @@ class config
     $this->parser = xml_parser_create();
     xml_set_element_handler($this->parser, [$this, "tag_open"], [$this, "tag_close"]);
 
-    if (!xml_parse($this->parser, chop($xmldata))) {
+    if (!xml_parse($this->parser, rtrim($xmldata))) {
       $msg = sprintf(_('XML error in fusiondirectory.conf: %s at line %d'),
             xml_error_string(xml_get_error_code($this->parser)),
             xml_get_current_line_number($this->parser));

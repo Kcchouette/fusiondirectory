@@ -562,48 +562,6 @@ function to_string ($value)
   }
 }
 
-/*! \brief Function to rewrite some problematic characters
- *
- * This function takes a string and replaces all possibly characters in it
- * with less problematic characters, as defined in $REWRITE.
- *
- * \param string $s the string to rewrite
- *
- * \return string $s the result of the rewrite
- */
-function rewrite ($s)
-{
-  /* Rewrite german 'umlauts' and spanish 'accents'
-   to get better results */
-  static $REWRITE = [
-    'ä' => 'ae',
-    'ö' => 'oe',
-    'ü' => 'ue',
-    'Ä' => 'Ae',
-    'Ö' => 'Oe',
-    'Ü' => 'Ue',
-    'ß' => 'ss',
-    'á' => 'a',
-    'é' => 'e',
-    'í' => 'i',
-    'ó' => 'o',
-    'ú' => 'u',
-    'Á' => 'A',
-    'É' => 'E',
-    'Í' => 'I',
-    'Ó' => 'O',
-    'Ú' => 'U',
-    'ñ' => 'ny',
-    'Ñ' => 'Ny',
-  ];
-
-  foreach ($REWRITE as $key => $val) {
-    $s = str_replace($key, $val, $s);
-  }
-
-  return $s;
-}
-
 
 /*!
  * \brief Return the base of a given DN
@@ -870,32 +828,10 @@ function rmdirRecursive ($path, $followLinks = FALSE)
  */
 function scan_directory ($path, $sort_desc = FALSE)
 {
-  $ret = FALSE;
-
-  /* is this a dir ? */
-  /* is this path a readable one */
   if (is_dir($path) && is_readable($path)) {
-    /* Get contents and write it into an array */
-    $ret = [];
-
-    $dir = opendir($path);
-
-    /* Is this a correct result ?*/
-    if ($dir) {
-      while ($fp = readdir($dir)) {
-        $ret[] = $fp;
-      }
-    }
+    return scandir($path, $sort_desc ? SCANDIR_SORT_DESCENDING : SCANDIR_SORT_ASCENDING);
   }
-  /* Sort array ascending , like scandir */
-  sort($ret);
-
-  /* Sort descending if parameter is sort_desc is set */
-  if ($sort_desc) {
-    $ret = array_reverse($ret);
-  }
-
-  return $ret;
+  return [];
 }
 
 
@@ -955,34 +891,19 @@ function clean_smarty_compile_dir ($directory)
  */
 function create_revision ($revision_file, $revision)
 {
-  $result = FALSE;
-
-  if (is_dir(dirname($revision_file)) && is_writable(dirname($revision_file))) {
-    $fh = fopenWithErrorHandling($revision_file, 'w');
-    if (is_array($fh)) {
-      $error = new FusionDirectoryError(
-        htmlescape(_('Cannot write to revision file:')).'<br/>'.
-        implode(
-          '<br/>',
-          array_map('htmlescape', $fh)
-        )
-      );
-      $error->display();
-      return $result;
-    } else {
-      if (fwrite($fh, $revision)) {
-        $result = TRUE;
-      }
-      fclose($fh);
-    }
-  }
-
-  if (!$result) {
+  if (!is_dir(dirname($revision_file)) || !is_writable(dirname($revision_file))) {
     $error = new FusionDirectoryError(htmlescape(_('Cannot write to revision file!')));
     $error->display();
+    return FALSE;
   }
 
-  return $result;
+  if (file_put_contents($revision_file, $revision) === FALSE) {
+    $error = new FusionDirectoryError(htmlescape(_('Cannot write to revision file!')));
+    $error->display();
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /*!
@@ -997,32 +918,11 @@ function create_revision ($revision_file, $revision)
  */
 function compare_revision ($revision_file, $revision)
 {
-  // FALSE means revision differs
-  $result = FALSE;
-
-  if (file_exists($revision_file) && is_readable($revision_file)) {
-    // Open file
-    $fh = fopenWithErrorHandling($revision_file, 'r');
-    if (is_array($fh)) {
-      $error = new FusionDirectoryError(
-        htmlescape(_('Cannot read revision file:')).'<br/>'.
-        implode(
-          '<br/>',
-          array_map('htmlescape', $fh)
-        )
-      );
-      $error->display();
-    } else {
-      // Compare File contents with current revision
-      if ($revision == fread($fh, filesize($revision_file))) {
-        $result = TRUE;
-      }
-      // Close file
-      fclose($fh);
-    }
+  if (!file_exists($revision_file) || !is_readable($revision_file)) {
+    return FALSE;
   }
 
-  return $result;
+  return $revision === file_get_contents($revision_file);
 }
 
 
@@ -1562,26 +1462,6 @@ function mail_utf8 ($to, $from_user, $from_email, $subject, $message, $replyto_u
   $additional_parameters = "-f".$from_email;
 
   return mail($to, $subject, $message, $headers, $additional_parameters);
-}
-
-/* Calls fopen, gives errors as an array if any, file handle if successful */
-function fopenWithErrorHandling (...$args)
-{
-  $errors = [];
-  set_error_handler(
-    function (int $errno, string $errstr, string $errfile, int $errline, array $errcontext) use (&$errors): bool
-    {
-      $errors[] = $errstr;
-
-      return TRUE;
-    }
-  );
-  $fh = @fopen(...$args);
-  restore_error_handler();
-  if ($fh !== FALSE) {
-    return $fh;
-  }
-  return $errors;
 }
 
 // Check to see if it exists in case PHP has this function later
