@@ -88,35 +88,11 @@ class setupStepChecks extends setupStep
     $M = TRUE;
     $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
 
-    /* Check for json support */
-    $N = msgPool::checkingFor('json');
-    $D = _('FusionDirectory requires this module to encode variables for javascript use.');
-    $S = msgPool::installPhpModule('json');
-    $R = function_exists('json_encode');
-    $M = TRUE;
-    $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
-
-    /* Check for filter support */
-    $N = msgPool::checkingFor('filter');
-    $D = _('FusionDirectory requires this module to filters a variable with a specified filter.');
-    $S = msgPool::installPhpModule('filter');
-    $R = function_exists('filter_var');
-    $M = TRUE;
-    $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
-
     /* Check for iconv */
     $N = msgPool::checkingFor("iconv");
     $D = _("FusionDirectory requires this module for the samba integration.");
     $S = msgPool::installPhpModule("iconv");
     $R = function_exists("iconv");
-    $M = TRUE;
-    $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];
-
-    /* Check if mbstring module is available */
-    $N = msgPool::checkingFor(_("mbstring"));
-    $D = _("FusionDirectory requires this module to handle unicode strings.");
-    $S = msgPool::installPhpModule("mbstring");
-    $R = function_exists("mb_strlen");
     $M = TRUE;
     $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];
 
@@ -126,13 +102,6 @@ class setupStepChecks extends setupStep
     $R = class_exists('Imagick', FALSE);
     $M = TRUE;
     $basic_checks[] = ['NAME' => $N , 'DESC' => $D , 'RESULT' => $R , 'SOLUTION' => $S , 'MUST' => $M ];
-
-    $N = msgPool::checkingFor(_("compression module"));
-    $D = _("FusionDirectory requires this extension to handle snapshots.");
-    $S = msgPool::installPhpModule("compile with --with-zlib");
-    $R = function_exists("gzcompress");
-    $M = FALSE;
-    $basic_checks[] = ["NAME" => $N , "DESC" => $D , "RESULT" => $R , "SOLUTION" => $S , "MUST" => $M ];
 
     /* PHP Configuration checks */
 

@@ -921,21 +921,6 @@ class config
       return FALSE;
     }
 
-    /* Check if gzcompress is available */
-    if (!function_exists('gzcompress')) {
-      /* Send message if not done already */
-      if (!session::is_set('snapshotFailMessageSend')) {
-        session::set('snapshotFailMessageSend', TRUE);
-        $error = new FusionDirectoryError(
-          htmlescape(sprintf(
-            _('The snapshot functionality is enabled, but the required compression module is missing. Please install "%s".'),
-            'php-zip / php-gzip'
-          ))
-        );
-        $error->display();
-      }
-      return FALSE;
-    }
     return TRUE;
   }
 

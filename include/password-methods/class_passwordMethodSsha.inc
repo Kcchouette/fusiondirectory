@@ -25,46 +25,22 @@
  * Source code for class passwordMethodSsha
  */
 
-/*!
- * \brief This class contains all the functions for ssha password method
- * \see passwordMethod
- */
 class passwordMethodSsha extends passwordMethod
 {
-  /*!
-   * \brief passwordMethodSsha Constructor
-   */
   function __construct ()
   {
   }
 
-  /*!
-   * \brief Is available
-   *
-   * \return TRUE if is avaibable, otherwise return false
-   */
   public function is_available (): bool
   {
-    return function_exists('sha1');
+    return TRUE;
   }
 
-  /*!
-   * \brief Generate template hash
-   *
-   * \param string $pwd Password
-   * \param bool $locked Should the password be locked
-   *
-   * \return string the password hash
-   */
   public function generate_hash (string $pwd, bool $locked = FALSE): string
   {
-    if (function_exists('sha1')) {
-      $salt = substr(pack('h*', md5(strval(random_int(0, PHP_INT_MAX)))), 0, 8);
-      $salt = substr(pack('H*', sha1($salt.$pwd)), 0, 4);
-      $pwd  = '{SSHA}'.($locked ? '!' : '').base64_encode(pack('H*', sha1($pwd.$salt)).$salt);
-    } else {
-      throw new FusionDirectoryException(msgPool::missingext('sha1'));
-    }
+    $salt = substr(pack('h*', md5(strval(random_int(0, PHP_INT_MAX)))), 0, 8);
+    $salt = substr(pack('H*', sha1($salt.$pwd)), 0, 4);
+    $pwd  = '{SSHA}'.($locked ? '!' : '').base64_encode(pack('H*', sha1($pwd.$salt)).$salt);
     return $pwd;
   }
 
@@ -73,19 +49,10 @@ class passwordMethodSsha extends passwordMethod
     $hash = base64_decode(substr($hash, 6));
     $salt = substr($hash, 20);
     $hash = substr($hash, 0, 20);
-    if (function_exists('sha1')) {
-      $nhash = pack('H*', sha1($pwd . $salt));
-    } else {
-      $error = new FusionDirectoryError(msgPool::missingext('sha1'));
-      $error->display();
-      return FALSE;
-    }
+    $nhash = pack('H*', sha1($pwd . $salt));
     return ($nhash == $hash);
   }
 
-  /*!
-   * \brief Get the hash name
-   */
   static function get_hash_name ()
   {
     return 'ssha';

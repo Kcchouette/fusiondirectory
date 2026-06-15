@@ -25,51 +25,23 @@
  * Source code for class passwordMethodSha
  */
 
-/*!
- * \brief This class contains all the functions for sha password method
- * \see passwordMethod
- */
 class passwordMethodSha extends passwordMethod
 {
-  /*!
-   * \brief passwordMethodSha Constructor
-   */
   function __construct ()
   {
   }
 
-  /*!
-   * \brief Is available
-   *
-   * \return TRUE if is avaibable, otherwise return false
-   */
   public function is_available (): bool
   {
-    return function_exists('sha1');
+    return TRUE;
   }
 
-  /*!
-   * \brief Generate template hash
-   *
-   * \param string $pwd Password
-   * \param bool $locked Should the password be locked
-   *
-   * \return string the password hash
-   */
   public function generate_hash (string $pwd, bool $locked = FALSE): string
   {
-    if (function_exists('sha1')) {
-      $hash = '{SHA}'.($locked ? '!' : '').base64_encode(pack('H*', sha1($pwd)));
-    } else {
-      throw new FusionDirectoryException(msgPool::missingext('sha1'));
-    }
-
+    $hash = '{SHA}'.($locked ? '!' : '').base64_encode(pack('H*', sha1($pwd)));
     return $hash;
   }
 
-  /*!
-   * \brief Get the hash name
-   */
   static function get_hash_name ()
   {
     return 'sha';

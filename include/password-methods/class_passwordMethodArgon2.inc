@@ -40,7 +40,7 @@ class passwordMethodArgon2 extends passwordMethod
    */
   public function is_available (): bool
   {
-    return defined('PASSWORD_ARGON2ID') && function_exists('password_hash') && function_exists('password_verify');
+    return defined('PASSWORD_ARGON2ID');
   }
 
   /*!

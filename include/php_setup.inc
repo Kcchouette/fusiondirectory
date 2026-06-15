@@ -51,9 +51,6 @@ function html_trace ($errstr = "")
     'cred_decrypt'       => [0, 1],
     'LDAP/__construct'   => [1],
   ];
-  if (!function_exists('debug_backtrace')) {
-    return ['', ''];
-  }
   $trace = array_slice(debug_backtrace(), 1);
 
   $loc = '';
