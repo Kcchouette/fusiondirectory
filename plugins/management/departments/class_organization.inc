@@ -25,26 +25,16 @@ class organization extends department
 
   static function plInfo (): array
   {
-    return [
-      'plShortName'   => _('Organization'),
-      'plDescription' => _('Organization'),
-      'plObjectClass' => ['gosaDepartment'],
-      'plFilter'      => '(&(objectClass=organization)(objectClass=gosaDepartment))',
-      'plObjectType'  => ['organization' => [
-        'aclCategory' => 'department',
-        'name'        => _('Organization'),
-        'ou'          => '',
-        'icon'        => 'geticon.php?context=types&icon=organization&size=16',
-        'tabClass'    => 'deptabs',
-        'mainAttr'    => static::$namingAttr,
-      ]],
-      'plForeignKeys'  => [
-        'manager' => ['user','dn','manager=%oldvalue%','*']
-      ],
-      'plSearchAttrs' => ['description'],
-
-      'plProvidedAcls' => parent::generatePlProvidedAcls(static::getAttributesInfo())
-    ];
+    return static::departmentBasePlInfo(
+      _('Organization'),
+      _('Organization'),
+      ['gosaDepartment'],
+      '(&(objectClass=organization)(objectClass=gosaDepartment))',
+      ['organization' => [
+        'name' => _('Organization'),
+        'icon' => 'geticon.php?context=types&icon=organization&size=16',
+      ]]
+    );
   }
 
   static function getAttributesInfo (): array

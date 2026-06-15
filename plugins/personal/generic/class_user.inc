@@ -18,31 +18,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class PostalAddressAttribute extends TextAreaAttribute
-{
-  function inputValue ($ldapValue)
-  {
-    return str_replace(
-      ['$', '\24', '\5C'],
-      ["\n", '$', '\\'],
-      $ldapValue
-    );
-  }
-
-  function computeLdapValue ()
-  {
-    return str_replace(
-      ["\r\n", "\n", "\r"],
-      '$',
-      str_replace(
-        ['\\', '$'],
-        ['\5C', '\24'],
-        $this->getValue()
-      )
-    );
-  }
-}
-
 class user extends simplePlugin
 {
   // This is used to see if the password is locked. The "was" is better interpreted as "is" - it is historical here.

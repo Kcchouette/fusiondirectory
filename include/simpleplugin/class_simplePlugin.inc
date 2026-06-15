@@ -1418,6 +1418,43 @@ class simplePlugin implements SimpleTab
     }
   }
 
+  protected function checkMemberPermissions (string $ldapAttribute, string $aclAttribute, array $currentValues, array $initialValues): array
+  {
+    global $ui;
+
+    $errors  = [];
+    $adding  = array_diff($currentValues, $initialValues);
+    $removing = array_diff($initialValues, $currentValues);
+    foreach (array_merge($adding, $removing) as $dn) {
+      if (strpos($ui->get_permissions($dn, 'user/userRoles', $aclAttribute, $this->acl_skip_write()), 'w') === FALSE) {
+        $errors[] = new SimplePluginPermissionError($this, msgPool::permModify($dn, $aclAttribute));
+      }
+    }
+    return $errors;
+  }
+
+  private static function resolveObjectTypes (string $class): array
+  {
+    if ($class == 'aclAssignment') {
+      return ['ACLASSIGNMENT'];
+    }
+    if (is_subclass_of($class, 'simpleService')) {
+      return ['SERVER'];
+    }
+    $cinfos   = pluglist::pluginInfos($class);
+    $types    = [];
+    foreach ($cinfos['plObjectType'] as $key => $objectType) {
+      if (!is_numeric($key)) {
+        $objectType = $key;
+      }
+      if (preg_match('/^ogroup-/i', $objectType)) {
+        $objectType = 'OGROUP';
+      }
+      $types[] = strtoupper($objectType);
+    }
+    return array_unique($types);
+  }
+
   /* Returns an array with the errors or an empty array */
   protected function ldap_save (): array
   {

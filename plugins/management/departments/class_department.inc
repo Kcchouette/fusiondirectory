@@ -26,28 +26,47 @@ class department extends simplePlugin
 
   static function plInfo (): array
   {
+    return static::departmentBasePlInfo(
+      _('Department'),
+      _('Departments'),
+      ['gosaDepartment'],
+      '(&(objectClass=organizationalUnit)(objectClass=gosaDepartment))',
+      ['department' => [
+        'name' => _('Department'),
+        'ou'   => '',
+        'icon' => 'geticon.php?context=places&icon=folder&size=16',
+      ]]
+    );
+  }
+
+  protected static function departmentBasePlInfo (
+    string $name,
+    string $description,
+    array $objectClasses,
+    string $filter,
+    array $objectTypeOverrides,
+    string $category = 'department'
+  ): array {
+    $objectTypeKey = array_key_first($objectTypeOverrides);
+    $objectType    = $objectTypeOverrides[$objectTypeKey];
+
     return [
-      'plShortName'   => _('Department'),
-      'plDescription' => _('Departments'),
-      /* Do not append the structural object classes here, they are added dynamically in the constructor */
-      'plObjectClass' => ['gosaDepartment'],
-      'plFilter'      => '(&(objectClass=organizationalUnit)(objectClass=gosaDepartment))',
-      'plCategory'    => ['department' => ['objectClass' => 'gosaDepartment', 'description' => _('Departments')]],
-      'plObjectType'  => [
-        'department' => [
-          'name'      => _('Department'),
-          'ou'        => '',
-          'icon'      => 'geticon.php?context=places&icon=folder&size=16',
-          'tabClass'  => 'deptabs',
-          'mainAttr'  => static::$namingAttr,
-        ]
-      ],
+      'plShortName'   => $name,
+      'plDescription' => $description,
+      'plObjectClass' => $objectClasses,
+      'plFilter'      => $filter,
+      'plCategory'    => [$category => ['objectClass' => 'gosaDepartment', 'description' => $description]],
+      'plObjectType'  => [$objectTypeKey => array_merge([
+        'aclCategory' => 'department',
+        'ou'          => '',
+        'tabClass'    => 'deptabs',
+        'mainAttr'    => static::$namingAttr,
+      ], $objectType)],
       'plForeignKeys' => [
         'manager' => ['user','dn','manager=%oldvalue%','*']
       ],
-      'plSearchAttrs' => ['description'],
-
-      'plProvidedAcls' => parent::generatePlProvidedAcls(static::getAttributesInfo())
+      'plSearchAttrs'  => ['description'],
+      'plProvidedAcls' => parent::generatePlProvidedAcls(static::getAttributesInfo()),
     ];
   }
 

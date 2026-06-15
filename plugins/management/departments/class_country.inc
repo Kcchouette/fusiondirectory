@@ -25,26 +25,16 @@ class country extends department
 
   static function plInfo (): array
   {
-    return [
-      'plShortName'   => _('Country'),
-      'plDescription' => _('Country'),
-      'plObjectClass' => ['gosaDepartment'],
-      'plFilter'      => '(&(objectClass=country)(objectClass=gosaDepartment))',
-      'plObjectType'  => ['country' => [
-        'aclCategory' => 'department',
-        'name'        => _('Country'),
-        'ou'          => '',
-        'icon'        => 'geticon.php?context=types&icon=country&size=16',
-        'tabClass'    => 'deptabs',
-        'mainAttr'    => static::$namingAttr,
-      ]],
-      'plForeignKeys'  => [
-        'manager' => ['user','dn','manager=%oldvalue%','*']
-      ],
-      'plSearchAttrs' => ['description'],
-
-      'plProvidedAcls' => parent::generatePlProvidedAcls(static::getAttributesInfo())
-    ];
+    return static::departmentBasePlInfo(
+      _('Country'),
+      _('Country'),
+      ['gosaDepartment'],
+      '(&(objectClass=country)(objectClass=gosaDepartment))',
+      ['country' => [
+        'name' => _('Country'),
+        'icon' => 'geticon.php?context=types&icon=country&size=16',
+      ]]
+    );
   }
 
   static function getAttributesInfo (): array

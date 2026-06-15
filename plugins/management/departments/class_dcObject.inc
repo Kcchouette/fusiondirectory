@@ -25,25 +25,16 @@ class dcObject extends department
 
   static function plInfo (): array
   {
-    return [
-      'plShortName'   => _('Domain Component'),
-      'plDescription' => _('Domain Component'),
-      'plObjectClass' => ['dcObject', 'gosaDepartment'],
-      'plObjectType'  => ['dcObject' => [
-        'aclCategory' => 'department',
-        'name'        => _('Domain Component'),
-        'ou'          => '',
-        'icon'        => 'geticon.php?context=types&icon=dc&size=16',
-        'tabClass'    => 'deptabs',
-        'mainAttr'    => static::$namingAttr,
-      ]],
-      'plForeignKeys'  => [
-        'manager' => ['user','dn','manager=%oldvalue%','*']
-      ],
-      'plSearchAttrs' => ['description'],
-
-      'plProvidedAcls' => parent::generatePlProvidedAcls(static::getAttributesInfo())
-    ];
+    return static::departmentBasePlInfo(
+      _('Domain Component'),
+      _('Domain Component'),
+      ['dcObject', 'gosaDepartment'],
+      '(objectClass=dcObject)',
+      ['dcObject' => [
+        'name' => _('Domain Component'),
+        'icon' => 'geticon.php?context=types&icon=dc&size=16',
+      ]]
+    );
   }
 
   static function getAttributesInfo (): array

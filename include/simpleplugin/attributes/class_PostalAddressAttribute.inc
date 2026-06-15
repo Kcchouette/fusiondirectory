@@ -1,7 +1,9 @@
 <?php
 /*
   This code is part of FusionDirectory (http://www.fusiondirectory.org/)
-  Copyright (C) 2013-2016  FusionDirectory
+
+  Copyright (C) 2003-2010  Cajus Pollmeier
+  Copyright (C) 2011-2019  FusionDirectory
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,30 +20,32 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-class domain extends department
+/*!
+ * \brief LDAP postal address attribute
+ *
+ * Handles the $-encoded postal address format in LDAP
+ */
+class PostalAddressAttribute extends TextAreaAttribute
 {
-  static protected $namingAttr  = 'dc';
-  protected $structuralOC       = ['domain'];
-
-  static function plInfo (): array
+  function inputValue ($ldapValue)
   {
-    return static::departmentBasePlInfo(
-      _('Domain'),
-      _('Domain'),
-      ['domain', 'gosaDepartment'],
-      '(objectClass=domain)',
-      ['domain' => [
-        'name' => _('Domain'),
-        'icon' => 'geticon.php?context=types&icon=domain&size=16',
-      ]]
+    return str_replace(
+      ['$', '\24', '\5C'],
+      ["\n", '$', '\\'],
+      $ldapValue
     );
   }
 
-  static function getAttributesInfo (): array
+  function computeLdapValue ()
   {
-    $attributesInfo = parent::getDepartmentAttributesInfo(_('domain'));
-    unset($attributesInfo['location']);
-    unset($attributesInfo['properties']['attrs'][3]); // category
-    return $attributesInfo;
+    return str_replace(
+      ["\r\n", "\n", "\r"],
+      '$',
+      str_replace(
+        ['\\', '$'],
+        ['\5C', '\24'],
+        $this->getValue()
+      )
+    );
   }
 }
